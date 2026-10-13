@@ -1,0 +1,147 @@
+---
+import { Image, type ImageMetadata } from "astro:assets";
+import ProductCard from "../components/ProductCard.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import heroImage from "../assets/hero-chocolates.svg";
+import products from "../data/products.json";
+
+const productImages = import.meta.glob<{ default: ImageMetadata }>("../assets/products/*.svg", {
+  eager: true,
+});
+const imagesByName = Object.fromEntries(
+  Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
+);
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+---
+
+<SiteLayout>
+  <main id="storefront" data-checkout-api={checkoutApiUrl}>
+    <section class="hero-section" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> Little batches, lots of love</p>
+        <h1>Chocolate made<br />to <em>make your day.</em></h1>
+        <p class="hero-description">
+          Thoughtful little treats, made by hand with lovely ingredients. The sort of chocolate
+          you’ll want to keep all to yourself. (We won’t tell.)
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#chocolates">Meet your new favourite <span aria-hidden="true">↘</span></a>
+          <span class="handwritten-note">made fresh, always <span aria-hidden="true">♡</span></span>
+        </div>
+        <div class="hero-proof">
+          <span class="proof-sparkle" aria-hidden="true">✳</span>
+          <span>Handmade in small batches</span>
+          <span class="proof-separator" aria-hidden="true">·</span>
+          <span>Never mass-produced</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="hero-art-frame">
+          <Image
+            src={heroImage}
+            alt="Handmade chocolate bar surrounded by cacao and pistachio"
+            width={880}
+            height={760}
+            widths={[440, 660, 880]}
+            sizes="(max-width: 620px) 90vw, 45vw"
+            format="webp"
+            quality={82}
+            priority
+            class="hero-image"
+          />
+        </div>
+        <div class="hero-stamp" aria-label="Made by hand">
+          <span>made</span>
+          <span>by hand</span>
+          <span class="stamp-heart" aria-hidden="true">♥</span>
+        </div>
+        <p class="hero-photo-caption">A little something lovely, just for you.</p>
+      </div>
+    </section>
+
+    <section class="promise-strip" aria-label="Our promise">
+      <span>Real ingredients</span>
+      <span aria-hidden="true">✳</span>
+      <span>Made fresh to order</span>
+      <span aria-hidden="true">✳</span>
+      <span>Wrapped with love</span>
+      <span aria-hidden="true">✳</span>
+      <span>Always a little special</span>
+    </section>
+
+    <section class="products-section" id="chocolates">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">The chocolate shelf</p>
+          <h2>Meet the <em>sweet ones.</em></h2>
+        </div>
+        <p>Small-batch favourites for slow afternoons, big celebrations, and everything in between.</p>
+      </div>
+      <div class="product-grid">
+        {products.map((product, index) => {
+          const image = imagesByName[product.image];
+          if (!image) throw new Error(`Product image not found: ${product.image}`);
+          return <ProductCard product={product} image={image} index={index} />;
+        })}
+      </div>
+      <p class="catalog-note">Everything is made in small batches. If your favourite sells out, it’ll be back soon.</p>
+    </section>
+
+    <section class="story-section" id="our-story">
+      <div class="story-mark" aria-hidden="true">c<span>&</span>k</div>
+      <div class="story-copy">
+        <p class="eyebrow">A tiny kitchen, a big sweet tooth</p>
+        <h2>Good chocolate<br />should feel like <em>a hug.</em></h2>
+        <p>
+          Cocoa &amp; Kind began with a saucepan, a little patience, and one too many “just one more”
+          tastings. Every piece is still made by hand, in little batches, with the kind of care
+          you can taste.
+        </p>
+        <a class="text-link" href="#chocolates">Find your happy place <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="story-aside">
+        <div class="story-note">
+          <span aria-hidden="true">“</span>
+          <p>Good things take time.<br />Great chocolate takes a little longer.</p>
+          <small>A note from our kitchen</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="kindness-section" id="kindness">
+      <div class="kindness-heading">
+        <p class="eyebrow">A few sweet details</p>
+        <h2>Good to <em>know.</em></h2>
+      </div>
+      <div class="kindness-grid">
+        <article class="kindness-card">
+          <span class="kindness-icon" aria-hidden="true">✳</span>
+          <h3>Made fresh, just for you</h3>
+          <p>We make in small batches, so every box leaves our kitchen at its very best.</p>
+        </article>
+        <article class="kindness-card">
+          <span class="kindness-icon" aria-hidden="true">♡</span>
+          <h3>Thoughtful ingredients</h3>
+          <p>Simple, lovely ingredients make chocolate that needs no big introduction.</p>
+        </article>
+        <article class="kindness-card">
+          <span class="kindness-icon" aria-hidden="true">↗</span>
+          <h3>A little note on delivery</h3>
+          <p>Delivery details and any delivery charge are confirmed with you after checkout.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing-banner">
+      <p class="eyebrow">Go on, you deserve it</p>
+      <h2>Let’s make today<br /><em>a little sweeter.</em></h2>
+      <a class="button button-light" href="#chocolates">Shop the chocolates <span aria-hidden="true">↗</span></a>
+      <span class="closing-spark closing-spark-one" aria-hidden="true">✳</span>
+      <span class="closing-spark closing-spark-two" aria-hidden="true">✳</span>
+    </section>
+  </main>
+</SiteLayout>
+
+<script>
+  import "../scripts/storefront";
+</script>

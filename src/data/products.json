@@ -1,0 +1,38 @@
+[
+  {
+    "id": "midnight-dark",
+    "name": "Midnight Dark",
+    "description": "70% single-origin chocolate with a slow, deep cocoa finish.",
+    "price": 349,
+    "image": "midnight-dark.svg",
+    "tag": "Bestseller",
+    "weight": "100 g"
+  },
+  {
+    "id": "pistachio-praline",
+    "name": "Pistachio Praline",
+    "description": "Roasted pistachio praline wrapped in silky milk chocolate.",
+    "price": 449,
+    "image": "pistachio-praline.svg",
+    "tag": "Small batch",
+    "weight": "120 g"
+  },
+  {
+    "id": "sea-salt-caramel",
+    "name": "Sea Salt Caramel",
+    "description": "Soft caramel, a pinch of sea salt, and a little bit of magic.",
+    "price": 399,
+    "image": "sea-salt-caramel.svg",
+    "tag": "A little sweet",
+    "weight": "110 g"
+  },
+  {
+    "id": "the-gift-box",
+    "name": "The Little Joy Box",
+    "description": "A gift-ready assortment of our favourite handmade treats.",
+    "price": 899,
+    "image": "the-gift-box.svg",
+    "tag": "Made for gifting",
+    "weight": "240 g"
+  }
+]

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="75" y1="35" x2="711" y2="681" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFE2D4"/>
+      <stop offset="1" stop-color="#D7C4B4"/>
+    </linearGradient>
+    <linearGradient id="box" x1="253" y1="235" x2="558" y2="583" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8C5142"/>
+      <stop offset="1" stop-color="#67372F"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h800v720H0z"/>
+  <circle cx="623" cy="137" r="77" fill="#FBF2E8" fill-opacity=".62"/>
+  <ellipse cx="408" cy="584" fill="#56362E" fill-opacity=".17" rx="219" ry="46"/>
+  <path fill="#C5A16F" d="M397 265c-76-128-190-78-116 7 31 35 83 27 116 7M416 265c76-128 190-78 116 7-31 35-83 27-116 7"/>
+  <path fill="#E5C68F" d="m399 247 16 4-5 74-16-2z"/>
+  <path fill="url(#box)" d="m228 326 175-58 183 58-16 210-162 62-165-62z"/>
+  <path fill="#A76C55" d="m228 326 180 62 178-62-178-60z"/>
+  <path fill="#D7B18A" d="m247 382 159 55 160-55-10 139-151 55-147-55z"/>
+  <path fill="#4D2924" d="m289 416 47 16-1 45-47-17zM359 440l47 16v45l-47-17zM430 440l48-16-1 45-47 17zM500 416l48-16v45l-47 17z"/>
+  <path fill="#F0DAB6" d="M334 503c22-25 56-25 76 0-20 26-54 26-76 0M409 503c22-25 56-25 76 0-20 26-54 26-76 0"/>
+  <text x="408" y="364" fill="#FFF3DE" font-family="Georgia,serif" font-size="27" text-anchor="middle">A LITTLE JOY</text>
+</svg>

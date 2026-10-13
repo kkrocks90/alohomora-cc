@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 760" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="126" y1="20" x2="802" y2="731" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2E4D6"/>
+      <stop offset="1" stop-color="#D9BFA8"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="238" y1="205" x2="563" y2="641" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#64372D"/>
+      <stop offset="1" stop-color="#321C19"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h880v760H0z"/>
+  <circle cx="675" cy="148" r="119" fill="#F8F0E8" fill-opacity=".64"/>
+  <circle cx="152" cy="581" r="64" fill="#B28968" fill-opacity=".44"/>
+  <ellipse cx="454" cy="631" fill="#54382E" fill-opacity=".17" rx="282" ry="57"/>
+  <path fill="#A37556" d="m117 415 93-99 89 99-91 96zM637 536l69-74 66 74-67 70z"/>
+  <path fill="#6D4939" d="m139 414 71-75 67 75-69 75zM655 536l51-54 48 54-49 50z"/>
+  <path fill="#9F7052" d="M265 541c-9-63 44-128 112-138 28 78-10 139-112 138zM571 348c-6-58 42-114 104-123 24 70-12 124-104 123z"/>
+  <path fill="#E2CDAF" d="M285 513c19-43 53-78 92-95-2 57-33 89-92 95zM592 328c17-38 45-68 79-83-2 49-28 77-79 83z"/>
+  <path fill="url(#bar)" d="m349 110 283 43 33 427-305 41-48-447z"/>
+  <path fill="#D7AD77" d="m349 110 283 43 11 111-303-34z"/>
+  <path fill="#F5EBDD" d="m389 270 216 25 15 216-210 28-21-269z"/>
+  <path fill="#683F32" d="M422 333h153v4H422zM429 364h137v4H429z"/>
+  <text x="501" y="423" fill="#603A30" font-family="Georgia,serif" font-size="57" text-anchor="middle">made</text>
+  <text x="502" y="460" fill="#603A30" font-family="Georgia,serif" font-size="22" letter-spacing="2" text-anchor="middle">WITH A LITTLE LOVE</text>
+  <path stroke="#F9F0E4" stroke-opacity=".65" stroke-width="2" d="m392 293 202 23"/>
+  <path fill="#F0D7B6" d="m571 183 14 11-13 14-14-11zM603 193l14 11-13 14-14-11zM630 177l14 11-13 14-14-11z"/>
+</svg>

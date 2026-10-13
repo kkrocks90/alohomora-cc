@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="75" y1="35" x2="711" y2="681" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0DDC9"/>
+      <stop offset="1" stop-color="#D9B795"/>
+    </linearGradient>
+    <linearGradient id="wrap" x1="245" y1="122" x2="532" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BA7956"/>
+      <stop offset="1" stop-color="#87513D"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h800v720H0z"/>
+  <circle cx="631" cy="132" r="78" fill="#FFF4E4" fill-opacity=".62"/>
+  <ellipse cx="408" cy="588" fill="#704631" fill-opacity=".18" rx="211" ry="42"/>
+  <path fill="#9E6345" d="m182 437 111-117 105 117-105 117zM434 508l89-94 85 94-85 94z"/>
+  <path fill="#E7C69F" d="m208 436 85-89 80 89-80 89zM458 508l65-68 61 68-61 68z"/>
+  <path fill="url(#wrap)" d="m281 133 247 37 29 370-266 36-41-390z"/>
+  <path fill="#F0CE9D" d="m281 133 247 37 9 110-264-30z"/>
+  <path fill="#FFF0D8" d="m315 274 189 22 13 189-183 25-19-236z"/>
+  <text x="409" y="357" fill="#82513A" font-family="Georgia,serif" font-size="28" text-anchor="middle">SEA SALT</text>
+  <text x="409" y="395" fill="#82513A" font-family="Georgia,serif" font-size="29" text-anchor="middle">CARAMEL</text>
+  <path fill="#D3B389" d="m353 425 12-8 9 12-12 8zM385 418l12-8 9 12-12 8zM417 425l12-8 9 12-12 8zM449 418l12-8 9 12-12 8z"/>
+  <text x="410" y="461" fill="#9B7356" font-family="Arial,sans-serif" font-size="13" letter-spacing="3" text-anchor="middle">SWEET • SALTY • SOFT</text>
+</svg>

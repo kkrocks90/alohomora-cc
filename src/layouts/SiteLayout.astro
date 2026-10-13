@@ -1,0 +1,96 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Cocoa & Kind — handmade chocolate, made with a little love",
+  description = "Small-batch handmade chocolates, lovingly made and wrapped for sharing.",
+} = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#faf7f1" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="wordmark" href={`${base}#top`} aria-label="Cocoa and Kind home">
+        <span class="wordmark-mark" aria-hidden="true">c</span>
+        <span>cocoa <i>&</i> kind</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href={`${base}#chocolates`}>The chocolates</a>
+        <a href={`${base}#our-story`}>Our little story</a>
+        <a href={`${base}#kindness`}>Good to know</a>
+      </nav>
+      <button class="bag-button" id="open-cart" type="button" aria-controls="cart-drawer" aria-expanded="false">
+        <span>My bag</span>
+        <span class="bag-count" id="bag-count" aria-live="polite">0</span>
+      </button>
+    </header>
+
+    <slot />
+
+    <footer class="site-footer">
+      <a class="wordmark footer-wordmark" href={`${base}#top`}>
+        <span class="wordmark-mark" aria-hidden="true">c</span>
+        <span>cocoa <i>&</i> kind</span>
+      </a>
+      <p>A little chocolate. A lot of heart.</p>
+      <a href={`${base}#chocolates`}>Back to the good stuff ↑</a>
+      <small>© {new Date().getFullYear()} Cocoa &amp; Kind. Made in small batches.</small>
+    </footer>
+
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true">
+      <div class="drawer-header">
+        <div>
+          <p class="eyebrow">A treat for later</p>
+          <h2 id="cart-title">Your little bag</h2>
+        </div>
+        <button class="icon-button" id="close-cart" type="button" aria-label="Close shopping bag">×</button>
+      </div>
+      <p class="empty-cart" id="empty-cart">Your bag is waiting for something lovely.</p>
+      <div class="cart-items" id="cart-items"></div>
+      <div class="cart-summary" id="cart-summary" hidden>
+        <div class="subtotal-row"><span>Subtotal</span><strong id="cart-total">₹0</strong></div>
+        <p class="delivery-note">Delivery details and any delivery charge are confirmed after you order.</p>
+        <form class="checkout-form" id="checkout-form">
+          <label>
+            Your name
+            <input name="name" autocomplete="name" maxlength="80" required />
+          </label>
+          <label>
+            Phone number
+            <input name="phone" type="tel" autocomplete="tel" maxlength="20" required />
+          </label>
+          <label>
+            Email <span class="optional-label">(optional)</span>
+            <input name="email" type="email" autocomplete="email" maxlength="120" />
+          </label>
+          <label>
+            Delivery address
+            <textarea name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
+          </label>
+          <button class="button button-primary checkout-button" id="checkout-button" type="submit">
+            Continue to secure payment
+            <span aria-hidden="true">↗</span>
+          </button>
+        </form>
+      </div>
+      <p class="checkout-status" id="checkout-status" role="status" aria-live="polite"></p>
+      <p class="payment-footnote">Secure checkout by Razorpay · Your payment details never touch our website.</p>
+    </aside>
+  </body>
+</html>

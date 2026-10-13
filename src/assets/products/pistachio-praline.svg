@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="75" y1="35" x2="711" y2="681" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6E7D5"/>
+      <stop offset="1" stop-color="#BCC6A8"/>
+    </linearGradient>
+    <linearGradient id="wrap" x1="245" y1="122" x2="532" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#687252"/>
+      <stop offset="1" stop-color="#424B34"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h800v720H0z"/>
+  <circle cx="628" cy="143" r="82" fill="#F4F0DD" fill-opacity=".58"/>
+  <ellipse cx="408" cy="588" fill="#353D2D" fill-opacity=".18" rx="211" ry="42"/>
+  <path fill="#75804F" d="M173 484c0-52 52-96 116-96 17 66-28 119-116 96zM565 490c-9-45 31-96 84-107 23 58-8 111-84 107z"/>
+  <path fill="#D9D69A" d="M198 467c18-30 52-48 84-53-8 42-36 63-84 53zM586 477c8-27 29-47 54-59-2 35-20 54-54 59z"/>
+  <path fill="url(#wrap)" d="m281 133 247 37 29 370-266 36-41-390z"/>
+  <path fill="#D9D69A" d="m281 133 247 37 9 110-264-30z"/>
+  <path fill="#F1ECD9" d="m315 274 189 22 13 189-183 25-19-236z"/>
+  <text x="409" y="359" fill="#48513B" font-family="Georgia,serif" font-size="29" text-anchor="middle">PISTACHIO</text>
+  <text x="409" y="397" fill="#48513B" font-family="Georgia,serif" font-size="27" text-anchor="middle">PRALINE</text>
+  <path stroke="#81905E" stroke-width="2" d="M355 426h109"/>
+  <text x="410" y="453" fill="#687252" font-family="Arial,sans-serif" font-size="13" letter-spacing="3" text-anchor="middle">ROASTED • CREAMY</text>
+</svg>

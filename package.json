@@ -1,0 +1,19 @@
+{
+  "name": "handmade-chocolate-shop",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.toml"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "astro": "^5.13.5",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}

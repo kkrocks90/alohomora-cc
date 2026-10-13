@@ -1,0 +1,56 @@
+---
+import { Image, type ImageMetadata } from "astro:assets";
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  weight: string;
+  tag: string;
+}
+
+interface Props {
+  product: Product;
+  image: ImageMetadata;
+  index: number;
+}
+
+const { product, image, index } = Astro.props;
+---
+
+<article class="product-card" style={`--card-index: ${index}`}>
+  <div class="product-image-wrap">
+    <Image
+      src={image}
+      alt={`${product.name} chocolate, wrapped by hand`}
+      width={800}
+      height={720}
+      widths={[320, 480, 640, 800]}
+      sizes="(max-width: 620px) 46vw, (max-width: 900px) 44vw, 25vw"
+      format="webp"
+      quality={82}
+      loading="lazy"
+      class="product-image"
+    />
+    <span class="product-tag">{product.tag}</span>
+  </div>
+  <div class="product-copy">
+    <div class="product-name-row">
+      <h3>{product.name}</h3>
+      <span class="product-weight">{product.weight}</span>
+    </div>
+    <p>{product.description}</p>
+    <div class="product-buy-row">
+      <strong>₹{product.price}</strong>
+      <button
+        class="add-button"
+        type="button"
+        data-add-to-cart={product.id}
+        aria-label={`Add ${product.name} to your bag`}
+      >
+        Add to bag <span aria-hidden="true">+</span>
+      </button>
+    </div>
+  </div>
+</article>

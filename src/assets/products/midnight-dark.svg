@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="42" x2="731" y2="678" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9DDD0"/>
+      <stop offset="1" stop-color="#CDB7A1"/>
+    </linearGradient>
+    <linearGradient id="wrap" x1="242" y1="121" x2="532" y2="591" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4B2924"/>
+      <stop offset="1" stop-color="#271613"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h800v720H0z"/>
+  <circle cx="645" cy="120" r="79" fill="#F6EDE3" fill-opacity=".58"/>
+  <ellipse cx="408" cy="588" fill="#49302A" fill-opacity=".18" rx="211" ry="42"/>
+  <path fill="#A17659" d="m182 437 111-117 105 117-105 117zM434 508l89-94 85 94-85 94z"/>
+  <path fill="#6C4738" d="m209 436 84-88 79 88-79 88zM458 508l65-68 61 68-61 68z"/>
+  <path fill="url(#wrap)" d="m281 133 247 37 29 370-266 36-41-390z"/>
+  <path fill="#D4A66E" d="m281 133 247 37 9 110-264-30z"/>
+  <path fill="#EAD9BD" d="m315 274 189 22 13 189-183 25-19-236z"/>
+  <path fill="#5A342B" d="M343 335h133v4H343zM350 365h118v4H350z"/>
+  <text x="409" y="414" fill="#5A342B" font-family="Georgia,serif" font-size="50" text-anchor="middle">70%</text>
+  <text x="410" y="449" fill="#765447" font-family="Arial,sans-serif" font-size="13" letter-spacing="4" text-anchor="middle">DARK COCOA</text>
+  <path stroke="#F6E8D1" stroke-opacity=".66" stroke-width="2" d="m317 294 176 21"/>
+</svg>

@@ -1,0 +1,6 @@
+name = "cocoa-kind-checkout"
+main = "index.js"
+compatibility_date = "2025-08-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://kkrocks90.github.io"
