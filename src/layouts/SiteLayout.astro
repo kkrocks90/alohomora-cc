@@ -34,6 +34,7 @@ const base = import.meta.env.BASE_URL;
         <a href={`${base}#our-story`}>Our little story</a>
         <a href={`${base}#kindness`}>Good to know</a>
       </nav>
+      <a class="account-link" href={`${base}account/`}>My orders</a>
       <button class="bag-button" id="open-cart" type="button" aria-controls="cart-drawer" aria-expanded="false">
         <span>My bag</span>
         <span class="bag-count" id="bag-count" aria-live="polite">0</span>
@@ -50,6 +51,7 @@ const base = import.meta.env.BASE_URL;
       <p>A little chocolate. A lot of heart.</p>
       <a href={`${base}#chocolates`}>Back to the good stuff ↑</a>
       <nav class="policy-links" aria-label="Policies">
+        <a href={`${base}account/`}>My orders</a>
         <a href={`${base}terms-and-conditions/`}>Terms &amp; Conditions</a>
         <a href={`${base}privacy-policy/`}>Privacy Policy</a>
         <a href={`${base}shipping-policy/`}>Shipping Policy</a>
@@ -81,8 +83,8 @@ const base = import.meta.env.BASE_URL;
             <input name="phone" type="tel" autocomplete="tel" maxlength="20" required />
           </label>
           <label>
-            Email <span class="optional-label">(optional)</span>
-            <input name="email" type="email" autocomplete="email" maxlength="120" />
+            Email <span class="optional-label">(used for order history)</span>
+            <input name="email" type="email" autocomplete="email" maxlength="120" required />
           </label>
           <label>
             Delivery address

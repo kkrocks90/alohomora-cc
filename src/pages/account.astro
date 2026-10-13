@@ -1,0 +1,62 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+---
+
+<SiteLayout title="My orders — Cocoa & Kind" description="Sign in securely to view your Cocoa & Kind orders.">
+  <main class="account-page" id="customer-account" data-checkout-api={checkoutApiUrl}>
+    <section class="account-panel" aria-labelledby="account-title">
+      <p class="eyebrow">Your little chocolate corner</p>
+      <h1 id="account-title">My orders</h1>
+      <p class="account-intro">
+        Enter the email address you used at checkout. We’ll send a one-time code to show your
+        paid orders.
+      </p>
+
+      <form class="account-form" id="account-email-form">
+        <label for="account-email">Email address</label>
+        <input
+          id="account-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          maxlength="120"
+          required
+        />
+        <button class="button button-primary" type="submit">Send sign-in code <span aria-hidden="true">↗</span></button>
+      </form>
+
+      <form class="account-form" id="account-code-form" hidden>
+        <label for="account-code">Six-digit code</label>
+        <input
+          id="account-code"
+          name="code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          required
+        />
+        <button class="button button-primary" type="submit">View my orders <span aria-hidden="true">↗</span></button>
+        <button class="account-text-button" id="account-change-email" type="button">Use a different email</button>
+      </form>
+
+      <p class="account-status" id="account-status" role="status" aria-live="polite"></p>
+      <section class="account-orders" id="account-orders" aria-live="polite" hidden>
+        <div class="account-orders-heading">
+          <div>
+            <p class="eyebrow">Made with love</p>
+            <h2>Your order history</h2>
+          </div>
+          <button class="account-text-button" id="account-sign-out" type="button">Sign out</button>
+        </div>
+        <div class="order-list" id="order-list"></div>
+      </section>
+    </section>
+  </main>
+  <script>
+    import "../scripts/account";
+  </script>
+</SiteLayout>

@@ -6,6 +6,12 @@ import {
   isValidDeliveryLocation,
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
+import {
+  getCustomerOrders,
+  logoutCustomer,
+  requestLoginCode,
+  verifyLoginCode,
+} from "./customer-auth.js";
 
 const encoder = new TextEncoder();
 const MAX_REQUEST_BYTES = 20_000;
@@ -19,7 +25,7 @@ function jsonResponse(body, status, origin) {
   if (origin) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     headers.set("Access-Control-Max-Age", "86400");
     headers.set("Vary", "Origin");
   }
@@ -66,9 +72,8 @@ function validateOrder(body, storeLocation) {
   if (!isValidDeliveryLocation(body.deliveryLocation)) {
     throw new Error("Please enter valid coordinates for your delivery address pin.");
   }
-  if (customer.email !== "" && customer.email !== undefined &&
-      (typeof customer.email !== "string" || customer.email.length > 120 ||
-       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email))) {
+  if (typeof customer.email !== "string" || customer.email.length > 120 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim())) {
     throw new Error("Please enter a valid email address.");
   }
   if (!Array.isArray(body.items) || body.items.length === 0 || body.items.length > products.length) {
@@ -129,7 +134,7 @@ async function handleCreateOrder(request, env, origin) {
   const notes = {
     customer_name: order.customer.name.trim(),
     phone: order.customer.phone.trim(),
-    email: typeof order.customer.email === "string" ? order.customer.email.trim() : "",
+    email: order.customer.email.trim().toLowerCase(),
     address: order.customer.address.trim(),
     items: JSON.stringify(order.items.map(({ product, quantity }) => [product.id, quantity, product.price])),
     delivery_method: order.fulfillmentMethod,
@@ -352,7 +357,7 @@ export default {
       headers: {
         "Access-Control-Allow-Origin": configuredOrigin,
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Max-Age": "86400",
         "Vary": "Origin",
       },
@@ -362,6 +367,22 @@ export default {
     const path = new URL(request.url).pathname.replace(/\/+$/, "");
     if (path === "/orders") return handleCreateOrder(request, env, configuredOrigin);
     if (path === "/verify") return handleVerifyPayment(request, env, configuredOrigin);
+    if (path === "/auth/request-code") {
+      const result = await requestLoginCode(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/auth/verify-code") {
+      const result = await verifyLoginCode(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/auth/orders") {
+      const result = await getCustomerOrders(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/auth/logout") {
+      const result = await logoutCustomer(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
     return errorResponse("Not found.", 404, configuredOrigin);
   },
 };

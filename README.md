@@ -27,6 +27,8 @@ Before deploying the worker, replace `STORE_LATITUDE` and `STORE_LONGITUDE` in `
 
 Paid orders are saved to a Cloudflare D1 database through the existing checkout Worker; a customer's browser is never used to write order data. A row is created only after the Worker verifies Razorpay's signature, confirms a captured payment, checks the amount against the product catalog, and verifies the delivery-method notes. Safe verification retries do not create duplicate orders. If the database is not set up, the Worker refuses to start payment. The database stores customer contact and delivery details, itemized products, paid amount, payment and order IDs, estimated delivery distance and method, and the customer's policy acknowledgement. It does not store payment-card information or delivery coordinates.
 
+Customers can visit **My orders** and request a one-time email code to see up to 50 of their recent paid orders. Checkout now requires an email address so new orders can be associated with the verified account. Codes expire after 10 minutes, are limited to five attempts, and can be requested once per minute per email; sessions expire after 30 days and are stored as hashes. Sign-in is limited to email addresses already associated with paid orders. Orders placed before this feature with no email address cannot be shown in customer history.
+
 Cloudflare Workers Free currently includes D1 allowances of 5 million rows read per day, 100,000 rows written per day, and 5 GB of total storage; see [Cloudflare D1 pricing and limits](https://developers.cloudflare.com/d1/platform/pricing/) before relying on a free-plan limit. Check database usage in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Metrics**. Restrict access to the Cloudflare account to trusted shop operators. Establish and follow an appropriate order-data retention period; delete records you no longer need, consistent with legal recordkeeping requirements.
 
 To create the free order database before deploying the Worker:
@@ -38,13 +40,13 @@ To create the free order database before deploying the Worker:
    ```
 
 2. Copy the `database_id` returned by Wrangler into `database_id` in `worker/wrangler.toml`. Replace both store-coordinate placeholders there with the shop's real decimal latitude and longitude.
-3. Create the order table in the remote D1 database by applying its migration:
+3. Create the order and customer sign-in tables in the remote D1 database by applying all pending migrations:
 
    ```sh
    npx wrangler d1 migrations apply cocoa-kind-orders --remote --config worker/wrangler.toml
    ```
 
-4. Deploy the Worker and finish the Razorpay setup below. Once payment and D1 are configured, test an order end to end and confirm its `paid` row appears in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Console**. If this is the GitHub Pages `main` repository, set `ALLOWED_ORIGIN` to `https://kkrocks90.github.io`. For local testing, use a localhost origin temporarily and restore the live origin before deploying to production.
+4. Deploy the Worker and finish the Razorpay and email setup below. Once payment and D1 are configured, test an order end to end and confirm its `paid` row appears in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Console**. If this is the GitHub Pages `main` repository, set `ALLOWED_ORIGIN` to `https://kkrocks90.github.io`. For local testing, use a localhost origin temporarily and restore the live origin before deploying to production.
 
 To generate reports, run SQL in the D1 Console. For example:
 
@@ -90,7 +92,7 @@ The GitHub Actions workflow builds the site and publishes it to GitHub Pages whe
 
 ## Razorpay checkout
 
-GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates Razorpay orders using server-side secrets, verifies payment signatures, and checks payment capture status. Once an order is paid and verified, the Worker also saves it in Cloudflare D1 for shop reports and follow-up. Razorpay order notes provide the Worker with the verified order details; product prices are checked against `src/data/products.json` on the server, not accepted from the browser. A customer notification email is not configured.
+GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates Razorpay orders using server-side secrets, verifies payment signatures, and checks payment capture status. Once an order is paid and verified, the Worker also saves it in Cloudflare D1 for shop reports and follow-up. Razorpay order notes provide the Worker with the verified order details; product prices are checked against `src/data/products.json` on the server, not accepted from the browser. Resend sends customer sign-in codes; order confirmation and delivery-notification emails are not configured.
 
 1. Create a Cloudflare account, the [D1 database](#free-paid-order-storage-and-reports), and a Razorpay account. Start with Razorpay test keys.
 2. Set `ALLOWED_ORIGIN` in `worker/wrangler.toml` to the website's origin (for example, `https://kkrocks90.github.io`; do not include the repository path). The shop coordinates and D1 `database_id` must also be configured before checkout is enabled.
@@ -108,7 +110,16 @@ GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates R
    npx wrangler secret put RAZORPAY_KEY_SECRET --config worker/wrangler.toml
    ```
 
-5. Copy the deployed Worker URL and add it to the repository under **Settings → Secrets and variables → Actions → Variables** as `PUBLIC_CHECKOUT_API_URL` (for example, `https://cocoa-kind-checkout.<your-subdomain>.workers.dev`). The value is public; never put a Razorpay secret in a GitHub variable, site file, or browser code.
-6. Redeploy the Pages workflow. Test a complete payment with Razorpay test mode before switching the Worker secrets to live keys.
+5. Create a [Resend](https://resend.com/) account, verify a domain you control for sending email, and choose a sender address on that verified domain. Replace the `LOGIN_FROM_EMAIL` example in `worker/wrangler.toml` with that sender. Add the Resend API key and a randomly generated secret (at least 32 characters) as Worker secrets:
+
+   ```sh
+   npx wrangler secret put RESEND_API_KEY --config worker/wrangler.toml
+   npx wrangler secret put AUTH_TOKEN_SECRET --config worker/wrangler.toml
+   ```
+
+   Wrangler prompts for each value. Do not paste credentials into this repository, GitHub Actions variables, or customer-facing website code. Resend's free plan and domain-verification requirements may change; check its current limits before relying on it.
+
+6. Copy the deployed Worker URL and add it to the repository under **Settings → Secrets and variables → Actions → Variables** as `PUBLIC_CHECKOUT_API_URL` (for example, `https://cocoa-kind-checkout.<your-subdomain>.workers.dev`). The URL is public; never put a Razorpay or Resend secret in a GitHub variable, site file, or browser code.
+7. Redeploy the Pages workflow. Test a complete payment with Razorpay test mode before switching the Worker secrets to live keys, and test customer sign-in with an email address used for a paid test order.
 
 Payment processing is not free: Razorpay charges its applicable transaction fees. GitHub Pages and Cloudflare Workers have free plans, each with their own usage limits. Until the Worker URL and Razorpay keys are configured, the storefront remains viewable but checkout clearly reports that it is not ready.

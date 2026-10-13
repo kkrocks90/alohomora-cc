@@ -22,8 +22,8 @@ import PolicyPage from "../components/PolicyPage.astro";
 
   <h2>2. Information used for an order</h2>
   <p>
-    When you check out, the website asks for your name, phone number, delivery address, and
-    optionally your email address. To calculate an approximate distance, the checkout also
+    When you check out, the website asks for your name, phone number, email address, and delivery
+    address. To calculate an approximate distance, the checkout also
     sends the delivery pin’s latitude and longitude to the shop’s Cloudflare Worker. The Worker
     calculates the straight-line distance and uses it to suggest Porter (15 km or less) or
     courier (over 15 km) for the shop to book manually. The shop’s site does not send the
@@ -37,7 +37,7 @@ import PolicyPage from "../components/PolicyPage.astro";
     delivery-method details to the shop's Cloudflare Worker. The Worker creates a Razorpay order
     and includes the supplied contact and delivery address in that payment provider's order notes
     so the shop can fulfil the order. After Razorpay confirms payment, the Worker saves your name,
-    phone, optional email, delivery address, product details, paid amount, order and payment IDs,
+    phone, email, delivery address, product details, paid amount, order and payment IDs,
     delivery-method estimate, distance, and policy acknowledgement in a Cloudflare D1 database
     controlled by the shop. Only authorized shop account users should have access to its records.
     The delivery coordinates are used to calculate distance but are not stored in this database.
@@ -45,17 +45,21 @@ import PolicyPage from "../components/PolicyPage.astro";
   </p>
   <p>
     The shopping bag is saved in your browser's local storage so it can remain available when
-    you return. This starter site does not set up advertising analytics or a separate customer
-    database. Review the production hosting, application logs, and any services you add before
-    publishing; update this notice if your actual practices differ.
+    you return. This starter site does not set up advertising analytics. Customers can request a
+    one-time email code to view paid orders associated with that address. The shop's database
+    stores only a hash of each sign-in code and session token; codes expire after 10 minutes,
+    sign-in attempts are limited, and customer sessions expire after 30 days. Sign-in codes are
+    delivered by Resend. Review the production hosting, application logs, and any services you
+    add before publishing; update this notice if your actual practices differ.
   </p>
 
   <h2>3. Payments and service providers</h2>
   <p>
     Razorpay processes payment through its own checkout. This website does not collect or store
     your full card, bank, or payment credentials. Cloudflare runs the checkout Worker, and
-    GitHub Pages hosts the static website. These providers may process information under their
-    own terms and privacy notices. Add or update this list if the shop starts using email,
+    GitHub Pages hosts the static website. Resend delivers customer sign-in codes to email
+    addresses associated with paid orders. These providers may process information under their
+    own terms and privacy notices. Add or update this list if the shop starts using
     analytics, customer-support, shipping, or other services that receive personal information.
   </p>
 

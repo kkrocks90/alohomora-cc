@@ -872,6 +872,180 @@ h2 em {
   overflow-wrap: anywhere;
 }
 
+.account-link {
+  padding: 9px 4px;
+  color: #725343;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.account-link:hover,
+.account-text-button:hover {
+  color: #a25f4c;
+}
+
+.account-page {
+  min-height: 65vh;
+  padding: 64px 20px 84px;
+}
+
+.account-panel {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: clamp(25px, 6vw, 46px);
+  border: 1px solid #e3d7ca;
+  background: #fffdf9;
+  box-shadow: 0 16px 50px rgb(65 44 31 / 5%);
+}
+
+.account-panel > .eyebrow {
+  margin-bottom: 10px;
+}
+
+.account-panel h1,
+.account-orders h2 {
+  margin: 0;
+  color: var(--cocoa-dark);
+  font-family: var(--serif);
+  font-size: clamp(38px, 7vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.account-intro {
+  max-width: 390px;
+  margin: 13px 0 25px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.account-form {
+  display: grid;
+  gap: 10px;
+}
+
+.account-form label {
+  color: #6b5549;
+  font-size: 11px;
+}
+
+.account-form input {
+  width: 100%;
+  min-height: 43px;
+  padding: 9px 11px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  outline-color: #9e7460;
+  background: #fff;
+  color: #46332a;
+  font-size: 14px;
+}
+
+.account-form .button {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.account-form[hidden],
+.account-orders[hidden] {
+  display: none;
+}
+
+.account-text-button {
+  justify-self: start;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #805744;
+  cursor: pointer;
+  font-size: 11px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.account-status {
+  min-height: 18px;
+  margin: 16px 0 0;
+  color: #416443;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.account-status[data-state="error"] {
+  color: #a43c31;
+}
+
+.account-orders {
+  margin-top: 31px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+
+.account-orders-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.account-orders-heading .eyebrow {
+  margin-bottom: 6px;
+}
+
+.account-orders h2 {
+  font-size: clamp(25px, 5vw, 34px);
+}
+
+.order-list {
+  display: grid;
+  gap: 12px;
+}
+
+.order-card {
+  padding: 16px;
+  border: 1px solid #e8ded3;
+  background: #fff;
+}
+
+.order-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #493027;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.order-paid {
+  color: #416443;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.order-card-meta,
+.account-empty {
+  margin: 8px 0;
+  color: #89786d;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.order-card ul {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 0;
+  padding-left: 17px;
+  color: #6f5d51;
+  font-size: 11px;
+}
+
 .policy-page-nav {
   display: flex;
   flex-wrap: wrap;
