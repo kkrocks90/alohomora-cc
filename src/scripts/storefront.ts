@@ -8,6 +8,8 @@ interface PaymentOrder {
   amount: number;
   currency: string;
   keyId: string;
+  fulfillmentMethod: "Porter (manual booking)" | "Courier (manual booking)";
+  distanceKm: number;
 }
 
 interface PaymentResponse {
@@ -38,37 +40,26 @@ declare global {
   }
 }
 
-const storefront = document.querySelector<HTMLElement>("#storefront");
-const openCartButton = document.querySelector<HTMLButtonElement>("#open-cart");
-const closeCartButton = document.querySelector<HTMLButtonElement>("#close-cart");
-const cartDrawer = document.querySelector<HTMLElement>("#cart-drawer");
-const backdrop = document.querySelector<HTMLElement>("#drawer-backdrop");
-const cartItems = document.querySelector<HTMLElement>("#cart-items");
-const cartSummary = document.querySelector<HTMLElement>("#cart-summary");
-const emptyCart = document.querySelector<HTMLElement>("#empty-cart");
-const cartTotal = document.querySelector<HTMLElement>("#cart-total");
-const bagCount = document.querySelector<HTMLElement>("#bag-count");
-const checkoutForm = document.querySelector<HTMLFormElement>("#checkout-form");
-const checkoutButton = document.querySelector<HTMLButtonElement>("#checkout-button");
-const checkoutStatus = document.querySelector<HTMLElement>("#checkout-status");
-
-if (
-  !storefront ||
-  !openCartButton ||
-  !closeCartButton ||
-  !cartDrawer ||
-  !backdrop ||
-  !cartItems ||
-  !cartSummary ||
-  !emptyCart ||
-  !cartTotal ||
-  !bagCount ||
-  !checkoutForm ||
-  !checkoutButton ||
-  !checkoutStatus
-) {
-  throw new Error("The storefront is missing required cart or checkout elements.");
+function requireElement<T extends HTMLElement>(selector: string): T {
+  const element = document.querySelector<T>(selector);
+  if (!element) throw new Error(`The storefront is missing the required ${selector} element.`);
+  return element;
 }
+
+const storefront = requireElement<HTMLElement>("#storefront");
+const openCartButton = requireElement<HTMLButtonElement>("#open-cart");
+const closeCartButton = requireElement<HTMLButtonElement>("#close-cart");
+const cartDrawer = requireElement<HTMLElement>("#cart-drawer");
+const backdrop = requireElement<HTMLElement>("#drawer-backdrop");
+const cartItems = requireElement<HTMLElement>("#cart-items");
+const cartSummary = requireElement<HTMLElement>("#cart-summary");
+const emptyCart = requireElement<HTMLElement>("#empty-cart");
+const cartTotal = requireElement<HTMLElement>("#cart-total");
+const bagCount = requireElement<HTMLElement>("#bag-count");
+const checkoutForm = requireElement<HTMLFormElement>("#checkout-form");
+const checkoutButton = requireElement<HTMLButtonElement>("#checkout-button");
+const checkoutStatus = requireElement<HTMLElement>("#checkout-status");
+const locationButton = requireElement<HTMLButtonElement>("#use-delivery-location");
 
 const productById = new Map<string, Product>(products.map((product) => [product.id, product]));
 const checkoutApiUrl = (storefront.dataset.checkoutApi ?? "").replace(/\/+$/, "");
@@ -181,6 +172,39 @@ openCartButton.addEventListener("click", openCart);
 closeCartButton.addEventListener("click", closeCart);
 backdrop.addEventListener("click", closeCart);
 
+locationButton.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    setStatus("Location isn’t available in this browser. Enter the delivery pin’s latitude and longitude instead.", "error");
+    return;
+  }
+
+  locationButton.disabled = true;
+  setStatus("Finding this device’s location…");
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const latitudeInput = checkoutForm.elements.namedItem("latitude");
+      const longitudeInput = checkoutForm.elements.namedItem("longitude");
+      if (!(latitudeInput instanceof HTMLInputElement) || !(longitudeInput instanceof HTMLInputElement)) {
+        throw new Error("The delivery coordinate fields are missing.");
+      }
+      latitudeInput.value = position.coords.latitude.toFixed(6);
+      longitudeInput.value = position.coords.longitude.toFixed(6);
+      setStatus("Location added. Confirm this device is at the delivery address.");
+      locationButton.disabled = false;
+    },
+    (error) => {
+      const message = error.code === error.PERMISSION_DENIED
+        ? "Location access was denied. Allow location access or enter the delivery pin’s coordinates instead."
+        : error.code === error.TIMEOUT
+          ? "Couldn’t get your location in time. Try again or enter the delivery pin’s coordinates."
+          : "Couldn’t get your location. Check your device settings or enter the delivery pin’s coordinates.";
+      setStatus(message, "error");
+      locationButton.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 },
+  );
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && cartDrawer.classList.contains("is-open")) {
     closeCart();
@@ -264,7 +288,14 @@ function isPaymentOrder(payload: unknown): payload is PaymentOrder {
     "currency" in payload &&
     payload.currency === "INR" &&
     "keyId" in payload &&
-    typeof payload.keyId === "string"
+    typeof payload.keyId === "string" &&
+    "fulfillmentMethod" in payload &&
+    (payload.fulfillmentMethod === "Porter (manual booking)" ||
+      payload.fulfillmentMethod === "Courier (manual booking)") &&
+    "distanceKm" in payload &&
+    typeof payload.distanceKm === "number" &&
+    Number.isFinite(payload.distanceKm) &&
+    payload.distanceKm >= 0
   );
 }
 
@@ -313,7 +344,23 @@ checkoutForm.addEventListener("submit", async (event) => {
     phone: String(formData.get("phone") ?? ""),
     email: String(formData.get("email") ?? ""),
     address: String(formData.get("address") ?? ""),
+    policyConsent: formData.get("policyConsent") === "on",
   };
+  const deliveryLocation = {
+    latitude: Number(formData.get("latitude")),
+    longitude: Number(formData.get("longitude")),
+  };
+  if (
+    !Number.isFinite(deliveryLocation.latitude) ||
+    deliveryLocation.latitude < -90 ||
+    deliveryLocation.latitude > 90 ||
+    !Number.isFinite(deliveryLocation.longitude) ||
+    deliveryLocation.longitude < -180 ||
+    deliveryLocation.longitude > 180
+  ) {
+    setStatus("Enter valid latitude and longitude for the delivery address pin.", "error");
+    return;
+  }
   checkoutButton.disabled = true;
   setStatus("Preparing your secure checkout…");
 
@@ -321,14 +368,16 @@ checkoutForm.addEventListener("submit", async (event) => {
     const orderResponse = await fetch(`${checkoutApiUrl}/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items, customer }),
+      body: JSON.stringify({ items, customer, deliveryLocation }),
     });
     const order = await readApiResponse(orderResponse, isPaymentOrder);
     await loadRazorpay();
 
     if (!window.Razorpay) throw new Error("Razorpay checkout is not available. Please try again.");
 
-    setStatus("");
+    setStatus(
+      `About ${order.distanceKm.toFixed(2)} km in a straight line · ${order.fulfillmentMethod}. The shop will confirm delivery details.`,
+    );
     const checkout = new window.Razorpay({
       key: order.keyId,
       amount: order.amount,

@@ -1,0 +1,85 @@
+---
+import PolicyPage from "../components/PolicyPage.astro";
+---
+
+<PolicyPage
+  title="Shipping Policy"
+  description="Check Cocoa & Kind delivery areas, shipping fees, and order timing before purchasing."
+  kicker="A little note about delivery"
+>
+  <p>
+    We want every box to arrive in lovely condition. The details below must be completed to
+    match the shop's real delivery service before this page is used to accept orders.
+  </p>
+
+  <h2>1. Delivery-method estimate</h2>
+  <p>
+    We calculate approximate straight-line distance between the shop location and the delivery
+    pin provided at checkout. At or within a 15 km radius, the order is marked
+    <strong>Porter — manual booking</strong>. Beyond 15 km, it is marked
+    <strong>courier — manual booking</strong>. This is a preliminary suggestion, not a booking,
+    delivery promise, or road-distance calculation. We check the address and arrange the
+    appropriate available service manually.
+  </p>
+
+  <h2>2. Where we deliver</h2>
+  <p>
+    Dispatch location: <strong>[ADD CITY AND STATE]</strong>. Delivery is available to:
+    <strong>[LIST STATES, PIN CODES, OR SERVICE AREA]</strong>. Areas we cannot currently serve:
+    <strong>[LIST EXCLUSIONS, OR SAY NONE IF ACCURATE]</strong>. Contact
+    <strong>[ADD CUSTOMER SUPPORT PHONE OR EMAIL]</strong> to confirm your address if you are
+    unsure. Do not accept an order for an address that has not been confirmed serviceable.
+  </p>
+
+  <h2>3. Shipping fee — required before taking payment</h2>
+  <p>
+    <strong>
+      The current Razorpay checkout charges the chocolate subtotal only; it does not calculate or
+      collect shipping. Do not accept live payments until the actual shipping fee is included in
+      the amount shown to the customer before payment.
+    </strong>
+  </p>
+  <p>
+    Set out the real delivery fee or rate by area or order, any free-delivery threshold, and
+    whether taxes or handling are included: <strong>[ADD SHIPPING CHARGES AND ANY CONDITIONS]</strong>.
+    Never add an undisclosed delivery charge after payment. If a parcel cannot be sent for the
+    paid amount, contact the customer and follow the published cancellation and refund policy
+    before proceeding.
+  </p>
+
+  <h2>4. Preparation and delivery estimates</h2>
+  <p>
+    Order preparation time: <strong>[ADD NUMBER OF BUSINESS DAYS]</strong>. Estimated transit
+    time by service area: <strong>[ADD DELIVERY ESTIMATES]</strong>. Orders are handed to the
+    delivery provider after payment and address confirmation. State cut-off times, weekend or
+    holiday handling, and how customers receive tracking information:
+    <strong>[ADD DISPATCH, HOLIDAY, AND TRACKING DETAILS]</strong>.
+  </p>
+  <p>
+    Estimates are not guaranteed arrival dates. Tell customers how to contact the shop about a
+    delayed parcel: <strong>[ADD DELAY AND LOST-PARCEL PROCESS]</strong>.
+  </p>
+
+  <h2>5. Chocolate care and delivery issues</h2>
+  <p>
+    Add how the products are packed and any verified temperature or weather limitations:
+    <strong>[ADD ACTUAL CHOCOLATE PACKAGING, STORAGE, AND WARM-WEATHER DELIVERY DETAILS]</strong>.
+    Please provide a complete, accessible delivery address and phone number. Explain what
+    happens when a delivery attempt fails, an address is incorrect, or a parcel arrives damaged,
+    incorrect, or incomplete: <strong>[ADD REDELIVERY AND DELIVERY-ISSUE PROCESS]</strong>.
+  </p>
+
+  <h2>6. Cancellation and refunds</h2>
+  <p>
+    For cancellation, returns, refunds, or replacement requests, use the process and contact
+    details in the shop's <a href="../terms-and-conditions/">Terms &amp; Conditions</a>:
+    <strong>[ADD LINKED, COMPLETE CANCELLATION AND REFUND TERMS BEFORE LAUNCH]</strong>. Customer
+    rights required by law continue to apply.
+  </p>
+
+  <h2>7. Questions</h2>
+  <p>
+    Delivery and address enquiries: <strong>[ADD CUSTOMER SUPPORT EMAIL AND PHONE]</strong>.
+    Effective date: <strong>[ADD EFFECTIVE DATE]</strong>.
+  </p>
+</PolicyPage>

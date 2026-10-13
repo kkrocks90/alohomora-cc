@@ -4,3 +4,5 @@ compatibility_date = "2025-08-01"
 
 [vars]
 ALLOWED_ORIGIN = "https://kkrocks90.github.io"
+STORE_LATITUDE = "REPLACE_WITH_STORE_LATITUDE"
+STORE_LONGITUDE = "REPLACE_WITH_STORE_LONGITUDE"

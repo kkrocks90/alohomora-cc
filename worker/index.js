@@ -1,9 +1,14 @@
 import products from "../src/data/products.json";
+import {
+  getDistanceKm,
+  getFulfillmentMethod,
+  getStoreLocation,
+  isValidDeliveryLocation,
+} from "./delivery.js";
 
 const encoder = new TextEncoder();
 const MAX_REQUEST_BYTES = 20_000;
 const MAX_QUANTITY = 20;
-
 function jsonResponse(body, status, origin) {
   const headers = new Headers({
     "Content-Type": "application/json; charset=utf-8",
@@ -40,7 +45,7 @@ async function readBody(request) {
   }
 }
 
-function validateOrder(body) {
+function validateOrder(body, storeLocation) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new Error("Order details are missing.");
   }
@@ -49,11 +54,17 @@ function validateOrder(body) {
   if (!customer || typeof customer !== "object" || Array.isArray(customer)) {
     throw new Error("Please provide your contact and delivery details.");
   }
+  if (customer.policyConsent !== true) {
+    throw new Error("Please review and agree to the shop policies before continuing.");
+  }
   if (!isValidText(customer.name, 80)) throw new Error("Please enter your name.");
   if (!isValidText(customer.phone, 20) || !/^\+?[0-9\s()-]{7,20}$/.test(customer.phone.trim())) {
     throw new Error("Please enter a valid phone number.");
   }
   if (!isValidText(customer.address, 250)) throw new Error("Please enter a delivery address.");
+  if (!isValidDeliveryLocation(body.deliveryLocation)) {
+    throw new Error("Please enter valid coordinates for your delivery address pin.");
+  }
   if (customer.email !== "" && customer.email !== undefined &&
       (typeof customer.email !== "string" || customer.email.length > 120 ||
        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email))) {
@@ -79,7 +90,14 @@ function validateOrder(body) {
 
   const amount = items.reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
   if (!Number.isSafeInteger(amount) || amount <= 0) throw new Error("Your order total is invalid.");
-  return { customer, items, amount };
+  const distanceKm = getDistanceKm(storeLocation, body.deliveryLocation);
+  return {
+    customer,
+    items,
+    amount,
+    distanceKm,
+    fulfillmentMethod: getFulfillmentMethod(distanceKm),
+  };
 }
 
 function hexToBytes(value) {
@@ -92,9 +110,14 @@ async function handleCreateOrder(request, env, origin) {
     return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
 
+  const storeLocation = getStoreLocation(env);
+  if (!storeLocation) {
+    return errorResponse("Delivery-distance checkout is not configured yet. Please contact the shop.", 503, origin);
+  }
+
   let order;
   try {
-    order = validateOrder(await readBody(request));
+    order = validateOrder(await readBody(request), storeLocation);
   } catch (error) {
     return errorResponse(error.message, 400, origin);
   }
@@ -105,6 +128,9 @@ async function handleCreateOrder(request, env, origin) {
     email: typeof order.customer.email === "string" ? order.customer.email.trim() : "",
     address: order.customer.address.trim(),
     items: order.items.map(({ product, quantity }) => `${quantity} x ${product.name}`).join(", "),
+    delivery_method: order.fulfillmentMethod,
+    distance_km: order.distanceKm.toFixed(2),
+    policies_ok: "terms_conditions, privacy_policy, shipping_policy",
   };
   const payload = {
     amount: order.amount,
@@ -149,6 +175,8 @@ async function handleCreateOrder(request, env, origin) {
     amount: providerOrder.amount,
     currency: providerOrder.currency,
     keyId: env.RAZORPAY_KEY_ID,
+    fulfillmentMethod: order.fulfillmentMethod,
+    distanceKm: Number(order.distanceKm.toFixed(2)),
   }, 201, origin);
 }
 

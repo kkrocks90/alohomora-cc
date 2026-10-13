@@ -1,0 +1,90 @@
+---
+import PolicyPage from "../components/PolicyPage.astro";
+---
+
+<PolicyPage
+  title="Privacy Policy"
+  description="Learn what information Cocoa & Kind collects for chocolate orders and how it is used."
+  kicker="Your information, handled thoughtfully"
+>
+  <p>
+    This draft explains how the sample shop's checkout is designed. Confirm the details and
+    replace every bracketed prompt before publishing; have the final notice reviewed for the
+    privacy laws that apply to your business and customers.
+  </p>
+
+  <h2>1. Who is responsible for your information</h2>
+  <p>
+    The shop operator is <strong>[ADD FULL LEGAL BUSINESS OR OWNER NAME]</strong>, trading as
+    Cocoa &amp; Kind. Privacy contact: <strong>[ADD PRIVACY OR CUSTOMER SUPPORT EMAIL]</strong>,
+    <strong>[ADD BUSINESS ADDRESS]</strong>.
+  </p>
+
+  <h2>2. Information used for an order</h2>
+  <p>
+    When you check out, the website asks for your name, phone number, delivery address, and
+    optionally your email address. To calculate an approximate distance, the checkout also
+    sends the delivery pin’s latitude and longitude to the shop’s Cloudflare Worker. The Worker
+    calculates the straight-line distance and uses it to suggest Porter (15 km or less) or
+    courier (over 15 km) for the shop to book manually. The shop’s site does not send the
+    coordinates to an external geocoding or distance API or include them in Razorpay order notes.
+    If you choose your device’s location, your browser or device’s location services may process
+    location information under their own terms. Provide the delivery pin, rather than a different
+    current location, so the estimate is useful.
+  </p>
+  <p>
+    The checkout sends your contact and delivery details and the selected product and manual
+    delivery-method details to the shop's Cloudflare Worker. The Worker creates a Razorpay order
+    and includes the supplied contact and delivery address in that payment provider's order notes
+    so the shop can fulfil the order. Provide only information needed to contact you and deliver
+    your purchase.
+  </p>
+  <p>
+    The shopping bag is saved in your browser's local storage so it can remain available when
+    you return. This starter site does not set up advertising analytics or a separate customer
+    database. Review the production hosting, application logs, and any services you add before
+    publishing; update this notice if your actual practices differ.
+  </p>
+
+  <h2>3. Payments and service providers</h2>
+  <p>
+    Razorpay processes payment through its own checkout. This website does not collect or store
+    your full card, bank, or payment credentials. Cloudflare runs the checkout Worker, and
+    GitHub Pages hosts the static website. These providers may process information under their
+    own terms and privacy notices. Add or update this list if the shop starts using email,
+    analytics, customer-support, shipping, or other services that receive personal information.
+  </p>
+
+  <h2>4. How the shop uses information</h2>
+  <p>
+    The intended use is to create and confirm payment orders, contact you about an order, arrange
+    its delivery, and respond to a question or issue. Add the shop's accurate retention schedule,
+    accounting or legal recordkeeping purposes, and any other use before publishing:
+    <strong>[ADD ACTUAL RETENTION PERIODS AND ANY OTHER PURPOSES]</strong>. This starter site
+    does not subscribe customers to marketing messages.
+  </p>
+
+  <h2>5. Your privacy choices and requests</h2>
+  <p>
+    To ask about, correct, or request deletion of information, contact
+    <strong>[ADD PRIVACY OR CUSTOMER SUPPORT EMAIL]</strong>. Add the rights available to
+    customers, response process, and any applicable privacy authority contact after reviewing
+    local requirements: <strong>[ADD APPLICABLE PRIVACY RIGHTS AND REQUEST PROCESS]</strong>.
+    Some payment or accounting records may need to be retained when required by law.
+  </p>
+
+  <h2>6. Security and children</h2>
+  <p>
+    Checkout uses a server-side Worker to keep Razorpay secret credentials out of the website's
+    public code. No internet transmission or storage is entirely risk-free. Add the shop's
+    contact and response steps for a suspected privacy incident:
+    <strong>[ADD PRIVACY INCIDENT CONTACT OR PROCESS]</strong>.
+  </p>
+
+  <h2>7. Updates and contact</h2>
+  <p>
+    We will update this page if the shop's practices change. Effective date:
+    <strong>[ADD EFFECTIVE DATE]</strong>. Privacy questions:
+    <strong>[ADD PRIVACY OR CUSTOMER SUPPORT EMAIL AND POSTAL ADDRESS]</strong>.
+  </p>
+</PolicyPage>
