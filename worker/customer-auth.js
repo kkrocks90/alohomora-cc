@@ -73,9 +73,9 @@ async function sendCode(email, code, env) {
     body: JSON.stringify({
       from: env.LOGIN_FROM_EMAIL,
       to: [email],
-      subject: "Your Cocoa & Kind sign-in code",
-      text: `Your Cocoa & Kind sign-in code is ${code}. It expires in 10 minutes. If you did not request this code, you can ignore this email.`,
-      html: `<p>Your Cocoa &amp; Kind sign-in code is:</p><p style="font-size:28px;font-weight:bold;letter-spacing:6px">${code}</p><p>It expires in 10 minutes. If you did not request this code, you can ignore this email.</p>`,
+      subject: "Your Chocolate Circle sign-in code",
+      text: `Your Chocolate Circle sign-in code is ${code}. It expires in 10 minutes. If you did not request this code, you can ignore this email.`,
+      html: `<p>Your Chocolate Circle sign-in code is:</p><p style="font-size:28px;font-weight:bold;letter-spacing:6px">${code}</p><p>It expires in 10 minutes. If you did not request this code, you can ignore this email.</p>`,
     }),
   });
   if (!response.ok) {

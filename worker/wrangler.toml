@@ -6,7 +6,7 @@ compatibility_date = "2025-08-01"
 ALLOWED_ORIGIN = "https://kkrocks90.github.io"
 STORE_LATITUDE = "REPLACE_WITH_STORE_LATITUDE"
 STORE_LONGITUDE = "REPLACE_WITH_STORE_LONGITUDE"
-LOGIN_FROM_EMAIL = "Cocoa & Kind <orders@example.com>"
+LOGIN_FROM_EMAIL = "Chocolate Circle <orders@example.com>"
 
 [[d1_databases]]
 binding = "ORDERS_DB"

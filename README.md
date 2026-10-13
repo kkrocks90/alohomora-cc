@@ -1,4 +1,4 @@
-# Cocoa & Kind chocolate shop
+# Chocolate Circle chocolate shop
 
 A fast, static Astro storefront for a small handmade-chocolate business. The sample shop name, descriptions, prices, and illustrated wrappers are placeholders; update them before publishing. Product details live in one JSON file. The supplied illustrations are lightweight SVGs; Astro creates responsive WebP variants at build time when you add raster product photographs.
 
@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Edit `src/data/products.json` to add or change products. Prices are whole Indian rupees. For each product, add a matching image under `src/assets/products/`; use a `.jpg`, `.png`, or `.webp` image instead of the sample `.svg` when you have product photography. Astro generates responsive, optimized WebP images from raster photos during the site build; SVG illustrations remain vector artwork. Keep product IDs unique, and use the same file name in the JSON `image` field.
+Edit `src/data/products.json` to add or change products. Prices are whole Indian rupees. Set `"featured": true` to highlight a product on the home page; every product appears in the `/store/` catalog, which supports search, tag filtering, sorting, and infinite scroll with a load-more button. For each product, add a matching image under `src/assets/products/`; use a `.jpg`, `.png`, or `.webp` image instead of the sample `.svg` when you have product photography. Astro generates responsive, optimized WebP images from raster photos during the site build; SVG illustrations remain vector artwork. Keep product IDs unique, and use the same file name in the JSON `image` field.
 
 Before launch, replace the sample name, product details, and illustrations with accurate business and product information. Add verified ingredient/allergen, weight, storage, delivery, contact, and applicable food-license details and customer policies. Change the shop name in `src/layouts/SiteLayout.astro`, `src/pages/index.astro`, and `src/scripts/storefront.ts`; update the brand colors and layout in `src/styles/global.css`.
 

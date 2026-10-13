@@ -398,7 +398,7 @@ checkoutForm.addEventListener("submit", async (event) => {
       key: order.keyId,
       amount: order.amount,
       currency: order.currency,
-      name: "Cocoa & Kind",
+      name: "Chocolate Circle",
       description: "Handmade chocolate order",
       order_id: order.id,
       prefill: {

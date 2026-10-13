@@ -6,7 +6,8 @@
     "price": 349,
     "image": "midnight-dark.svg",
     "tag": "Bestseller",
-    "weight": "100 g"
+    "weight": "100 g",
+    "featured": true
   },
   {
     "id": "pistachio-praline",
@@ -15,7 +16,8 @@
     "price": 449,
     "image": "pistachio-praline.svg",
     "tag": "Small batch",
-    "weight": "120 g"
+    "weight": "120 g",
+    "featured": true
   },
   {
     "id": "sea-salt-caramel",
@@ -33,6 +35,7 @@
     "price": 899,
     "image": "the-gift-box.svg",
     "tag": "Made for gifting",
-    "weight": "240 g"
+    "weight": "240 g",
+    "featured": true
   }
 ]

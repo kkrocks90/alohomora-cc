@@ -8,6 +8,7 @@ interface Product {
   price: number;
   weight: string;
   tag: string;
+  featured?: boolean;
 }
 
 interface Props {
@@ -19,7 +20,15 @@ interface Props {
 const { product, image, index } = Astro.props;
 ---
 
-<article class="product-card" style={`--card-index: ${index}`}>
+<article
+  class="product-card"
+  data-product-name={product.name.toLowerCase()}
+  data-product-search={`${product.name} ${product.description} ${product.tag}`.toLowerCase()}
+  data-product-tag={product.tag}
+  data-product-price={product.price}
+  data-product-featured={product.featured ? "true" : "false"}
+  style={`--card-index: ${index}`}
+>
   <div class="product-image-wrap">
     <Image
       src={image}

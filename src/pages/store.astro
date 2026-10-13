@@ -1,0 +1,69 @@
+---
+import { Image, type ImageMetadata } from "astro:assets";
+import ProductCard from "../components/ProductCard.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import products from "../data/products.json";
+
+const productImages = import.meta.glob<{ default: ImageMetadata }>("../assets/products/*.svg", {
+  eager: true,
+});
+const imagesByName = Object.fromEntries(
+  Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
+);
+const tags = [...new Set(products.map((product) => product.tag))].sort((a, b) => a.localeCompare(b));
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+---
+
+<SiteLayout title="Shop all chocolates — Chocolate Circle" description="Browse handmade Chocolate Circle treats. Filter and sort the full chocolate collection.">
+  <main class="store-page" id="storefront" data-checkout-api={checkoutApiUrl}>
+    <section class="store-heading">
+      <p class="eyebrow">The whole chocolate shelf</p>
+      <h1>Find your <em>sweet spot.</em></h1>
+      <p>Small-batch chocolates, made by hand and ready to make someone’s day.</p>
+    </section>
+
+    <section class="store-results" aria-label="Chocolate collection">
+      <div class="store-toolbar">
+        <label class="store-search">
+          <span>Search chocolates</span>
+          <input id="store-search" type="search" placeholder="Try caramel or pistachio" autocomplete="off" />
+        </label>
+        <label>
+          <span>Filter by</span>
+          <select id="store-filter">
+            <option value="">All chocolates</option>
+            {tags.map((tag) => <option value={tag}>{tag}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>Sort by</span>
+          <select id="store-sort">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: low to high</option>
+            <option value="price-high">Price: high to low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="store-count" id="store-count" role="status" aria-live="polite"></p>
+      <div class="product-grid store-grid" id="store-grid">
+        {products.map((product, index) => {
+          const image = imagesByName[product.image];
+          if (!image) throw new Error(`Product image not found: ${product.image}`);
+          return <ProductCard product={product} image={image} index={index} />;
+        })}
+      </div>
+      <p class="store-empty" id="store-empty" hidden>No chocolates match those choices. Try a different search or filter.</p>
+      <div class="store-load-area">
+        <span id="store-scroll-sentinel" aria-hidden="true"></span>
+        <button class="button button-primary store-load-more" id="store-load-more" type="button">
+          Load more chocolates <span aria-hidden="true">↓</span>
+        </button>
+      </div>
+    </section>
+  </main>
+  <script>
+    import "../scripts/catalog";
+  </script>
+</SiteLayout>
