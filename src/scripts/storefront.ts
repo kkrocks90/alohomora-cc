@@ -12,6 +12,12 @@ interface PaymentOrder {
   distanceKm: number;
 }
 
+interface VerifiedPayment {
+  verified: true;
+  fulfillmentMethod: PaymentOrder["fulfillmentMethod"];
+  distanceKm: number;
+}
+
 interface PaymentResponse {
   razorpay_order_id: string;
   razorpay_payment_id: string;
@@ -299,12 +305,19 @@ function isPaymentOrder(payload: unknown): payload is PaymentOrder {
   );
 }
 
-function isVerifiedPayment(payload: unknown): payload is { verified: true } {
+function isVerifiedPayment(payload: unknown): payload is VerifiedPayment {
   return (
     typeof payload === "object" &&
     payload !== null &&
     "verified" in payload &&
-    payload.verified === true
+    payload.verified === true &&
+    "fulfillmentMethod" in payload &&
+    (payload.fulfillmentMethod === "Porter (manual booking)" ||
+      payload.fulfillmentMethod === "Courier (manual booking)") &&
+    "distanceKm" in payload &&
+    typeof payload.distanceKm === "number" &&
+    Number.isFinite(payload.distanceKm) &&
+    payload.distanceKm >= 0
   );
 }
 
@@ -316,12 +329,15 @@ async function verifyPayment(payment: PaymentResponse) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payment),
   });
-  await readApiResponse(response, isVerifiedPayment);
+  const confirmation = await readApiResponse(response, isVerifiedPayment);
   paymentConfirmed = true;
   cart = {};
   saveCart();
   renderCart();
-  setStatus(`Payment verified · order ${payment.razorpay_order_id}`, "success");
+  setStatus(
+    `Payment saved · order ${payment.razorpay_order_id} · ${confirmation.fulfillmentMethod} · approximately ${confirmation.distanceKm.toFixed(2)} km.`,
+    "success",
+  );
 }
 
 checkoutForm.addEventListener("submit", async (event) => {

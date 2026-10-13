@@ -23,17 +23,78 @@ The checkout uses the browser's built-in geolocation (with the customer's permis
 
 Before deploying the worker, replace `STORE_LATITUDE` and `STORE_LONGITUDE` in `worker/wrangler.toml` with the shop's actual decimal GPS coordinates (for example, `12.345678`). Leave the placeholders until you know the right pin; checkout safely reports that distance checking is not configured rather than charging for an order using a made-up location. Customers can use the location button while physically at the delivery address, or get the pin coordinates from a map and enter them. Geolocation and entered coordinates are customer-provided estimates and can be inaccurate; verify the address when booking delivery.
 
+## Free paid-order storage and reports
+
+Paid orders are saved to a Cloudflare D1 database through the existing checkout Worker; a customer's browser is never used to write order data. A row is created only after the Worker verifies Razorpay's signature, confirms a captured payment, checks the amount against the product catalog, and verifies the delivery-method notes. Safe verification retries do not create duplicate orders. If the database is not set up, the Worker refuses to start payment. The database stores customer contact and delivery details, itemized products, paid amount, payment and order IDs, estimated delivery distance and method, and the customer's policy acknowledgement. It does not store payment-card information or delivery coordinates.
+
+Cloudflare Workers Free currently includes D1 allowances of 5 million rows read per day, 100,000 rows written per day, and 5 GB of total storage; see [Cloudflare D1 pricing and limits](https://developers.cloudflare.com/d1/platform/pricing/) before relying on a free-plan limit. Check database usage in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Metrics**. Restrict access to the Cloudflare account to trusted shop operators. Establish and follow an appropriate order-data retention period; delete records you no longer need, consistent with legal recordkeeping requirements.
+
+To create the free order database before deploying the Worker:
+
+1. From the repository root, create it in the Cloudflare account connected to Wrangler:
+
+   ```sh
+   npx wrangler d1 create cocoa-kind-orders
+   ```
+
+2. Copy the `database_id` returned by Wrangler into `database_id` in `worker/wrangler.toml`. Replace both store-coordinate placeholders there with the shop's real decimal latitude and longitude.
+3. Create the order table in the remote D1 database by applying its migration:
+
+   ```sh
+   npx wrangler d1 migrations apply cocoa-kind-orders --remote --config worker/wrangler.toml
+   ```
+
+4. Deploy the Worker and finish the Razorpay setup below. Once payment and D1 are configured, test an order end to end and confirm its `paid` row appears in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Console**. If this is the GitHub Pages `main` repository, set `ALLOWED_ORIGIN` to `https://kkrocks90.github.io`. For local testing, use a localhost origin temporarily and restore the live origin before deploying to production.
+
+To generate reports, run SQL in the D1 Console. For example:
+
+```sql
+SELECT
+  substr(created_at, 1, 7) AS month,
+  count(*) AS paid_orders,
+  sum(amount_paise) / 100.0 AS sales_inr
+FROM orders
+GROUP BY month
+ORDER BY month DESC;
+```
+
+```sql
+SELECT
+  delivery_method,
+  count(*) AS paid_orders,
+  sum(amount_paise) / 100.0 AS sales_inr
+FROM orders
+GROUP BY delivery_method
+ORDER BY delivery_method;
+```
+
+```sql
+SELECT created_at, order_id, customer_name, customer_phone, customer_email,
+       delivery_address, items_json, amount_paise / 100.0 AS total_inr,
+       delivery_method, distance_km
+FROM orders
+ORDER BY created_at DESC;
+```
+
+For an independent backup, export the D1 database periodically using Wrangler:
+
+```sh
+npx wrangler d1 export cocoa-kind-orders --remote --output=cocoa-kind-orders-backup.sql --config worker/wrangler.toml
+```
+
+Keep exports protected because they include customer personal information.
+
 ## Free hosting
 
 The GitHub Actions workflow builds the site and publishes it to GitHub Pages whenever `main` is updated. On GitHub Free, the repository must be public to use Pages. In the repository's **Settings → Pages**, select **GitHub Actions** as the build and deployment source. The workflow is configured for `https://kkrocks90.github.io/alohomora-cc/`; change `site` and `base` in `astro.config.mjs` if you use another GitHub account, repository name, or custom domain.
 
 ## Razorpay checkout
 
-GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates Razorpay orders using server-side secrets, verifies payment signatures, and checks payment capture status. Customer name, phone, email, delivery address, and item names are attached to the Razorpay order notes for fulfillment. No order database or automated confirmation email is included; manage paid orders from the Razorpay dashboard and follow up with the customer. Product prices are checked against `src/data/products.json` on the server, not accepted from the browser.
+GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates Razorpay orders using server-side secrets, verifies payment signatures, and checks payment capture status. Once an order is paid and verified, the Worker also saves it in Cloudflare D1 for shop reports and follow-up. Razorpay order notes provide the Worker with the verified order details; product prices are checked against `src/data/products.json` on the server, not accepted from the browser. A customer notification email is not configured.
 
-1. Create a Cloudflare account and a Razorpay account. Start with Razorpay test keys.
-2. Set `ALLOWED_ORIGIN` in `worker/wrangler.toml` to the website's origin (for example, `https://kkrocks90.github.io`; do not include the repository path).
-3. In a terminal, from the repository root, deploy the Worker:
+1. Create a Cloudflare account, the [D1 database](#free-paid-order-storage-and-reports), and a Razorpay account. Start with Razorpay test keys.
+2. Set `ALLOWED_ORIGIN` in `worker/wrangler.toml` to the website's origin (for example, `https://kkrocks90.github.io`; do not include the repository path). The shop coordinates and D1 `database_id` must also be configured before checkout is enabled.
+3. From the repository root, deploy the Worker:
 
    ```sh
    npm ci

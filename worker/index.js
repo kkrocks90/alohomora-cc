@@ -1,10 +1,11 @@
-import products from "../src/data/products.json";
+import products from "../src/data/products.json" with { type: "json" };
 import {
   getDistanceKm,
   getFulfillmentMethod,
   getStoreLocation,
   isValidDeliveryLocation,
 } from "./delivery.js";
+import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
 
 const encoder = new TextEncoder();
 const MAX_REQUEST_BYTES = 20_000;
@@ -106,6 +107,9 @@ function hexToBytes(value) {
 }
 
 async function handleCreateOrder(request, env, origin) {
+  if (!env.ORDERS_DB) {
+    return errorResponse("The order database is not configured yet. Please contact the shop.", 503, origin);
+  }
   if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
     return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
@@ -127,7 +131,7 @@ async function handleCreateOrder(request, env, origin) {
     phone: order.customer.phone.trim(),
     email: typeof order.customer.email === "string" ? order.customer.email.trim() : "",
     address: order.customer.address.trim(),
-    items: order.items.map(({ product, quantity }) => `${quantity} x ${product.name}`).join(", "),
+    items: JSON.stringify(order.items.map(({ product, quantity }) => [product.id, quantity, product.price])),
     delivery_method: order.fulfillmentMethod,
     distance_km: order.distanceKm.toFixed(2),
     policies_ok: "terms_conditions, privacy_policy, shipping_policy",
@@ -181,6 +185,13 @@ async function handleCreateOrder(request, env, origin) {
 }
 
 async function handleVerifyPayment(request, env, origin) {
+  if (!env.ORDERS_DB) {
+    return errorResponse(
+      "The order database is not configured. Your payment was not confirmed by the shop; please do not pay again and contact the shop with your Razorpay payment receipt.",
+      503,
+      origin,
+    );
+  }
   if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
     return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
@@ -246,6 +257,7 @@ async function handleVerifyPayment(request, env, origin) {
     return errorResponse("Payment verification returned an invalid response. Please contact the shop.", 502, origin);
   }
   if (
+    payment.id !== body.razorpay_payment_id ||
     payment.order_id !== body.razorpay_order_id ||
     payment.status !== "captured" ||
     payment.currency !== "INR"
@@ -282,6 +294,7 @@ async function handleVerifyPayment(request, env, origin) {
     verifiedOrder.id !== body.razorpay_order_id ||
     verifiedOrder.currency !== "INR" ||
     verifiedOrder.status !== "paid" ||
+    !Number.isSafeInteger(verifiedOrder.amount) ||
     verifiedOrder.amount_due !== 0 ||
     verifiedOrder.amount_paid !== verifiedOrder.amount ||
     payment.amount !== verifiedOrder.amount
@@ -289,7 +302,39 @@ async function handleVerifyPayment(request, env, origin) {
     return errorResponse("Payment has not been fully captured yet. Please contact the shop if money was debited.", 409, origin);
   }
 
-  return jsonResponse({ verified: true }, 200, origin);
+  let paidOrder;
+  try {
+    paidOrder = parsePaidOrderNotes(
+      verifiedOrder.id,
+      payment.id,
+      verifiedOrder.notes,
+      verifiedOrder.amount,
+    );
+  } catch (error) {
+    console.error("The captured Razorpay order could not be reconciled with its order details.", error);
+    return errorResponse(
+      "Your payment was received, but the order could not be saved. Please do not pay again; contact the shop with your Razorpay order ID.",
+      502,
+      origin,
+    );
+  }
+
+  try {
+    await savePaidOrder(env.ORDERS_DB, paidOrder);
+  } catch (error) {
+    console.error("Could not save the captured Razorpay order in D1.", error);
+    return errorResponse(
+      "Your payment was received, but saving the order failed. Please do not pay again; contact the shop with your Razorpay order ID.",
+      503,
+      origin,
+    );
+  }
+
+  return jsonResponse({
+    verified: true,
+    fulfillmentMethod: paidOrder.deliveryMethod,
+    distanceKm: Number(paidOrder.distanceKm.toFixed(2)),
+  }, 200, origin);
 }
 
 export default {
