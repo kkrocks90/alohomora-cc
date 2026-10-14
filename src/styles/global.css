@@ -503,6 +503,10 @@ h2 em {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.store-grid .product-card {
+  animation-delay: 0ms;
+}
+
 .product-card {
   min-width: 0;
   animation: rise-in 500ms both;

@@ -21,8 +21,14 @@ if (catalog) {
   let visibleCount = pageSize;
   let matchingProducts = [...products];
 
-  function updateCatalog(resetVisibleCount = true) {
-    if (resetVisibleCount) visibleCount = pageSize;
+  function updateResults() {
+    emptyState.hidden = matchingProducts.length > 0;
+    resultCount.textContent = `${matchingProducts.length} ${matchingProducts.length === 1 ? "product" : "products"}`;
+    loadButton.hidden = matchingProducts.length <= visibleCount;
+  }
+
+  function updateCatalog() {
+    visibleCount = pageSize;
     const query = searchInput.value.trim().toLocaleLowerCase();
     const selectedTag = filterSelect.value;
     const sort = sortSelect.value;
@@ -53,14 +59,17 @@ if (catalog) {
       product.hidden = false;
       grid.append(product);
     });
-    emptyState.hidden = matchingProducts.length > 0;
-    resultCount.textContent = `${matchingProducts.length} ${matchingProducts.length === 1 ? "product" : "products"}`;
-    loadButton.hidden = matchingProducts.length <= visibleCount;
+    updateResults();
   }
 
   function loadMore() {
-    visibleCount += pageSize;
-    updateCatalog(false);
+    const nextVisibleCount = Math.min(visibleCount + pageSize, matchingProducts.length);
+    matchingProducts.slice(visibleCount, nextVisibleCount).forEach((product) => {
+      product.hidden = false;
+      grid.append(product);
+    });
+    visibleCount = nextVisibleCount;
+    updateResults();
   }
 
   searchInput.addEventListener("input", () => updateCatalog());
