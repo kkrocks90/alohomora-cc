@@ -6,7 +6,7 @@ compatibility_date = "2025-08-01"
 ALLOWED_ORIGIN = "https://kkrocks90.github.io"
 STORE_LATITUDE = "12.9234"
 STORE_LONGITUDE = "80.1873"
-LOGIN_FROM_EMAIL = "Chocolate Circle <onboarding@resend.dev>"
+LOGIN_FROM_EMAIL = "Chocolate Circle <login@auth.chocolatecircle.in>"
 
 [[d1_databases]]
 binding = "ORDERS_DB"
