@@ -1,0 +1,29 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const base = import.meta.env.BASE_URL;
+---
+
+<SiteLayout
+  title="Thank you — Chocolate Circle"
+  description="Your Chocolate Circle order confirmation and details."
+>
+  <main class="thank-you-page" id="thank-you-page" data-checkout-api={checkoutApiUrl}>
+    <section class="thank-you-panel checkout-panel" aria-labelledby="thank-you-title">
+      <p class="eyebrow">A little joy is on its way</p>
+      <h1 id="thank-you-title">Thank <em>you.</em></h1>
+      <p class="thank-you-status" id="thank-you-status" role="status" aria-live="polite">
+        Loading your verified order details…
+      </p>
+      <div id="thank-you-order" hidden></div>
+      <div class="thank-you-actions">
+        <a class="button button-primary" href={`${base}store/`}>Shop more treats <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href={`${base}account/`}>View my orders <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
+  <script>
+    import "../scripts/thank-you";
+  </script>
+</SiteLayout>

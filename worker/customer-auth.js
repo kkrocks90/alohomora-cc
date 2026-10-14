@@ -4,7 +4,7 @@ const CODE_RESEND_DELAY_MS = 60 * 1000;
 const MAX_CODE_ATTEMPTS = 5;
 const SESSION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
 const GENERIC_CODE_MESSAGE =
-  "If a paid order is associated with that email, a sign-in code will arrive shortly.";
+  "If we can send a sign-in code to that email, it will arrive shortly.";
 
 function result(status, body) {
   return { status, body };
@@ -99,12 +99,6 @@ export async function requestLoginCode(request, env) {
 
   const now = Date.now();
   try {
-    const order = await env.ORDERS_DB
-      .prepare("SELECT 1 AS found FROM orders WHERE customer_email = ? COLLATE NOCASE LIMIT 1")
-      .bind(email)
-      .first();
-    if (!order) return result(202, { message: GENERIC_CODE_MESSAGE });
-
     const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000).padStart(6, "0");
     const codeHash = await hmacHex(env.AUTH_TOKEN_SECRET, `${email}:${code}`);
     const reservation = await env.ORDERS_DB
@@ -222,7 +216,7 @@ export async function verifyLoginCode(request, env) {
   }
 }
 
-async function authenticatedEmail(request, env) {
+export async function authenticatedEmail(request, env) {
   const authorization = request.headers.get("Authorization") ?? "";
   const match = /^Bearer ([0-9a-f]{64})$/i.exec(authorization);
   if (!match) return null;
@@ -244,7 +238,8 @@ export async function getCustomerOrders(request, env) {
     const { results } = await env.ORDERS_DB
       .prepare(
         `SELECT order_id, payment_status, items_json, amount_paise, currency,
-                delivery_method, created_at
+                delivery_method, created_at, customer_name, customer_phone,
+                delivery_address, event_date
          FROM orders
          WHERE customer_email = ? COLLATE NOCASE
          ORDER BY created_at DESC
@@ -262,6 +257,10 @@ export async function getCustomerOrders(request, env) {
         currency: order.currency,
         deliveryMethod: order.delivery_method,
         createdAt: order.created_at,
+        customerName: order.customer_name,
+        customerPhone: order.customer_phone,
+        deliveryAddress: order.delivery_address,
+        eventDate: order.event_date ?? "",
       })),
     });
   } catch (error) {

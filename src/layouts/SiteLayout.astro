@@ -108,93 +108,12 @@ const base = import.meta.env.BASE_URL;
       <div class="cart-items" id="cart-items"></div>
       <div class="cart-summary" id="cart-summary" hidden>
         <div class="subtotal-row"><span>Subtotal</span><strong id="cart-total">₹0</strong></div>
-        <p class="delivery-note">Delivery details and any delivery charge are confirmed after you order.</p>
-        <form class="checkout-form" id="checkout-form">
-          <label>
-            Your name
-            <input name="name" autocomplete="name" maxlength="80" required />
-          </label>
-          <label>
-            Phone number
-            <input name="phone" type="tel" autocomplete="tel" maxlength="20" required />
-          </label>
-          <label>
-            Email <span class="optional-label">(used for order history)</span>
-            <input name="email" type="email" autocomplete="email" maxlength="120" required />
-          </label>
-          <label>
-            Delivery address
-            <textarea name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
-          </label>
-          <fieldset class="delivery-location">
-            <legend>Delivery location</legend>
-            <p>
-              We use your delivery pin to check the approximate straight-line distance from the
-              shop and suggest Porter or a courier. Nothing is booked automatically.
-            </p>
-            <button class="location-button" id="use-delivery-location" type="button">
-              Use this device’s location
-            </button>
-            <span class="location-or">or enter a map pin’s coordinates</span>
-            <a
-              class="map-help-link"
-              href="https://maps.google.com/"
-              target="_blank"
-              rel="noreferrer"
-            >Open Google Maps to find your delivery pin ↗</a>
-            <span class="location-privacy">
-              Long-press the delivery address on the map to drop a pin, then enter the pin’s
-              latitude and longitude below.
-            </span>
-            <div class="coordinate-fields">
-              <label>
-                Latitude
-                <input
-                  name="latitude"
-                  type="number"
-                  inputmode="decimal"
-                  step="any"
-                  min="-90"
-                  max="90"
-                  autocomplete="off"
-                  required
-                />
-              </label>
-              <label>
-                Longitude
-                <input
-                  name="longitude"
-                  type="number"
-                  inputmode="decimal"
-                  step="any"
-                  min="-180"
-                  max="180"
-                  autocomplete="off"
-                  required
-                />
-              </label>
-            </div>
-            <span class="location-privacy">
-              Use the delivery address pin, not your current location if it’s somewhere else.
-              Coordinates are used only to calculate distance.
-            </span>
-          </fieldset>
-          <label class="policy-consent">
-            <input name="policyConsent" type="checkbox" required />
-            <span>
-              I agree to the <a href={`${base}terms-and-conditions/`}>Terms &amp; Conditions</a>,
-              <a href={`${base}privacy-policy/`}>Privacy Policy</a>, and
-              <a href={`${base}shipping-policy/`}>Shipping Policy</a>.
-            </span>
-          </label>
-          <button class="button button-primary checkout-button" id="checkout-button" type="submit">
-            Continue to secure payment
-            <span aria-hidden="true">↗</span>
-          </button>
-        </form>
+        <p class="delivery-note">Delivery details and any delivery charge are confirmed separately.</p>
+        <a class="button button-primary checkout-button" id="proceed-to-checkout" href={`${base}checkout/`}>
+          Continue to checkout <span aria-hidden="true">↗</span>
+        </a>
       </div>
-      <p class="checkout-status" id="checkout-status" role="status" aria-live="polite"></p>
-      <p class="payment-footnote">Secure checkout by Razorpay · Your payment details never touch our website.</p>
+      <p class="payment-footnote">Secure payment is available on the separate checkout page after sign-in.</p>
     </aside>
     <script>
       import "../scripts/navigation";

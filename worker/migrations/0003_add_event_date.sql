@@ -1,0 +1,1 @@
+ALTER TABLE orders ADD COLUMN event_date TEXT NOT NULL DEFAULT '';

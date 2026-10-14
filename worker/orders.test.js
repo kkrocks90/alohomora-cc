@@ -19,6 +19,7 @@ function createDatabase() {
               rows.set(orderId, {
                 payment_id: paymentId,
                 customer_name: customerName,
+                event_date: values[6],
               });
             },
             first: async () => {
@@ -41,6 +42,7 @@ const paidOrder = {
   customerPhone: "+911234567890",
   customerEmail: "customer@example.com",
   deliveryAddress: "123 Sample Street",
+  eventDate: "2026-12-25",
   items: [{
     id: "product-1001",
     name: "Choco Cubes (Pack of 40)",
@@ -60,6 +62,7 @@ function createPaidNotes(overrides = {}) {
     phone: "+911234567890",
     email: "customer@example.com",
     address: "123 Sample Street",
+    event_date: "2026-12-25",
     items: JSON.stringify([["product-1001", 2, 800, "Chocolate", "A red wrapper with a birthday message"]]),
     delivery_method: "Porter (manual booking)",
     distance_km: "5.25",
@@ -75,7 +78,14 @@ test("reconstructs verified order details from Razorpay order notes", () => {
     createPaidNotes(),
     paidOrder.amountPaise,
   );
+  assert.throws(
+    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
+      event_date: "2026-02-31",
+    }), paidOrder.amountPaise),
+    /invalid event date/i,
+  );
   assert.equal(order.customerName, paidOrder.customerName);
+  assert.equal(order.eventDate, paidOrder.eventDate);
   assert.equal(order.deliveryMethod, paidOrder.deliveryMethod);
   assert.deepEqual(order.items, paidOrder.items);
 });
@@ -182,6 +192,7 @@ test("stores a verified paid order once", async () => {
   assert.deepEqual(database.rows.get(paidOrder.orderId), {
     payment_id: paidOrder.paymentId,
     customer_name: paidOrder.customerName,
+    event_date: paidOrder.eventDate,
   });
 });
 

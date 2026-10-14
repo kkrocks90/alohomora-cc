@@ -32,6 +32,16 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
   }
 
   const deliveryAddress = requireNoteText(notes, "address", 250);
+  const eventDate = notes?.event_date ?? "";
+  if (
+    typeof eventDate !== "string" ||
+    (eventDate !== "" &&
+      (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate) ||
+        Number.isNaN(Date.parse(`${eventDate}T00:00:00.000Z`)) ||
+        new Date(`${eventDate}T00:00:00.000Z`).toISOString().slice(0, 10) !== eventDate))
+  ) {
+    throw new Error("The paid order has an invalid event date.");
+  }
   const itemNoteParts = [];
   for (let index = 0; index < 8; index += 1) {
     const key = index === 0 ? "items" : `items_${index}`;
@@ -131,6 +141,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     customerPhone,
     customerEmail,
     deliveryAddress,
+    eventDate,
     items,
     amountPaise,
     deliveryMethod,
@@ -152,6 +163,7 @@ export async function savePaidOrder(database, order) {
         customer_phone,
         customer_email,
         delivery_address,
+        event_date,
         items_json,
         amount_paise,
         currency,
@@ -159,7 +171,7 @@ export async function savePaidOrder(database, order) {
         distance_km,
         policies_accepted,
         created_at
-      ) VALUES (?, ?, 'paid', ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
+      ) VALUES (?, ?, 'paid', ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
       ON CONFLICT(order_id) DO NOTHING`,
     )
     .bind(
@@ -169,6 +181,7 @@ export async function savePaidOrder(database, order) {
       order.customerPhone,
       order.customerEmail,
       order.deliveryAddress,
+      order.eventDate ?? "",
       JSON.stringify(order.items),
       order.amountPaise,
       order.deliveryMethod,

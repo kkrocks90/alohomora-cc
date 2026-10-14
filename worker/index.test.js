@@ -2,6 +2,22 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import worker from "./index.js";
 
+const authenticatedOrdersDb = {
+  prepare(sql) {
+    return {
+      bind() {
+        return {
+          first: async () => /SELECT email FROM customer_sessions/i.test(sql)
+            ? { email: "customer@example.com" }
+            : null,
+        };
+      },
+    };
+  },
+};
+
+const sessionHeaders = { Authorization: `Bearer ${"a".repeat(64)}` };
+
 test("does not create a payment order when the D1 database is not bound", async () => {
   const response = await worker.fetch(
     new Request("https://checkout.example.com/orders", {
@@ -26,6 +42,7 @@ test("requires flavour and wrapper selections before creating a payment order", 
       headers: {
         Origin: "https://shop.example.com",
         "Content-Type": "application/json",
+        ...sessionHeaders,
       },
       body: JSON.stringify({
         items: [{ id: "midnight-dark", quantity: 1 }],
@@ -43,7 +60,7 @@ test("requires flavour and wrapper selections before creating a payment order", 
       ALLOWED_ORIGIN: "https://shop.example.com",
       STORE_LATITUDE: "0",
       STORE_LONGITUDE: "0",
-      ORDERS_DB: {},
+      ORDERS_DB: authenticatedOrdersDb,
       RAZORPAY_KEY_ID: "test_key",
       RAZORPAY_KEY_SECRET: "test_secret",
     },
@@ -90,6 +107,7 @@ test("includes different selected variants in the Razorpay order notes", async (
       headers: {
         Origin: "https://shop.example.com",
         "Content-Type": "application/json",
+        ...sessionHeaders,
       },
       body: JSON.stringify({
         items,
@@ -107,7 +125,7 @@ test("includes different selected variants in the Razorpay order notes", async (
       ALLOWED_ORIGIN: "https://shop.example.com",
       STORE_LATITUDE: "0",
       STORE_LONGITUDE: "0",
-      ORDERS_DB: {},
+      ORDERS_DB: authenticatedOrdersDb,
       RAZORPAY_KEY_ID: "test_key",
       RAZORPAY_KEY_SECRET: "test_secret",
     },
@@ -161,6 +179,7 @@ test("accepts products with no flavour selector when wrapper design is provided"
       headers: {
         Origin: "https://shop.example.com",
         "Content-Type": "application/json",
+        ...sessionHeaders,
       },
       body: JSON.stringify({
         items: [{
@@ -183,11 +202,247 @@ test("accepts products with no flavour selector when wrapper design is provided"
       ALLOWED_ORIGIN: "https://shop.example.com",
       STORE_LATITUDE: "0",
       STORE_LONGITUDE: "0",
-      ORDERS_DB: {},
+      ORDERS_DB: authenticatedOrdersDb,
       RAZORPAY_KEY_ID: "test_key",
       RAZORPAY_KEY_SECRET: "test_secret",
     },
   );
 
   assert.equal(response.status, 201);
+});
+
+test("requires a signed-in customer before creating or verifying a payment", async () => {
+  const unauthenticatedDatabase = {
+    prepare() {
+      return { bind() { return { first: async () => null }; } };
+    },
+  };
+  for (const path of ["/orders", "/verify"]) {
+    const response = await worker.fetch(
+      new Request(`https://checkout.example.com${path}`, {
+        method: "POST",
+        headers: {
+          Origin: "https://shop.example.com",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      }),
+      {
+        ALLOWED_ORIGIN: "https://shop.example.com",
+        STORE_LATITUDE: "0",
+        STORE_LONGITUDE: "0",
+        ORDERS_DB: unauthenticatedDatabase,
+        RAZORPAY_KEY_ID: "test_key",
+        RAZORPAY_KEY_SECRET: "test_secret",
+      },
+    );
+    assert.equal(response.status, 401, `${path} must reject unsigned requests`);
+  }
+});
+
+test("prevents a signed-in customer from ordering under a different email", async () => {
+  const response = await worker.fetch(
+    new Request("https://checkout.example.com/orders", {
+      method: "POST",
+      headers: {
+        Origin: "https://shop.example.com",
+        "Content-Type": "application/json",
+        ...sessionHeaders,
+      },
+      body: JSON.stringify({
+        items: [{ id: "product-1002", quantity: 1, flavour: "", wrapper: "A green wrapper" }],
+        customer: {
+          name: "Customer Example",
+          phone: "+911234567890",
+          email: "different@example.com",
+          address: "123 Sample Street",
+          policyConsent: true,
+        },
+        deliveryLocation: { latitude: 0, longitude: 0 },
+      }),
+    }),
+    {
+      ALLOWED_ORIGIN: "https://shop.example.com",
+      STORE_LATITUDE: "0",
+      STORE_LONGITUDE: "0",
+      ORDERS_DB: authenticatedOrdersDb,
+      RAZORPAY_KEY_ID: "test_key",
+      RAZORPAY_KEY_SECRET: "test_secret",
+    },
+  );
+  assert.equal(response.status, 403);
+  assert.match((await response.json()).error, /match the signed-in account/i);
+});
+
+test("validates event dates and includes selected dates in payment notes", async (context) => {
+  const originalFetch = globalThis.fetch;
+  let notes;
+  globalThis.fetch = async (_url, init) => {
+    notes = JSON.parse(String(init?.body)).notes;
+    return Response.json({ id: "order_event123", amount: 240000, currency: "INR" });
+  };
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  const customer = {
+    name: "Customer Example",
+    phone: "+911234567890",
+    email: "customer@example.com",
+    address: "123 Sample Street",
+    policyConsent: true,
+  };
+  const createRequest = (eventDate) => worker.fetch(
+    new Request("https://checkout.example.com/orders", {
+      method: "POST",
+      headers: {
+        Origin: "https://shop.example.com",
+        "Content-Type": "application/json",
+        ...sessionHeaders,
+      },
+      body: JSON.stringify({
+        items: [{ id: "product-1002", quantity: 1, flavour: "", wrapper: "A blue gift wrapper" }],
+        customer: { ...customer, eventDate },
+        deliveryLocation: { latitude: 0, longitude: 0 },
+      }),
+    }),
+    {
+      ALLOWED_ORIGIN: "https://shop.example.com",
+      STORE_LATITUDE: "0",
+      STORE_LONGITUDE: "0",
+      ORDERS_DB: authenticatedOrdersDb,
+      RAZORPAY_KEY_ID: "test_key",
+      RAZORPAY_KEY_SECRET: "test_secret",
+    },
+  );
+
+  const invalid = await createRequest("2026-02-31");
+  assert.equal(invalid.status, 400);
+  assert.match((await invalid.json()).error, /valid event date/i);
+
+  const futureDate = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  const valid = await createRequest(futureDate);
+  assert.equal(valid.status, 201);
+  assert.equal(notes.event_date, futureDate);
+});
+
+test("only the signed-in order owner can verify payment and receive the order reference", async (context) => {
+  const originalFetch = globalThis.fetch;
+  const orderId = "order_verified123";
+  const paymentId = "pay_verified123";
+  const amount = 80000;
+  const secret = "test_secret";
+  const notes = {
+    customer_name: "Customer Example",
+    phone: "+911234567890",
+    email: "customer@example.com",
+    address: "123 Sample Street",
+    items: JSON.stringify([[
+      "product-1001",
+      1,
+      800,
+      "Chocolate",
+      "A red wrapper with a birthday message",
+    ]]),
+    delivery_method: "Porter (manual booking)",
+    distance_km: "5.25",
+    policies_ok: "terms_conditions, privacy_policy, shipping_policy",
+  };
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signatureBytes = new Uint8Array(await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`${orderId}|${paymentId}`),
+  ));
+  const signature = Array.from(signatureBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  const databaseFor = (email) => {
+    const savedOrders = new Map();
+    return {
+      savedOrders,
+      prepare(sql) {
+        return {
+          bind(...values) {
+            return {
+              first: async () => {
+                if (/SELECT email FROM customer_sessions/i.test(sql)) return { email };
+                if (/SELECT payment_id FROM orders/i.test(sql)) {
+                  return savedOrders.get(values[0]) ?? null;
+                }
+                return null;
+              },
+              run: async () => {
+                if (/INSERT INTO orders/i.test(sql)) {
+                  savedOrders.set(values[0], { payment_id: values[1] });
+                }
+                return { meta: { changes: 1 } };
+              },
+            };
+          },
+        };
+      },
+    };
+  };
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/payments/")) {
+      return Response.json({
+        id: paymentId,
+        order_id: orderId,
+        status: "captured",
+        currency: "INR",
+        amount,
+      });
+    }
+    return Response.json({
+      id: orderId,
+      currency: "INR",
+      status: "paid",
+      amount,
+      amount_due: 0,
+      amount_paid: amount,
+      notes,
+    });
+  };
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  for (const [email, expectedStatus] of [
+    ["different@example.com", 403],
+    ["customer@example.com", 200],
+  ]) {
+    const database = databaseFor(email);
+    const response = await worker.fetch(
+      new Request("https://checkout.example.com/verify", {
+        method: "POST",
+        headers: {
+          Origin: "https://shop.example.com",
+          "Content-Type": "application/json",
+          ...sessionHeaders,
+        },
+        body: JSON.stringify({
+          razorpay_order_id: orderId,
+          razorpay_payment_id: paymentId,
+          razorpay_signature: signature,
+        }),
+      }),
+      {
+        ALLOWED_ORIGIN: "https://shop.example.com",
+        ORDERS_DB: database,
+        RAZORPAY_KEY_ID: "test_key",
+        RAZORPAY_KEY_SECRET: secret,
+      },
+    );
+    assert.equal(response.status, expectedStatus);
+    if (email === "customer@example.com") {
+      assert.equal((await response.json()).orderId, orderId);
+      assert.equal(database.savedOrders.size, 1);
+    } else {
+      assert.equal(database.savedOrders.size, 0);
+    }
+  }
 });

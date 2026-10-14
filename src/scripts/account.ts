@@ -89,6 +89,7 @@ if (root) {
         amountPaise?: number;
         createdAt?: string;
         deliveryMethod?: string;
+        eventDate?: string;
       };
       const card = document.createElement("article");
       card.className = "order-card";
@@ -108,6 +109,7 @@ if (root) {
         date && !Number.isNaN(date.valueOf()) ? date.toLocaleDateString("en-IN", { dateStyle: "medium" }) : "",
         typeof order.amountPaise === "number" ? formatPrice.format(order.amountPaise / 100) : "",
         order.deliveryMethod ?? "",
+        order.eventDate ? `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}` : "",
       ].filter(Boolean).join(" · ");
 
       const items = document.createElement("ul");
@@ -155,7 +157,7 @@ if (root) {
       codeForm.hidden = false;
       emailForm.hidden = true;
       codeInput.focus();
-      setStatus(String(result.message ?? "If a paid order is associated with that email, a sign-in code will arrive shortly."));
+      setStatus(String(result.message ?? "If we can send a sign-in code to that email, it will arrive shortly."));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not send a sign-in code.", true);
     } finally {

@@ -7,8 +7,10 @@ import {
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
 import {
+  authenticatedEmail,
   getCustomerOrders,
   logoutCustomer,
+  normalizeCustomerEmail,
   requestLoginCode,
   verifyLoginCode,
 } from "./customer-auth.js";
@@ -69,6 +71,23 @@ function validateOrder(body, storeLocation) {
     throw new Error("Please enter a valid phone number.");
   }
   if (!isValidText(customer.address, 250)) throw new Error("Please enter a delivery address.");
+  if (customer.eventDate !== undefined && customer.eventDate !== "") {
+    const eventDate = customer.eventDate;
+    const parsedDate = typeof eventDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(eventDate)
+      ? new Date(`${eventDate}T00:00:00.000Z`)
+      : null;
+    if (
+      !parsedDate ||
+      Number.isNaN(parsedDate.valueOf()) ||
+      parsedDate.toISOString().slice(0, 10) !== eventDate ||
+      eventDate < new Date().toISOString().slice(0, 10)
+    ) {
+      throw new Error("Please choose a valid event date that is today or later.");
+    }
+    customer.eventDate = eventDate;
+  } else {
+    customer.eventDate = "";
+  }
   if (!isValidDeliveryLocation(body.deliveryLocation)) {
     throw new Error("Please enter valid coordinates for your delivery address pin.");
   }
@@ -139,9 +158,24 @@ async function handleCreateOrder(request, env, origin) {
     return errorResponse("Delivery-distance checkout is not configured yet. Please contact the shop.", 503, origin);
   }
 
+  let customerEmail;
+  try {
+    customerEmail = await authenticatedEmail(request, env);
+  } catch (error) {
+    console.error("Could not authenticate customer before creating an order.", error);
+    return errorResponse("Customer sign-in is temporarily unavailable. Please try again shortly.", 503, origin);
+  }
+  if (!customerEmail) return errorResponse("Please sign in before checking out.", 401, origin);
+
   let order;
   try {
-    order = validateOrder(await readBody(request), storeLocation);
+    const body = await readBody(request);
+    const submittedEmail = normalizeCustomerEmail(body?.customer?.email);
+    if (submittedEmail !== customerEmail) {
+      return errorResponse("The checkout email must match the signed-in account.", 403, origin);
+    }
+    body.customer.email = customerEmail;
+    order = validateOrder(body, storeLocation);
   } catch (error) {
     return errorResponse(error.message, 400, origin);
   }
@@ -166,6 +200,7 @@ async function handleCreateOrder(request, env, origin) {
     phone: order.customer.phone.trim(),
     email: order.customer.email.trim().toLowerCase(),
     address: order.customer.address.trim(),
+    event_date: order.customer.eventDate,
     ...itemNotes,
     delivery_method: order.fulfillmentMethod,
     distance_km: order.distanceKm.toFixed(2),
@@ -230,6 +265,15 @@ async function handleVerifyPayment(request, env, origin) {
   if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
     return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
+
+  let customerEmail;
+  try {
+    customerEmail = await authenticatedEmail(request, env);
+  } catch (error) {
+    console.error("Could not authenticate customer before verifying payment.", error);
+    return errorResponse("Customer sign-in is temporarily unavailable. Please contact the shop.", 503, origin);
+  }
+  if (!customerEmail) return errorResponse("Please sign in to verify this payment.", 401, origin);
 
   let body;
   try {
@@ -353,6 +397,9 @@ async function handleVerifyPayment(request, env, origin) {
       origin,
     );
   }
+  if (paidOrder.customerEmail !== customerEmail) {
+    return errorResponse("This payment belongs to a different signed-in account.", 403, origin);
+  }
 
   try {
     await savePaidOrder(env.ORDERS_DB, paidOrder);
@@ -367,6 +414,7 @@ async function handleVerifyPayment(request, env, origin) {
 
   return jsonResponse({
     verified: true,
+    orderId: paidOrder.orderId,
     fulfillmentMethod: paidOrder.deliveryMethod,
     distanceKm: Number(paidOrder.distanceKm.toFixed(2)),
   }, 200, origin);

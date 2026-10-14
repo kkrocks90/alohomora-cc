@@ -22,14 +22,19 @@ test("normalizes valid customer email and rejects malformed addresses", () => {
   assert.equal(normalizeCustomerEmail(""), null);
 });
 
-test("customer email-code requests do not reveal whether an order email exists", async () => {
+test("first-time customers can request a code without revealing account existence", async (context) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response("{}", { status: 200 });
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
   const database = {
     prepare(sql) {
-      assert.match(sql, /SELECT 1 AS found FROM orders/i);
+      assert.match(sql, /INSERT INTO customer_login_codes/i);
       return {
         bind(email) {
           assert.equal(email, "customer@example.com");
-          return { first: async () => null };
+          return { run: async () => ({ meta: { changes: 1 } }) };
         },
       };
     },
@@ -47,7 +52,7 @@ test("customer email-code requests do not reveal whether an order email exists",
   );
 
   assert.equal(response.status, 202);
-  assert.match((await response.json()).message, /if a paid order is associated/i);
+  assert.match((await response.json()).message, /if we can send a sign-in code/i);
 });
 
 test("customer sign-in code endpoint requires configured email delivery", async () => {
@@ -92,7 +97,6 @@ test("one-time email code grants access to paid orders and logout revokes the se
           return this;
         },
         async first() {
-          if (/SELECT 1 AS found FROM orders/i.test(sql)) return { found: 1 };
           if (/SELECT code_hash, expires_at, attempts/i.test(sql)) {
             const challenge = database.challenge;
             return this.values[0] === challenge?.email
@@ -156,6 +160,10 @@ test("one-time email code grants access to paid orders and logout revokes the se
               currency: "INR",
               delivery_method: "Porter (manual booking)",
               created_at: "2026-10-14T00:00:00.000Z",
+              customer_name: "Customer Example",
+              customer_phone: "+911234567890",
+              delivery_address: "123 Sample Street",
+              event_date: "2026-12-25",
             }],
           };
         },
@@ -202,6 +210,10 @@ test("one-time email code grants access to paid orders and logout revokes the se
   );
   assert.equal(orders.status, 200);
   assert.equal(orders.body.orders[0].orderId, "order_test123");
+  assert.equal(orders.body.orders[0].customerName, "Customer Example");
+  assert.equal(orders.body.orders[0].customerPhone, "+911234567890");
+  assert.equal(orders.body.orders[0].deliveryAddress, "123 Sample Street");
+  assert.equal(orders.body.orders[0].eventDate, "2026-12-25");
 
   const replay = await verifyLoginCode(
     makeRequest("/auth/verify-code", { email: "customer@example.com", code }),
