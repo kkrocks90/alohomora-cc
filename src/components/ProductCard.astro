@@ -8,6 +8,7 @@ interface Product {
   price: number;
   packSize: string;
   tag: string;
+  flavours: string[];
   featured?: boolean;
 }
 
@@ -54,7 +55,10 @@ const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
     </div>
     <p>{product.description}</p>
     <div class="product-buy-row">
-      <strong>₹{product.price}</strong>
+      <div class="product-card-price">
+        <strong>₹{product.price}</strong>
+        {product.flavours.length > 0 && <span>{product.flavours.length} flavours</span>}
+      </div>
       <a class="add-button" href={productUrl}>Choose options <span aria-hidden="true">→</span></a>
     </div>
   </div>

@@ -440,6 +440,30 @@ h2 em {
   font-style: italic;
 }
 
+.announcement-strip {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 9px 16px;
+  background: #4a3026;
+  color: #fff8ee;
+  font-size: 11px;
+  letter-spacing: 0.035em;
+  text-align: center;
+  transition: background-color 160ms ease;
+}
+
+.announcement-strip:hover {
+  background: #624234;
+}
+
+.announcement-sparkle,
+.announcement-arrow {
+  color: #e2bb8a;
+}
+
 .promise-strip {
   display: flex;
   min-height: 64px;
@@ -458,6 +482,111 @@ h2 em {
 .promise-strip span:nth-child(even) {
   color: #b17a62;
   font-size: 14px;
+}
+
+.category-shortcuts {
+  width: min(100%, 1320px);
+  margin: 0 auto;
+  padding: 76px clamp(24px, 8vw, 118px) 0;
+}
+
+.category-shortcuts-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 23px;
+}
+
+.category-shortcuts-heading .eyebrow {
+  margin-bottom: 9px;
+}
+
+.category-shortcuts-heading h2 {
+  margin: 0;
+  color: var(--cocoa-dark);
+  font-family: var(--serif);
+  font-size: clamp(31px, 4vw, 45px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.category-shortcuts-heading h2 em {
+  color: #a8715b;
+  font-weight: 400;
+}
+
+.category-shortcuts-heading .text-link {
+  flex: 0 0 auto;
+  margin-bottom: 5px;
+}
+
+.category-shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.category-shortcut {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1.8;
+  background: #67483a;
+  isolation: isolate;
+}
+
+.category-shortcut-image,
+.category-shortcut-shade {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+}
+
+.category-shortcut-image {
+  z-index: -2;
+  object-fit: cover;
+  transition: transform 450ms ease;
+}
+
+.category-shortcut-shade {
+  z-index: -1;
+  background: linear-gradient(180deg, rgb(32 20 16 / 3%) 16%, rgb(32 20 16 / 68%) 100%);
+  transition: background-color 180ms ease;
+}
+
+.category-shortcut:hover .category-shortcut-image {
+  transform: scale(1.045);
+}
+
+.category-shortcut-copy {
+  position: absolute;
+  right: 17px;
+  bottom: 15px;
+  left: 17px;
+  display: grid;
+  gap: 5px;
+  color: #fffaf2;
+}
+
+.category-shortcut-copy strong {
+  font-family: var(--serif);
+  font-size: clamp(18px, 2.2vw, 27px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.category-shortcut-copy > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #f1d9bb;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .products-section {
@@ -611,20 +740,36 @@ h2 em {
   font-weight: 500;
 }
 
+.product-card-price {
+  display: grid;
+  gap: 2px;
+}
+
+.product-card-price > span {
+  color: #928072;
+  font-size: 10px;
+}
+
 .add-button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 0 6px 8px;
-  border: 0;
-  background: transparent;
-  color: #7a5040;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #e0d2c4;
+  border-radius: 2px;
+  background: #f4ede4;
+  color: #634435;
   cursor: pointer;
   font-size: 11px;
+  font-weight: 600;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
 .add-button:hover {
-  color: #b05f48;
+  border-color: #725041;
+  background: #725041;
+  color: #fffaf2;
 }
 
 .add-button span {
@@ -1209,7 +1354,7 @@ h2 em {
 .policy-content a:hover,
 .policy-page-nav a:hover,
 .policy-consent a:hover {
-  color: #b05f48;
+  color: #fffaf2;
 }
 
 .policy-page {
@@ -2244,6 +2389,13 @@ h2 em {
     scroll-padding-top: 75px;
   }
 
+  .announcement-strip {
+    min-height: 39px;
+    gap: 7px;
+    padding: 8px 11px;
+    font-size: 9px;
+  }
+
   .site-header {
     min-height: 69px;
     padding: 0 17px;
@@ -2393,6 +2545,49 @@ h2 em {
     display: none;
   }
 
+  .category-shortcuts {
+    padding: 52px 19px 0;
+  }
+
+  .category-shortcuts-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 11px;
+    margin-bottom: 17px;
+  }
+
+  .category-shortcuts-heading h2 {
+    font-size: 35px;
+  }
+
+  .category-shortcut-grid {
+    grid-auto-columns: minmax(78vw, 1fr);
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    gap: 12px;
+    margin-right: -19px;
+    overflow-x: auto;
+    padding-right: 19px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  .category-shortcut {
+    aspect-ratio: 1.65;
+    scroll-snap-align: start;
+  }
+
+  .category-shortcut-copy {
+    right: 13px;
+    bottom: 12px;
+    left: 13px;
+  }
+
+  .category-shortcut-copy strong {
+    font-size: 22px;
+  }
+
   .products-section {
     padding: 73px 19px 74px;
   }
@@ -2507,8 +2702,14 @@ h2 em {
     font-size: 15px;
   }
 
+  .product-card-price > span {
+    font-size: 9px;
+  }
+
   .add-button {
-    gap: 4px;
+    min-height: 31px;
+    gap: 5px;
+    padding: 0 7px;
     font-size: 10px;
   }
 

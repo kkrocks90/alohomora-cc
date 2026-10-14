@@ -16,6 +16,10 @@ if (catalog) {
   const loadButton = requireCatalogElement<HTMLButtonElement>(catalog, "#store-load-more");
   const loadingStatus = requireCatalogElement<HTMLElement>(catalog, "#store-loading");
   const sentinel = requireCatalogElement<HTMLElement>(catalog, "#store-scroll-sentinel");
+  const requestedTag = new URL(window.location.href).searchParams.get("category");
+  if (requestedTag && Array.from(filterSelect.options).some((option) => option.value === requestedTag)) {
+    filterSelect.value = requestedTag;
+  }
 
   const pageSize = 8;
   const products = Array.from(grid.querySelectorAll<HTMLElement>(".product-card"));
