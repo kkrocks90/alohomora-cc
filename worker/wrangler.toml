@@ -4,12 +4,12 @@ compatibility_date = "2025-08-01"
 
 [vars]
 ALLOWED_ORIGIN = "https://kkrocks90.github.io"
-STORE_LATITUDE = "REPLACE_WITH_STORE_LATITUDE"
-STORE_LONGITUDE = "REPLACE_WITH_STORE_LONGITUDE"
-LOGIN_FROM_EMAIL = "Chocolate Circle <orders@example.com>"
+STORE_LATITUDE = "12.9234"
+STORE_LONGITUDE = "80.1873"
+LOGIN_FROM_EMAIL = "Chocolate Circle <onboarding@resend.dev>"
 
 [[d1_databases]]
 binding = "ORDERS_DB"
 database_name = "cocoa-kind-orders"
-database_id = "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
+database_id = "47c716f8-d535-4705-85f0-e730284f6e77"
 migrations_dir = "migrations"
