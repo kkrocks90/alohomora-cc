@@ -18,6 +18,9 @@ if (root) {
   const emailInput = requireElement(root.querySelector<HTMLInputElement>("#account-email"), "#account-email");
   const codeInput = requireElement(root.querySelector<HTMLInputElement>("#account-code"), "#account-code");
   const status = requireElement(root.querySelector<HTMLElement>("#account-status"), "#account-status");
+  const profileSection = requireElement(root.querySelector<HTMLElement>("#account-profile"), "#account-profile");
+  const profileDetails = requireElement(root.querySelector<HTMLElement>("#profile-details"), "#profile-details");
+  const profileAddressList = requireElement(root.querySelector<HTMLElement>("#profile-address-list"), "#profile-address-list");
   const ordersSection = requireElement(root.querySelector<HTMLElement>("#account-orders"), "#account-orders");
   const orderList = requireElement(root.querySelector<HTMLElement>("#order-list"), "#order-list");
   const changeEmailButton = requireElement(
@@ -44,6 +47,19 @@ if (root) {
     }
   }
 
+  interface CustomerOrder {
+    orderId?: string;
+    status?: string;
+    items?: { name?: string; quantity?: number; flavour?: string; wrapper?: string }[];
+    amountPaise?: number;
+    createdAt?: string;
+    deliveryMethod?: string;
+    eventDate?: string;
+    customerName?: string;
+    customerPhone?: string;
+    deliveryAddress?: string;
+  }
+
   async function post(path: string, body?: unknown, token?: string) {
     if (!apiUrl) throw new Error("Customer sign-in is not configured yet. Please contact the shop.");
     const response = await fetch(`${apiUrl}${path}`, {
@@ -64,7 +80,54 @@ if (root) {
     return result;
   }
 
-  function showOrderHistory(orders: unknown[]) {
+  function showProfile(orders: CustomerOrder[], accountEmail: string) {
+    profileDetails.replaceChildren();
+    const latestOrder = orders[0];
+    const details = [
+      ["Email address", accountEmail],
+      ["Name", latestOrder?.customerName ?? ""],
+      ["Phone number", latestOrder?.customerPhone ?? ""],
+    ];
+    for (const [label, value] of details) {
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const description = document.createElement("dd");
+      description.textContent = value || "Not available from previous orders";
+      profileDetails.append(term, description);
+    }
+
+    profileAddressList.replaceChildren();
+    const uniqueAddresses = new Map<string, CustomerOrder>();
+    for (const order of orders) {
+      const address = order.deliveryAddress?.trim();
+      if (address && !uniqueAddresses.has(address.toLocaleLowerCase())) {
+        uniqueAddresses.set(address.toLocaleLowerCase(), order);
+      }
+    }
+    if (uniqueAddresses.size === 0) {
+      const empty = document.createElement("p");
+      empty.className = "account-empty";
+      empty.textContent = "Addresses from your paid orders will appear here.";
+      profileAddressList.append(empty);
+    } else {
+      for (const [address, order] of uniqueAddresses) {
+        const card = document.createElement("article");
+        card.className = "profile-address-card";
+        const addressText = document.createElement("p");
+        addressText.textContent = order.deliveryAddress ?? address;
+        const usedOn = document.createElement("span");
+        const date = order.createdAt ? new Date(order.createdAt) : null;
+        usedOn.textContent = date && !Number.isNaN(date.valueOf())
+          ? `Used for an order on ${date.toLocaleDateString("en-IN", { dateStyle: "medium" })}`
+          : "Used for a previous order";
+        card.append(addressText, usedOn);
+        profileAddressList.append(card);
+      }
+    }
+    profileSection.hidden = false;
+  }
+
+  function showOrderHistory(orders: CustomerOrder[]) {
     orderList.replaceChildren();
     if (orders.length === 0) {
       const empty = document.createElement("p");
@@ -81,16 +144,7 @@ if (root) {
       maximumFractionDigits: 2,
     });
     for (const value of orders) {
-      if (!value || typeof value !== "object") continue;
-      const order = value as {
-        orderId?: string;
-        status?: string;
-        items?: { name?: string; quantity?: number; flavour?: string; wrapper?: string }[];
-        amountPaise?: number;
-        createdAt?: string;
-        deliveryMethod?: string;
-        eventDate?: string;
-      };
+      const order = value;
       const card = document.createElement("article");
       card.className = "order-card";
       const heading = document.createElement("div");
@@ -132,10 +186,15 @@ if (root) {
     setBusy(true);
     try {
       const result = await post("/auth/orders", undefined, token);
-      showOrderHistory(Array.isArray(result.orders) ? result.orders : []);
+      const orders = Array.isArray(result.orders)
+        ? result.orders.filter((value): value is CustomerOrder => Boolean(value && typeof value === "object"))
+        : [];
+      const accountEmail = typeof result.email === "string" ? result.email : email;
+      showProfile(orders, accountEmail);
+      showOrderHistory(orders);
       emailForm.hidden = true;
       codeForm.hidden = true;
-      setStatus(`Signed in as ${String(result.email ?? email)}.`);
+      setStatus(`Signed in as ${accountEmail}.`);
     } catch (error) {
       if (error instanceof AccountApiError && error.status === 401) {
         sessionStorage.removeItem(sessionKey);
@@ -197,6 +256,7 @@ if (root) {
     try {
       if (token) await post("/auth/logout", undefined, token);
       sessionStorage.removeItem(sessionKey);
+      profileSection.hidden = true;
       ordersSection.hidden = true;
       emailForm.hidden = false;
       setStatus("You’re signed out.");

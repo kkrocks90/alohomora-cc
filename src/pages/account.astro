@@ -4,14 +4,13 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
 
-<SiteLayout title="My orders — Chocolate Circle" description="Sign in securely to view your Chocolate Circle orders.">
+<SiteLayout title="My profile — Chocolate Circle" description="Sign in securely to view your Chocolate Circle profile, delivery addresses, and orders.">
   <main class="account-page" id="customer-account" data-checkout-api={checkoutApiUrl}>
     <section class="account-panel" aria-labelledby="account-title">
       <p class="eyebrow">Your little chocolate corner</p>
-      <h1 id="account-title">My orders</h1>
+      <h1 id="account-title">My profile</h1>
       <p class="account-intro">
-        Enter the email address you used at checkout. We’ll send a one-time code to show your
-        paid orders.
+        Sign in with your email to view your details, delivery addresses, and order history.
       </p>
 
       <form class="account-form" id="account-email-form">
@@ -39,18 +38,31 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           maxlength="6"
           required
         />
-        <button class="button button-primary" type="submit">View my orders <span aria-hidden="true">↗</span></button>
+        <button class="button button-primary" type="submit">View my profile <span aria-hidden="true">↗</span></button>
         <button class="account-text-button" id="account-change-email" type="button">Use a different email</button>
       </form>
 
       <p class="account-status" id="account-status" role="status" aria-live="polite"></p>
-      <section class="account-orders" id="account-orders" aria-live="polite" hidden>
+      <section class="account-profile" id="account-profile" aria-labelledby="account-profile-title" hidden>
+        <div class="account-orders-heading">
+          <div>
+            <p class="eyebrow">Your account</p>
+            <h2 id="account-profile-title">Personal details</h2>
+          </div>
+          <button class="account-text-button" id="account-sign-out" type="button">Sign out</button>
+        </div>
+        <dl class="profile-details" id="profile-details"></dl>
+        <div class="profile-addresses">
+          <h3>Addresses from your orders</h3>
+          <div class="profile-address-list" id="profile-address-list"></div>
+        </div>
+      </section>
+      <section class="account-orders" id="account-orders" aria-labelledby="account-orders-title" aria-live="polite" hidden>
         <div class="account-orders-heading">
           <div>
             <p class="eyebrow">Made with love</p>
-            <h2>Your order history</h2>
+            <h2 id="account-orders-title">Your order history</h2>
           </div>
-          <button class="account-text-button" id="account-sign-out" type="button">Sign out</button>
         </div>
         <div class="order-list" id="order-list"></div>
       </section>

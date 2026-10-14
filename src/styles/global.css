@@ -1366,6 +1366,7 @@ h2 em {
 }
 
 .account-form[hidden],
+.account-profile[hidden],
 .account-orders[hidden] {
   display: none;
 }
@@ -1401,6 +1402,12 @@ h2 em {
   border-top: 1px solid var(--line);
 }
 
+.account-profile {
+  margin-top: 31px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+
 .account-orders-heading {
   display: flex;
   align-items: end;
@@ -1415,6 +1422,59 @@ h2 em {
 
 .account-orders h2 {
   font-size: clamp(25px, 5vw, 34px);
+}
+
+.profile-details {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.45fr) minmax(0, 1fr);
+  gap: 11px 16px;
+  margin: 18px 0 25px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.profile-details dt {
+  color: #89786d;
+}
+
+.profile-details dd {
+  margin: 0;
+  color: #493027;
+  overflow-wrap: anywhere;
+}
+
+.profile-addresses h3 {
+  margin: 0 0 11px;
+  color: #493027;
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 400;
+}
+
+.profile-address-list {
+  display: grid;
+  gap: 9px;
+}
+
+.profile-address-card {
+  padding: 13px 15px;
+  border: 1px solid #e8ded3;
+  background: #fff;
+}
+
+.profile-address-card p {
+  margin: 0;
+  color: #493027;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.profile-address-card span {
+  display: block;
+  margin-top: 5px;
+  color: #89786d;
+  font-size: 11px;
 }
 
 .order-list {

@@ -133,7 +133,7 @@ async function loadOrder() {
     return;
   }
   if (!apiUrl) {
-    status.textContent = "Order details are unavailable right now. Please visit My orders.";
+    status.textContent = "Order details are unavailable right now. Please visit your profile.";
     return;
   }
   const response = await fetch(`${apiUrl}/auth/orders`, {
@@ -160,7 +160,7 @@ async function loadOrder() {
   }
   const order = payload.orders.find((entry) => isOrder(entry) && entry.orderId === orderId);
   if (!isOrder(order)) {
-    status.textContent = "We couldn’t find this paid order in your account. Check My orders or contact the shop.";
+    status.textContent = "We couldn’t find this paid order in your account. Check your profile or contact the shop.";
     return;
   }
   renderOrder(order);
