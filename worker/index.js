@@ -76,7 +76,7 @@ function validateOrder(body, storeLocation) {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim())) {
     throw new Error("Please enter a valid email address.");
   }
-  if (!Array.isArray(body.items) || body.items.length === 0 || body.items.length > products.length) {
+  if (!Array.isArray(body.items) || body.items.length === 0 || body.items.length > 8) {
     throw new Error("Your bag does not contain a valid selection.");
   }
 
@@ -85,13 +85,28 @@ function validateOrder(body, storeLocation) {
   const items = body.items.map((item) => {
     if (!item || typeof item !== "object" || typeof item.id !== "string" ||
         !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > MAX_QUANTITY ||
-        seen.has(item.id)) {
-      throw new Error("Your bag contains an invalid item or quantity.");
+        typeof item.flavour !== "string" ||
+        typeof item.wrapper !== "string" || item.wrapper.trim().length < 3 ||
+        item.wrapper.trim().length > 120) {
+      throw new Error("Each product needs a valid quantity, any required flavour choice, and a wrapper description (3 to 120 characters).");
     }
     const product = productById.get(item.id);
     if (!product) throw new Error("A product in your bag is no longer available.");
-    seen.add(item.id);
-    return { product, quantity: item.quantity };
+    if (
+      (product.flavours.length > 0 && !product.flavours.includes(item.flavour)) ||
+      (product.flavours.length === 0 && item.flavour !== "")
+    ) {
+      throw new Error("Choose a valid flavour for each product that offers one.");
+    }
+    const variantKey = JSON.stringify([item.id, item.flavour, item.wrapper]);
+    if (seen.has(variantKey)) throw new Error("Your bag contains the same product options more than once.");
+    seen.add(variantKey);
+    return {
+      product,
+      quantity: item.quantity,
+      flavour: item.flavour,
+      wrapper: item.wrapper.trim(),
+    };
   });
 
   const amount = items.reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
@@ -131,12 +146,27 @@ async function handleCreateOrder(request, env, origin) {
     return errorResponse(error.message, 400, origin);
   }
 
+  const serializedItems = JSON.stringify(order.items.map(({ product, quantity, flavour, wrapper }) => [
+    product.id,
+    quantity,
+    product.price,
+    flavour,
+    wrapper,
+  ]));
+  const itemNoteChunks = serializedItems.match(/[\s\S]{1,240}/g) ?? [];
+  if (itemNoteChunks.length > 8) {
+    return errorResponse("Your order has too many customizations to process. Please contact the shop.", 400, origin);
+  }
+
+  const itemNotes = Object.fromEntries(
+    itemNoteChunks.map((chunk, index) => [index === 0 ? "items" : `items_${index}`, chunk]),
+  );
   const notes = {
     customer_name: order.customer.name.trim(),
     phone: order.customer.phone.trim(),
     email: order.customer.email.trim().toLowerCase(),
     address: order.customer.address.trim(),
-    items: JSON.stringify(order.items.map(({ product, quantity }) => [product.id, quantity, product.price])),
+    ...itemNotes,
     delivery_method: order.fulfillmentMethod,
     distance_km: order.distanceKm.toFixed(2),
     policies_ok: "terms_conditions, privacy_policy, shipping_policy",

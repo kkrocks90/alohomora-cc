@@ -41,8 +41,15 @@ const paidOrder = {
   customerPhone: "+911234567890",
   customerEmail: "customer@example.com",
   deliveryAddress: "123 Sample Street",
-  items: [{ id: "midnight-dark", name: "Midnight Dark", quantity: 2, unitPriceRupees: 349 }],
-  amountPaise: 69800,
+  items: [{
+    id: "product-1001",
+    name: "Choco Cubes (Pack of 40)",
+    quantity: 2,
+    unitPriceRupees: 800,
+    flavour: "Chocolate",
+    wrapper: "A red wrapper with a birthday message",
+  }],
+  amountPaise: 160000,
   deliveryMethod: "Porter (manual booking)",
   distanceKm: 5.25,
 };
@@ -53,7 +60,7 @@ function createPaidNotes(overrides = {}) {
     phone: "+911234567890",
     email: "customer@example.com",
     address: "123 Sample Street",
-    items: JSON.stringify([["midnight-dark", 2, 349]]),
+    items: JSON.stringify([["product-1001", 2, 800, "Chocolate", "A red wrapper with a birthday message"]]),
     delivery_method: "Porter (manual booking)",
     distance_km: "5.25",
     policies_ok: "terms_conditions, privacy_policy, shipping_policy",
@@ -76,15 +83,22 @@ test("reconstructs verified order details from Razorpay order notes", () => {
 test("does not accept paid order notes with tampered price or delivery method", () => {
   assert.throws(
     () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
-      items: JSON.stringify([["midnight-dark", 1, 349]]),
+      items: JSON.stringify([["product-1001", 1, 800]]),
     }), paidOrder.amountPaise),
     /amount does not match/,
   );
   assert.deepEqual(
     parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
-      items: JSON.stringify([["midnight-dark", 2, 350]]),
-    }), 70000).items,
-    [{ id: "midnight-dark", name: "Midnight Dark", quantity: 2, unitPriceRupees: 350 }],
+      items: JSON.stringify([["product-1001", 2, 801, "Chocolate", "A red wrapper with a birthday message"]]),
+    }), 160200).items,
+    [{
+      id: "product-1001",
+      name: "Choco Cubes (Pack of 40)",
+      quantity: 2,
+      unitPriceRupees: 801,
+      flavour: "Chocolate",
+      wrapper: "A red wrapper with a birthday message",
+    }],
   );
   assert.throws(
     () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
@@ -93,6 +107,71 @@ test("does not accept paid order notes with tampered price or delivery method", 
     }), paidOrder.amountPaise),
     /invalid delivery method/,
   );
+});
+
+test("validates required flavours and wrapper descriptions and preserves product variants", () => {
+  const notes = createPaidNotes({
+    items: JSON.stringify([
+      ["product-1001", 1, 800, "Dark Chocolate", "Floral"],
+      ["product-1001", 1, 800, "Almonds", "A blue wrapper with a birthday note"],
+    ]),
+  });
+  const order = parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, notes, 160000);
+  assert.equal(order.items.length, 2);
+  assert.equal(order.items[0].flavour, "Dark Chocolate");
+  assert.equal(order.items[1].wrapper, "A blue wrapper with a birthday note");
+
+  assert.throws(
+    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
+      items: JSON.stringify([["product-1001", 2, 800, "", "A red wrapper with a birthday message"]]),
+    }), paidOrder.amountPaise),
+    /invalid product, quantity, flavour, or wrapper/,
+  );
+  assert.throws(
+    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
+      items: JSON.stringify([["product-1001", 2, 800, "Chocolate", "  "]]),
+    }), paidOrder.amountPaise),
+    /invalid product, quantity, flavour, or wrapper/,
+  );
+  assert.throws(
+    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
+      items: JSON.stringify([["product-1001", 2, 800, "Chocolate", "x".repeat(121)]]),
+    }), paidOrder.amountPaise),
+    /invalid product, quantity, flavour, or wrapper/,
+  );
+  assert.throws(
+    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
+      items: JSON.stringify([
+        ["product-1001", 1, 800, "Dark Chocolate", "Floral"],
+        ["product-1001", 1, 800, "Dark Chocolate", "Floral"],
+      ]),
+    }), paidOrder.amountPaise),
+    /duplicate product options/,
+  );
+});
+
+test("continues to verify paid orders created before product options were added", () => {
+  const order = parsePaidOrderNotes(
+    paidOrder.orderId,
+    paidOrder.paymentId,
+    createPaidNotes({ items: JSON.stringify([["product-1001", 2, 800]]) }),
+    paidOrder.amountPaise,
+  );
+  assert.equal(order.items[0].flavour, "Not selected (legacy order)");
+  assert.equal(order.items[0].wrapper, "Not selected (legacy order)");
+});
+
+test("reconstructs a product order without flavour options", () => {
+  const order = parsePaidOrderNotes(
+    paidOrder.orderId,
+    paidOrder.paymentId,
+    createPaidNotes({
+      items: JSON.stringify([["product-1002", 1, 2400, "", "A blue wrapper with a gift note"]]),
+    }),
+    240000,
+  );
+  assert.equal(order.items[0].name, "Treasure Tin - ₹120 Edition (Pack of 20)");
+  assert.equal(order.items[0].flavour, "");
 });
 
 test("stores a verified paid order once", async () => {

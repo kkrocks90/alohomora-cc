@@ -1,0 +1,96 @@
+---
+import { Image, type ImageMetadata } from "astro:assets";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import products from "../../data/products.json";
+
+const productImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/products/*.{jpg,jpeg,png,webp,svg}",
+  {
+    eager: true,
+  },
+);
+const imagesByName = Object.fromEntries(
+  Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
+);
+
+export function getStaticPaths() {
+  return products.map((product) => ({ params: { id: product.id }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const image = imagesByName[product.image];
+if (!image) throw new Error(`Product image not found: ${product.image}`);
+const base = import.meta.env.BASE_URL;
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+---
+
+<SiteLayout title={`${product.name} — Chocolate Circle`} description={product.description}>
+  <main class="product-detail-page" id="storefront" data-checkout-api={checkoutApiUrl}>
+    <nav class="product-breadcrumb" aria-label="Breadcrumb">
+      <a href={`${base}store/`}>Shop all treats</a>
+      <span aria-hidden="true">/</span>
+      <span>{product.name}</span>
+    </nav>
+    <article class="product-detail">
+      <div class="product-detail-image">
+        <Image
+          src={image}
+          alt={`${product.name}, handmade by Chocolate Circle`}
+          width={800}
+          height={720}
+          widths={[400, 600, 800]}
+          sizes="(max-width: 760px) 100vw, 50vw"
+          format="webp"
+          quality={84}
+          priority
+        />
+        <span class="product-tag">{product.tag}</span>
+      </div>
+      <div class="product-detail-copy">
+        <p class="eyebrow">Handmade in small batches</p>
+        <h1>{product.name}</h1>
+        <p class="product-detail-description">{product.description}</p>
+        <div class="product-detail-price">
+          <strong>₹{product.price}</strong>
+          <span>{product.packSize}</span>
+        </div>
+        <p class="product-option-note">
+          {product.flavours.length > 0 && "Choose a flavour and "}
+          describe the wrapper you’d like.
+        </p>
+        <form class="product-options" id="product-options-form">
+          {product.flavours.length > 0 && (
+            <label>
+              Flavour <span>Required</span>
+              <select name="flavour" required>
+                <option value="" disabled selected>Choose a flavour</option>
+                {product.flavours.map((flavour) => <option value={flavour}>{flavour}</option>)}
+              </select>
+            </label>
+          )}
+          <label>
+            Describe your wrapper design <span>Required</span>
+            <textarea
+              name="wrapper"
+              rows="4"
+              minlength="3"
+              maxlength="120"
+              placeholder="For example: pink flowers with a birthday message"
+              required
+            ></textarea>
+          </label>
+          <button
+            class="button button-primary product-add-button"
+            type="button"
+            data-add-to-cart={product.id}
+            aria-label={`Add ${product.name}${product.flavours.length > 0 ? " with selected flavour" : ""} and wrapper to your bag`}
+          >
+            Add to bag <span aria-hidden="true">+</span>
+          </button>
+        </form>
+        <p class="product-detail-footnote">Please describe the colours, theme, or message you’d like (up to 120 characters). We’ll confirm what’s possible.</p>
+      </div>
+    </article>
+    <a class="product-back-link" href={`${base}store/`}>← Back to all treats</a>
+  </main>
+</SiteLayout>

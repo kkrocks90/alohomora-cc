@@ -32,9 +32,23 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
   }
 
   const deliveryAddress = requireNoteText(notes, "address", 250);
+  const itemNoteParts = [];
+  for (let index = 0; index < 8; index += 1) {
+    const key = index === 0 ? "items" : `items_${index}`;
+    const value = notes?.[key];
+    if (value === undefined) break;
+    if (typeof value !== "string" || value.length > 256) {
+      throw new Error("The paid order items could not be read.");
+    }
+    itemNoteParts.push(value);
+  }
+  const expectedItemNoteKeys = Object.keys(notes ?? {}).filter((key) => /^items(?:_[1-7])?$/.test(key));
+  if (expectedItemNoteKeys.length !== itemNoteParts.length) {
+    throw new Error("The paid order items could not be read.");
+  }
   let requestedItems;
   try {
-    requestedItems = JSON.parse(requireNoteText(notes, "items", 256));
+    requestedItems = JSON.parse(itemNoteParts.join(""));
   } catch {
     throw new Error("The paid order items could not be read.");
   }
@@ -46,25 +60,44 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
   const items = requestedItems.map((item) => {
     if (
       !Array.isArray(item) ||
-      item.length !== 3 ||
+      (item.length !== 3 && item.length !== 5) ||
       typeof item[0] !== "string" ||
       !Number.isInteger(item[1]) ||
       item[1] < 1 ||
       item[1] > MAX_QUANTITY ||
       !Number.isSafeInteger(item[2]) ||
-      item[2] < 1 ||
-      seen.has(item[0])
+      item[2] < 1
     ) {
-      throw new Error("The paid order contains an invalid product or quantity.");
+      throw new Error("The paid order contains an invalid product, quantity, flavour, or wrapper.");
     }
     const product = productById.get(item[0]);
     if (!product) throw new Error("The paid order contains an unknown product.");
-    seen.add(item[0]);
+    const legacyOptions = item.length === 3;
+    const flavour = legacyOptions ? "" : item[3];
+    const wrapper = legacyOptions ? "" : item[4];
+    if (
+      !legacyOptions &&
+      (typeof flavour !== "string" ||
+        (product.flavours.length > 0 && !product.flavours.includes(flavour)) ||
+        (product.flavours.length === 0 && flavour !== "") ||
+        typeof wrapper !== "string" ||
+        wrapper.trim().length < 3 ||
+        wrapper.trim().length > 120)
+    ) {
+      throw new Error("The paid order contains an invalid product, quantity, flavour, or wrapper.");
+    }
+    const storedFlavour = legacyOptions ? "Not selected (legacy order)" : flavour;
+    const storedWrapper = legacyOptions ? "Not selected (legacy order)" : wrapper.trim();
+    const variantKey = JSON.stringify([item[0], storedFlavour, storedWrapper]);
+    if (seen.has(variantKey)) throw new Error("The paid order contains duplicate product options.");
+    seen.add(variantKey);
     return {
       id: product.id,
       name: product.name,
       quantity: item[1],
       unitPriceRupees: item[2],
+      flavour: storedFlavour,
+      wrapper: storedWrapper,
     };
   });
 

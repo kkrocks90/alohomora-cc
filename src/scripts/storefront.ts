@@ -1,7 +1,23 @@
 import products from "../data/products.json";
 
-type Product = (typeof products)[number];
-type Cart = Record<string, number>;
+type Product = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  tag: string;
+  packSize: string;
+  flavours: string[];
+  featured?: boolean;
+};
+interface CartItem {
+  id: string;
+  quantity: number;
+  flavour: string;
+  wrapper: string;
+}
+type Cart = CartItem[];
 
 interface PaymentOrder {
   id: string;
@@ -71,30 +87,51 @@ const productById = new Map<string, Product>(products.map((product) => [product.
 const checkoutApiUrl = (storefront.dataset.checkoutApi ?? "").replace(/\/+$/, "");
 const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 const storageKey = "cocoa-kind-cart-v1";
+let legacyCartNeedsOptions = false;
 let cart: Cart = loadCart();
 let previousFocus: HTMLElement | null = null;
 let paymentConfirmed = false;
 
 function loadCart(): Cart {
   const saved = localStorage.getItem(storageKey);
-  if (!saved) return {};
+  if (!saved) return [];
 
   const parsed: unknown = JSON.parse(saved);
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+  if (!parsed || typeof parsed !== "object") {
     throw new Error("Your saved shopping bag could not be read. Please clear this site's saved data and try again.");
   }
 
-  const restored: Cart = {};
-  for (const [id, quantity] of Object.entries(parsed)) {
-    if (productById.has(id) && Number.isInteger(quantity) && quantity > 0 && quantity <= 20) {
-      restored[id] = quantity;
-    }
+  if (!Array.isArray(parsed)) {
+    localStorage.removeItem(storageKey);
+    legacyCartNeedsOptions = true;
+    return [];
   }
-  return restored;
+
+  return parsed.filter((item): item is CartItem =>
+    Boolean(
+      item &&
+      typeof item === "object" &&
+      productById.has(item.id) &&
+      Number.isInteger(item.quantity) &&
+      item.quantity > 0 &&
+      item.quantity <= 20 &&
+      typeof item.flavour === "string" &&
+      (productById.get(item.id)!.flavours.length > 0
+        ? productById.get(item.id)!.flavours.includes(item.flavour)
+        : item.flavour === "") &&
+      typeof item.wrapper === "string" &&
+      item.wrapper.trim().length >= 3 &&
+      item.wrapper.trim().length <= 120,
+    ),
+  );
 }
 
 function saveCart() {
   localStorage.setItem(storageKey, JSON.stringify(cart));
+}
+
+function getCartItemKey(item: Pick<CartItem, "id" | "flavour" | "wrapper">) {
+  return JSON.stringify([item.id, item.flavour, item.wrapper]);
 }
 
 function setStatus(message: string, state: "info" | "error" | "success" = "info") {
@@ -104,9 +141,9 @@ function setStatus(message: string, state: "info" | "error" | "success" = "info"
 
 function renderCart() {
   cartItems.replaceChildren();
-  const entries = Object.entries(cart).filter(([id, quantity]) => productById.has(id) && quantity > 0);
-  const count = entries.reduce((sum, [, quantity]) => sum + quantity, 0);
-  const total = entries.reduce((sum, [id, quantity]) => sum + productById.get(id)!.price * quantity, 0);
+  const entries = cart.filter((item) => productById.has(item.id) && item.quantity > 0);
+  const count = entries.reduce((sum, item) => sum + item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity, 0);
 
   bagCount.textContent = String(count);
   openCartButton.setAttribute("aria-label", `Your shopping bag, ${count} ${count === 1 ? "item" : "items"}`);
@@ -119,8 +156,8 @@ function renderCart() {
   cartSummary.hidden = entries.length === 0;
   cartTotal.textContent = currency.format(total);
 
-  for (const [id, quantity] of entries) {
-    const product = productById.get(id)!;
+  for (const item of entries) {
+    const product = productById.get(item.id)!;
     const row = document.createElement("div");
     row.className = "cart-line";
 
@@ -130,7 +167,15 @@ function renderCart() {
     name.textContent = product.name;
     const price = document.createElement("span");
     price.textContent = `${currency.format(product.price)} each`;
-    copy.append(name, price);
+    const wrapper = document.createElement("span");
+    wrapper.textContent = `Wrapper: ${item.wrapper}`;
+    copy.append(name);
+    if (item.flavour) {
+      const flavour = document.createElement("span");
+      flavour.textContent = `Flavour: ${item.flavour}`;
+      copy.append(flavour);
+    }
+    copy.append(wrapper, price);
 
     const controls = document.createElement("div");
     controls.className = "cart-quantity";
@@ -139,16 +184,20 @@ function renderCart() {
     decrease.textContent = "−";
     decrease.setAttribute("aria-label", `Remove one ${product.name}`);
     decrease.dataset.cartAction = "decrease";
-    decrease.dataset.productId = id;
+    decrease.dataset.productId = item.id;
+    decrease.dataset.productFlavour = item.flavour;
+    decrease.dataset.productWrapper = item.wrapper;
     const amount = document.createElement("span");
-    amount.textContent = String(quantity);
-    amount.setAttribute("aria-label", `${quantity} ${quantity === 1 ? "item" : "items"}`);
+    amount.textContent = String(item.quantity);
+    amount.setAttribute("aria-label", `${item.quantity} ${item.quantity === 1 ? "item" : "items"}`);
     const increase = document.createElement("button");
     increase.type = "button";
     increase.textContent = "+";
     increase.setAttribute("aria-label", `Add one ${product.name}`);
     increase.dataset.cartAction = "increase";
-    increase.dataset.productId = id;
+    increase.dataset.productId = item.id;
+    increase.dataset.productFlavour = item.flavour;
+    increase.dataset.productWrapper = item.wrapper;
     controls.append(decrease, amount, increase);
     row.append(copy, controls);
     cartItems.append(row);
@@ -224,10 +273,29 @@ document.addEventListener("click", (event) => {
   if (addButton) {
     const id = addButton.dataset.addToCart;
     if (!id || !productById.has(id)) throw new Error(`Unknown product in storefront: ${id ?? "missing id"}`);
+    const optionsForm = addButton.closest<HTMLFormElement>("#product-options-form");
+    if (!optionsForm || !optionsForm.reportValidity()) return;
+    const formData = new FormData(optionsForm);
+    const flavour = String(formData.get("flavour") ?? "");
+    const wrapper = String(formData.get("wrapper") ?? "").trim();
+    const product = productById.get(id)!;
+    const hasValidFlavour = product.flavours.length > 0
+      ? product.flavours.includes(flavour)
+      : flavour === "";
+    if (!hasValidFlavour || wrapper.length < 3 || wrapper.length > 120) {
+      setStatus("Choose an available flavour and describe your wrapper design in 3 to 120 characters.", "error");
+      return;
+    }
     paymentConfirmed = false;
-    cart[id] = Math.min((cart[id] ?? 0) + 1, 20);
+    const newItem = { id, quantity: 1, flavour, wrapper };
+    const existingItem = cart.find((item) => getCartItemKey(item) === getCartItemKey(newItem));
+    if (existingItem) existingItem.quantity = Math.min(existingItem.quantity + 1, 20);
+    else cart.push(newItem);
     saveCart();
     renderCart();
+    if (legacyCartNeedsOptions) {
+      setStatus("Your saved bag needed flavour and wrapper choices, so it was cleared. Please choose both options again.", "info");
+    }
     setStatus("");
     openCart();
     return;
@@ -235,12 +303,15 @@ document.addEventListener("click", (event) => {
 
   const quantityButton = event.target.closest<HTMLButtonElement>("[data-cart-action]");
   const id = quantityButton?.dataset.productId;
-  if (!quantityButton || !id || !productById.has(id)) return;
-  const current = cart[id] ?? 0;
-  cart[id] = quantityButton.dataset.cartAction === "increase"
-    ? Math.min(current + 1, 20)
-    : Math.max(current - 1, 0);
-  if (cart[id] === 0) delete cart[id];
+  const flavour = quantityButton?.dataset.productFlavour;
+  const wrapper = quantityButton?.dataset.productWrapper;
+  if (!quantityButton || !id || typeof flavour !== "string" || !wrapper || !productById.has(id)) return;
+  const item = cart.find((entry) => getCartItemKey(entry) === getCartItemKey({ id, flavour, wrapper }));
+  if (!item) return;
+  item.quantity = quantityButton.dataset.cartAction === "increase"
+    ? Math.min(item.quantity + 1, 20)
+    : Math.max(item.quantity - 1, 0);
+  if (item.quantity === 0) cart = cart.filter((entry) => entry !== item);
   saveCart();
   renderCart();
 });
@@ -331,7 +402,7 @@ async function verifyPayment(payment: PaymentResponse) {
   });
   const confirmation = await readApiResponse(response, isVerifiedPayment);
   paymentConfirmed = true;
-  cart = {};
+  cart = [];
   saveCart();
   renderCart();
   setStatus(
@@ -349,9 +420,9 @@ checkoutForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  const items = Object.entries(cart)
-    .filter(([, quantity]) => quantity > 0)
-    .map(([id, quantity]) => ({ id, quantity }));
+  const items = cart
+    .filter((item) => item.quantity > 0)
+    .map(({ id, quantity, flavour, wrapper }) => ({ id, quantity, flavour, wrapper }));
   if (items.length === 0) return;
 
   const formData = new FormData(checkoutForm);

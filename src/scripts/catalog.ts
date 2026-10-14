@@ -54,7 +54,7 @@ if (catalog) {
       grid.append(product);
     });
     emptyState.hidden = matchingProducts.length > 0;
-    resultCount.textContent = `${matchingProducts.length} ${matchingProducts.length === 1 ? "chocolate" : "chocolates"}`;
+    resultCount.textContent = `${matchingProducts.length} ${matchingProducts.length === 1 ? "product" : "products"}`;
     loadButton.hidden = matchingProducts.length <= visibleCount;
   }
 

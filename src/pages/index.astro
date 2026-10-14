@@ -5,9 +5,12 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 import heroImage from "../assets/hero-chocolates.svg";
 import products from "../data/products.json";
 
-const productImages = import.meta.glob<{ default: ImageMetadata }>("../assets/products/*.svg", {
-  eager: true,
-});
+const productImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/products/*.{jpg,jpeg,png,webp,svg}",
+  {
+    eager: true,
+  },
+);
 const imagesByName = Object.fromEntries(
   Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
 );
@@ -73,10 +76,10 @@ const highlightedProducts = products.filter((product) => product.featured);
     <section class="products-section" id="chocolates">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">The chocolate shelf</p>
+          <p class="eyebrow">The treats shelf</p>
           <h2>Meet the <em>sweet ones.</em></h2>
         </div>
-        <p>Some little favourites for slow afternoons and big celebrations.</p>
+        <p>Handmade favourites for slow afternoons and big celebrations.</p>
       </div>
       <div class="product-grid featured-grid">
         {highlightedProducts.map((product, index) => {
@@ -87,7 +90,7 @@ const highlightedProducts = products.filter((product) => product.featured);
       </div>
       <p class="catalog-note">
         Everything is made in small batches. If your favourite sells out, it’ll be back soon.
-        <a class="text-link" href={`${import.meta.env.BASE_URL}store/`}>Explore all chocolates <span aria-hidden="true">→</span></a>
+        <a class="text-link" href={`${import.meta.env.BASE_URL}store/`}>Explore all treats <span aria-hidden="true">→</span></a>
       </p>
     </section>
 

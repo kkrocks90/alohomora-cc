@@ -37,11 +37,45 @@ const base = import.meta.env.BASE_URL;
       </nav>
       <a class="shop-link" href={`${base}store/`}>Shop</a>
       <a class="account-link" href={`${base}account/`}>My orders</a>
+      <button
+        class="menu-toggle"
+        id="open-mobile-menu"
+        type="button"
+        aria-label="Open navigation menu"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <button class="bag-button" id="open-cart" type="button" aria-controls="cart-drawer" aria-expanded="false">
         <span>My bag</span>
         <span class="bag-count" id="bag-count" aria-live="polite">0</span>
       </button>
     </header>
+
+    <div class="mobile-menu-backdrop" id="mobile-menu-backdrop" hidden></div>
+    <aside
+      class="mobile-menu"
+      id="mobile-menu"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mobile-menu-title"
+      aria-hidden="true"
+    >
+      <div class="mobile-menu-heading">
+        <p class="eyebrow" id="mobile-menu-title">Find your favourites</p>
+        <button class="icon-button" id="close-mobile-menu" type="button" aria-label="Close navigation menu">×</button>
+      </div>
+      <nav class="mobile-menu-links" aria-label="Mobile navigation">
+        <a href={`${base}store/`}>Shop all treats <span aria-hidden="true">↗</span></a>
+        <a href={`${base}#chocolates`}>Featured <span aria-hidden="true">↗</span></a>
+        <a href={`${base}#our-story`}>Our little story <span aria-hidden="true">↗</span></a>
+        <a href={`${base}#kindness`}>Good to know <span aria-hidden="true">↗</span></a>
+        <a href={`${base}account/`}>My orders <span aria-hidden="true">↗</span></a>
+      </nav>
+    </aside>
 
     <slot />
 
@@ -51,7 +85,7 @@ const base = import.meta.env.BASE_URL;
         <span>chocolate <i>circle</i></span>
       </a>
       <p>A little chocolate. A lot of heart.</p>
-      <a href={`${base}store/`}>Shop all chocolates ↑</a>
+      <a href={`${base}store/`}>Shop all treats ↑</a>
       <nav class="policy-links" aria-label="Policies">
         <a href={`${base}account/`}>My orders</a>
         <a href={`${base}terms-and-conditions/`}>Terms &amp; Conditions</a>
@@ -163,6 +197,7 @@ const base = import.meta.env.BASE_URL;
       <p class="payment-footnote">Secure checkout by Razorpay · Your payment details never touch our website.</p>
     </aside>
     <script>
+      import "../scripts/navigation";
       import "../scripts/storefront";
     </script>
   </body>

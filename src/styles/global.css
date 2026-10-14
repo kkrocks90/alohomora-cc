@@ -123,6 +123,103 @@ button {
   white-space: nowrap;
 }
 
+.menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0;
+  border: 1px solid #ddcfc0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  width: 16px;
+  height: 1px;
+  background: #624234;
+  transition: width 160ms ease;
+}
+
+.menu-toggle:hover span:nth-child(2) {
+  width: 11px;
+}
+
+.mobile-menu-backdrop {
+  position: fixed;
+  z-index: 29;
+  background: rgb(38 25 19 / 44%);
+  inset: 0;
+}
+
+.mobile-menu {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  right: 0;
+  display: flex;
+  width: min(86vw, 360px);
+  height: 100dvh;
+  flex-direction: column;
+  padding: 31px 26px;
+  background: var(--paper);
+  box-shadow: -14px 0 46px rgb(47 31 22 / 14%);
+  transform: translateX(105%);
+  transition: transform 260ms ease, visibility 260ms;
+  visibility: hidden;
+}
+
+.mobile-menu[aria-hidden="false"] {
+  transform: translateX(0);
+  transition: transform 260ms ease;
+  visibility: visible;
+}
+
+.mobile-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 19px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mobile-menu-heading .eyebrow {
+  margin: 0;
+}
+
+.mobile-menu-links {
+  display: grid;
+  margin-top: 15px;
+}
+
+.mobile-menu-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  color: #563b30;
+  font-family: var(--serif);
+  font-size: 21px;
+}
+
+.mobile-menu-links a span {
+  color: #a47d67;
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.mobile-menu-links a:hover {
+  color: #a25f4c;
+}
+
 .bag-button {
   display: inline-flex;
   align-items: center;
@@ -442,6 +539,10 @@ h2 em {
   transform: scale(1.035);
 }
 
+.product-detail-link {
+  display: block;
+}
+
 .product-tag {
   position: absolute;
   top: 12px;
@@ -473,6 +574,10 @@ h2 em {
   font-size: clamp(16px, 1.65vw, 20px);
   font-weight: 500;
   letter-spacing: -0.03em;
+}
+
+.product-name-row h3 a:hover {
+  color: #a25f4c;
 }
 
 .product-weight {
@@ -653,6 +758,170 @@ h2 em {
 .store-load-more[hidden],
 .store-empty[hidden] {
   display: none;
+}
+
+.product-detail-page {
+  width: min(100%, 1200px);
+  min-height: 65vh;
+  margin: 0 auto;
+  padding: 30px clamp(20px, 5vw, 70px) 70px;
+}
+
+.product-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 24px;
+  color: #8c796b;
+  font-size: 10px;
+}
+
+.product-breadcrumb a,
+.product-back-link {
+  color: #805744;
+  text-decoration: underline;
+  text-decoration-color: #c5a58c;
+  text-underline-offset: 3px;
+}
+
+.product-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(30px, 7vw, 90px);
+}
+
+.product-detail-image {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1.06;
+  background: #e9dfd3;
+}
+
+.product-detail-image > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-detail-copy {
+  padding: 25px 0;
+}
+
+.product-detail-copy > .eyebrow {
+  margin-bottom: 11px;
+}
+
+.product-detail-copy h1 {
+  margin: 0;
+  color: var(--cocoa-dark);
+  font-family: var(--serif);
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+.product-detail-description {
+  margin: 15px 0 20px;
+  color: #79685d;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.product-detail-price {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.product-detail-price strong {
+  color: #53382d;
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.product-detail-price span {
+  color: #98877a;
+  font-size: 11px;
+}
+
+.product-option-note {
+  margin: 20px 0 13px;
+  color: #79685d;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.product-options {
+  display: grid;
+  gap: 15px;
+}
+
+.product-options label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  color: #6b5549;
+  font-size: 11px;
+}
+
+.product-options label > span {
+  color: #a25f4c;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.product-options select,
+.product-options textarea {
+  width: 100%;
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  outline-color: #9e7460;
+  background: #fffdf9;
+  color: #46332a;
+  font: inherit;
+  font-size: 12px;
+}
+
+.product-options select {
+  min-height: 44px;
+}
+
+.product-options textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.product-add-button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.product-detail-footnote {
+  margin: 13px 0 0;
+  color: #938176;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.product-back-link {
+  display: inline-block;
+  margin-top: 33px;
+  font-size: 11px;
+}
+
+.cart-line-copy > span {
+  display: block;
+  margin-top: 4px;
 }
 
 .story-section {
@@ -1523,6 +1792,10 @@ h2 em {
   .story-aside {
     display: none;
   }
+
+  .product-detail {
+    gap: 30px;
+  }
 }
 
 @media (max-width: 620px) {
@@ -1551,7 +1824,17 @@ h2 em {
   }
 
   .shop-link {
-    display: inline-flex;
+    display: none;
+  }
+
+  .account-link {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: flex;
+    margin-left: auto;
+    margin-right: 9px;
   }
 
   .bag-button {
@@ -1641,6 +1924,39 @@ h2 em {
 
   .store-count {
     margin: 14px 0;
+  }
+
+  .product-detail-page {
+    padding: 20px 19px 54px;
+  }
+
+  .product-breadcrumb {
+    margin-bottom: 17px;
+  }
+
+  .product-detail {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .product-detail-copy {
+    padding: 8px 0 0;
+  }
+
+  .product-detail-copy h1 {
+    font-size: 40px;
+  }
+
+  .product-detail-description {
+    margin: 10px 0 15px;
+  }
+
+  .product-option-note {
+    margin-top: 15px;
+  }
+
+  .product-back-link {
+    margin-top: 23px;
   }
 
   .section-heading {

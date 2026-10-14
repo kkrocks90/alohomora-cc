@@ -85,7 +85,7 @@ if (root) {
       const order = value as {
         orderId?: string;
         status?: string;
-        items?: { name?: string; quantity?: number }[];
+        items?: { name?: string; quantity?: number; flavour?: string; wrapper?: string }[];
         amountPaise?: number;
         createdAt?: string;
         deliveryMethod?: string;
@@ -113,7 +113,11 @@ if (root) {
       const items = document.createElement("ul");
       for (const item of order.items ?? []) {
         const line = document.createElement("li");
-        line.textContent = `${item.name ?? "Chocolate"} × ${item.quantity ?? 1}`;
+        line.textContent = [
+          `${item.name ?? "Product"} × ${item.quantity ?? 1}`,
+          item.flavour || "",
+          item.wrapper ?? "Wrapper not recorded",
+        ].filter(Boolean).join(" · ");
         items.append(line);
       }
       card.append(heading, details, items);

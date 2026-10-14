@@ -1,6 +1,6 @@
 # Chocolate Circle chocolate shop
 
-A fast, static Astro storefront for a small handmade-chocolate business. The sample shop name, descriptions, prices, and illustrated wrappers are placeholders; update them before publishing. Product details live in one JSON file. The supplied illustrations are lightweight SVGs; Astro creates responsive WebP variants at build time when you add raster product photographs.
+A fast, static Astro storefront for Chocolate Circle. Product names, listed prices, photographs, and Choco Cubes flavour choices come from the shop's [Jotform order form](https://form.jotform.com/253120957812456). The concise descriptions and browse categories are site copy based on those product names and pack sizes. Product details live in one JSON file, with locally stored photographs optimized by Astro at build time.
 
 ## Run and edit the shop
 
@@ -11,9 +11,9 @@ npm ci
 npm run dev
 ```
 
-Edit `src/data/products.json` to add or change products. Prices are whole Indian rupees. Set `"featured": true` to highlight a product on the home page; every product appears in the `/store/` catalog, which supports search, tag filtering, sorting, and infinite scroll with a load-more button. For each product, add a matching image under `src/assets/products/`; use a `.jpg`, `.png`, or `.webp` image instead of the sample `.svg` when you have product photography. Astro generates responsive, optimized WebP images from raster photos during the site build; SVG illustrations remain vector artwork. Keep product IDs unique, and use the same file name in the JSON `image` field.
+Edit `src/data/products.json` to add or change products. Prices are whole Indian rupees. Set `"featured": true` to highlight a product on the home page; every product appears in the `/store/` catalog, which supports search, tag filtering, sorting, and infinite scroll with a load-more button. Product flavours are stored per product; Choco Cubes currently has the flavour choices listed on the Jotform. Customers describe their wrapper design (3–120 characters) before adding any product to the bag. Add each product photograph under `src/assets/products/`, keep product IDs unique, and set the matching image file name in the JSON `image` field. Astro generates responsive, optimized WebP images from the local photos at build time.
 
-Before launch, replace the sample name, product details, and illustrations with accurate business and product information. Add verified ingredient/allergen, weight, storage, delivery, contact, and applicable food-license details and customer policies. Change the shop name in `src/layouts/SiteLayout.astro`, `src/pages/index.astro`, and `src/scripts/storefront.ts`; update the brand colors and layout in `src/styles/global.css`.
+Before launch, verify all extracted names and prices against the current order form, add accurate ingredient/allergen, product-weight, storage, delivery, contact, and applicable food-license details, and complete the customer policies.
 
 Draft policy pages are available at `/terms-and-conditions/`, `/privacy-policy/`, and `/shipping-policy/`. They are linked in the footer and at checkout. Checkout requires customers to accept the linked policies, and records that acceptance in the Razorpay order notes. Before accepting real payments, replace every bracketed prompt with accurate business, privacy, cancellation/refund, and delivery details; review the drafts for applicable law. **Do not accept live payments until the shipping fee is shown and included in the amount charged.** The current payment integration charges the product subtotal only and does not calculate shipping.
 

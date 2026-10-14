@@ -4,9 +4,12 @@ import ProductCard from "../components/ProductCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import products from "../data/products.json";
 
-const productImages = import.meta.glob<{ default: ImageMetadata }>("../assets/products/*.svg", {
-  eager: true,
-});
+const productImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/products/*.{jpg,jpeg,png,webp,svg}",
+  {
+    eager: true,
+  },
+);
 const imagesByName = Object.fromEntries(
   Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
 );
@@ -14,24 +17,24 @@ const tags = [...new Set(products.map((product) => product.tag))].sort((a, b) =>
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
 
-<SiteLayout title="Shop all chocolates — Chocolate Circle" description="Browse handmade Chocolate Circle treats. Filter and sort the full chocolate collection.">
+<SiteLayout title="Shop all treats — Chocolate Circle" description="Browse handmade Chocolate Circle treats. Filter and sort the full product collection.">
   <main class="store-page" id="storefront" data-checkout-api={checkoutApiUrl}>
     <section class="store-heading">
-      <p class="eyebrow">The whole chocolate shelf</p>
+      <p class="eyebrow">The whole treats shelf</p>
       <h1>Find your <em>sweet spot.</em></h1>
-      <p>Small-batch chocolates, made by hand and ready to make someone’s day.</p>
+      <p>Handmade chocolates, candies, and gifts, ready to make someone’s day.</p>
     </section>
 
-    <section class="store-results" aria-label="Chocolate collection">
+    <section class="store-results" id="store-catalog" aria-label="Shop products">
       <div class="store-toolbar">
         <label class="store-search">
-          <span>Search chocolates</span>
-          <input id="store-search" type="search" placeholder="Try caramel or pistachio" autocomplete="off" />
+          <span>Search products</span>
+          <input id="store-search" type="search" placeholder="Try cubes or hamper" autocomplete="off" />
         </label>
         <label>
           <span>Filter by</span>
           <select id="store-filter">
-            <option value="">All chocolates</option>
+            <option value="">All products</option>
             {tags.map((tag) => <option value={tag}>{tag}</option>)}
           </select>
         </label>
@@ -54,11 +57,11 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           return <ProductCard product={product} image={image} index={index} />;
         })}
       </div>
-      <p class="store-empty" id="store-empty" hidden>No chocolates match those choices. Try a different search or filter.</p>
+      <p class="store-empty" id="store-empty" hidden>No products match those choices. Try a different search or filter.</p>
       <div class="store-load-area">
         <span id="store-scroll-sentinel" aria-hidden="true"></span>
         <button class="button button-primary store-load-more" id="store-load-more" type="button">
-          Load more chocolates <span aria-hidden="true">↓</span>
+          Load more products <span aria-hidden="true">↓</span>
         </button>
       </div>
     </section>
