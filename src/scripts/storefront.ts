@@ -129,8 +129,12 @@ document.addEventListener("click", (event) => {
     const optionsForm = addButton.closest<HTMLFormElement>("#product-options-form");
     if (!optionsForm || !optionsForm.reportValidity()) return;
     const formData = new FormData(optionsForm);
+    const quantity = Number(formData.get("quantity"));
     const flavour = String(formData.get("flavour") ?? "");
     const wrapper = String(formData.get("wrapper") ?? "").trim();
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
+      throw new Error("Choose a quantity between 1 and 20.");
+    }
     const hasValidFlavour = product.flavours.length > 0
       ? product.flavours.includes(flavour)
       : flavour === "";
@@ -138,9 +142,9 @@ document.addEventListener("click", (event) => {
       throw new Error("Choose an available flavour and describe your wrapper design in 3 to 120 characters.");
     }
 
-    const newItem = { id, quantity: 1, flavour, wrapper };
+    const newItem = { id, quantity, flavour, wrapper };
     const existingItem = cart.find((item) => getCartItemKey(item) === getCartItemKey(newItem));
-    if (existingItem) existingItem.quantity = Math.min(existingItem.quantity + 1, 20);
+    if (existingItem) existingItem.quantity = Math.min(existingItem.quantity + quantity, 20);
     else cart.push(newItem);
     saveCart(cart);
     renderCart();

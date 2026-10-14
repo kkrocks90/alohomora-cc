@@ -55,10 +55,17 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <span>{product.packSize}</span>
         </div>
         <p class="product-option-note">
-          {product.flavours.length > 0 && "Choose a flavour and "}
-          describe the wrapper you’d like.
+          Choose your quantity{product.flavours.length > 0 && ", flavour"}, then describe the wrapper you’d like.
         </p>
         <form class="product-options" id="product-options-form">
+          <label>
+            Quantity
+            <select name="quantity" required>
+              {Array.from({ length: 20 }, (_, index) => (
+                <option value={index + 1} selected={index === 0}>{index + 1}</option>
+              ))}
+            </select>
+          </label>
           {product.flavours.length > 0 && (
             <label>
               Flavour <span>Required</span>
