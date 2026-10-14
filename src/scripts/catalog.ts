@@ -14,12 +14,14 @@ if (catalog) {
   const resultCount = requireCatalogElement<HTMLElement>(catalog, "#store-count");
   const emptyState = requireCatalogElement<HTMLElement>(catalog, "#store-empty");
   const loadButton = requireCatalogElement<HTMLButtonElement>(catalog, "#store-load-more");
+  const loadingStatus = requireCatalogElement<HTMLElement>(catalog, "#store-loading");
   const sentinel = requireCatalogElement<HTMLElement>(catalog, "#store-scroll-sentinel");
 
   const pageSize = 8;
   const products = Array.from(grid.querySelectorAll<HTMLElement>(".product-card"));
   let visibleCount = pageSize;
   let matchingProducts = [...products];
+  let isLoadingMore = false;
 
   function updateResults() {
     emptyState.hidden = matchingProducts.length > 0;
@@ -62,7 +64,16 @@ if (catalog) {
     updateResults();
   }
 
-  function loadMore() {
+  async function loadMore() {
+    if (isLoadingMore || visibleCount >= matchingProducts.length) return;
+    isLoadingMore = true;
+    loadButton.disabled = true;
+    loadingStatus.hidden = false;
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+
     const nextVisibleCount = Math.min(visibleCount + pageSize, matchingProducts.length);
     matchingProducts.slice(visibleCount, nextVisibleCount).forEach((product) => {
       product.hidden = false;
@@ -70,6 +81,9 @@ if (catalog) {
     });
     visibleCount = nextVisibleCount;
     updateResults();
+    loadingStatus.hidden = true;
+    loadButton.disabled = false;
+    isLoadingMore = false;
   }
 
   searchInput.addEventListener("input", () => updateCatalog());

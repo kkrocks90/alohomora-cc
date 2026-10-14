@@ -63,6 +63,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         <button class="button button-primary store-load-more" id="store-load-more" type="button">
           Load more products <span aria-hidden="true">↓</span>
         </button>
+        <p class="store-loading" id="store-loading" role="status" aria-live="polite" hidden>
+          <span class="store-loading-spinner" aria-hidden="true"></span>
+          Loading more products…
+        </p>
       </div>
     </section>
   </main>

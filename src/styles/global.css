@@ -759,8 +759,32 @@ h2 em {
   min-width: 220px;
 }
 
+.store-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #89786d;
+  font-size: 14px;
+}
+
+.store-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #dfd3c9;
+  border-top-color: var(--cocoa);
+  border-radius: 50%;
+  animation: store-spinner 700ms linear infinite;
+}
+
+@keyframes store-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .store-load-more[hidden],
-.store-empty[hidden] {
+.store-empty[hidden],
+.store-loading[hidden] {
   display: none;
 }
 
