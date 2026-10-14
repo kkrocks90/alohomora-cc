@@ -102,7 +102,7 @@ button {
   align-items: center;
   gap: clamp(18px, 3.5vw, 48px);
   color: #68574e;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.02em;
 }
 
@@ -119,7 +119,7 @@ button {
 .shop-link {
   display: none;
   color: #725343;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -213,7 +213,7 @@ button {
 .mobile-menu-links a span {
   color: #a47d67;
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .mobile-menu-links a:hover {
@@ -229,7 +229,7 @@ button {
   border-radius: 999px;
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .bag-count {
@@ -240,7 +240,7 @@ button {
   border-radius: 50%;
   background: #725041;
   color: white;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .hero-section {
@@ -263,7 +263,7 @@ button {
 .eyebrow {
   margin: 0 0 20px;
   color: #976e5a;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.19em;
   line-height: 1.6;
@@ -313,7 +313,7 @@ h2 em {
   max-width: 420px;
   margin: 24px 0 27px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.85;
 }
 
@@ -334,7 +334,7 @@ h2 em {
   border: 0;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.025em;
   transition: background-color 160ms ease, transform 160ms ease;
@@ -356,7 +356,7 @@ h2 em {
 .handwritten-note {
   color: #896a58;
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: 15px;
   font-style: italic;
   transform: rotate(-4deg);
 }
@@ -371,7 +371,7 @@ h2 em {
   gap: 9px;
   margin-top: 39px;
   color: #89786d;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .proof-sparkle {
@@ -417,7 +417,7 @@ h2 em {
   background: rgb(250 247 241 / 84%);
   color: #805947;
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: 15px;
   font-style: italic;
   line-height: 1.05;
   transform: rotate(9deg);
@@ -426,7 +426,7 @@ h2 em {
 .stamp-heart {
   margin-top: 4px;
   color: #bd7c68;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .hero-photo-caption {
@@ -436,7 +436,7 @@ h2 em {
   margin: 0;
   color: #8e796b;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: 14px;
   font-style: italic;
 }
 
@@ -449,7 +449,7 @@ h2 em {
   padding: 14px 18px;
   background: #eee4d8;
   color: #705747;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   text-align: center;
   text-transform: uppercase;
@@ -457,7 +457,7 @@ h2 em {
 
 .promise-strip span:nth-child(even) {
   color: #b17a62;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .products-section {
@@ -489,7 +489,7 @@ h2 em {
   max-width: 300px;
   margin-bottom: 4px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -551,7 +551,7 @@ h2 em {
   border-radius: 2px;
   background: rgb(250 247 241 / 91%);
   color: #755849;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.06em;
 }
 
@@ -582,7 +582,7 @@ h2 em {
 
 .product-weight {
   color: #98877a;
-  font-size: 9px;
+  font-size: 10px;
   white-space: nowrap;
 }
 
@@ -590,7 +590,7 @@ h2 em {
   min-height: 39px;
   margin: 8px 0 14px;
   color: #847369;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.7;
 }
 
@@ -616,7 +616,7 @@ h2 em {
   background: transparent;
   color: #7a5040;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .add-button:hover {
@@ -630,7 +630,7 @@ h2 em {
   place-items: center;
   border: 1px solid #c7a692;
   border-radius: 50%;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
 }
 
@@ -638,7 +638,7 @@ h2 em {
   margin: 25px 0 0;
   color: #97867a;
   font-family: var(--serif);
-  font-size: 12px;
+  font-size: 13px;
   font-style: italic;
   text-align: center;
 }
@@ -646,7 +646,7 @@ h2 em {
 .catalog-note .text-link {
   margin-left: 10px;
   font-family: var(--sans);
-  font-size: 10px;
+  font-size: 11px;
   font-style: normal;
 }
 
@@ -684,7 +684,7 @@ h2 em {
   max-width: 420px;
   margin: 15px auto 0;
   color: #79685d;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -707,7 +707,7 @@ h2 em {
   display: grid;
   gap: 7px;
   color: #6b5549;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .store-toolbar input,
@@ -721,13 +721,13 @@ h2 em {
   background: #fffdf9;
   color: #46332a;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .store-count {
   margin: 17px 0;
   color: #89786d;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .store-grid .product-card[hidden] {
@@ -773,7 +773,7 @@ h2 em {
   gap: 9px;
   margin-bottom: 24px;
   color: #8c796b;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .product-breadcrumb a,
@@ -826,7 +826,7 @@ h2 em {
 .product-detail-description {
   margin: 15px 0 20px;
   color: #79685d;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -848,13 +848,13 @@ h2 em {
 
 .product-detail-price span {
   color: #98877a;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .product-option-note {
   margin: 20px 0 13px;
   color: #79685d;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.7;
 }
 
@@ -869,12 +869,12 @@ h2 em {
   align-items: baseline;
   gap: 8px;
   color: #6b5549;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .product-options label > span {
   color: #a25f4c;
-  font-size: 9px;
+  font-size: 10px;
   text-transform: uppercase;
 }
 
@@ -889,7 +889,7 @@ h2 em {
   background: #fffdf9;
   color: #46332a;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .product-options select {
@@ -909,14 +909,14 @@ h2 em {
 .product-detail-footnote {
   margin: 13px 0 0;
   color: #938176;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.7;
 }
 
 .product-back-link {
   display: inline-block;
   margin-top: 33px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .cart-line-copy > span {
@@ -976,7 +976,7 @@ h2 em {
   max-width: 450px;
   margin: 17px 0;
   color: #79685d;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
 }
 
@@ -985,7 +985,7 @@ h2 em {
   align-items: center;
   gap: 12px;
   color: #805744;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -1018,7 +1018,7 @@ h2 em {
 
 .story-note small {
   color: #958072;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .kindness-section {
@@ -1069,7 +1069,7 @@ h2 em {
   max-width: 240px;
   margin: 0 auto;
   color: #8a796d;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.8;
 }
 
@@ -1142,20 +1142,20 @@ h2 em {
   margin: 0;
   color: #8d7c70;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: 14px;
   font-style: italic;
 }
 
 .site-footer > a:not(.wordmark) {
   justify-self: end;
   color: #725343;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .site-footer > small {
   grid-column: 1 / -1;
   color: #a08f81;
-  font-size: 9px;
+  font-size: 10px;
   text-align: center;
 }
 
@@ -1164,7 +1164,7 @@ h2 em {
   grid-column: 1 / -1;
   justify-content: center;
   gap: 18px;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .policy-links a,
@@ -1213,7 +1213,7 @@ h2 em {
 .policy-updated {
   margin: 14px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .policy-updated strong,
@@ -1227,7 +1227,7 @@ h2 em {
   border: 1px solid #dbc5a8;
   background: #f4ebdd;
   color: #644a38;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -1239,7 +1239,7 @@ h2 em {
 
 .policy-content {
   color: #6f5d51;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.9;
 }
 
@@ -1264,7 +1264,7 @@ h2 em {
 .account-link {
   padding: 9px 4px;
   color: #725343;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1306,7 +1306,7 @@ h2 em {
   max-width: 390px;
   margin: 13px 0 25px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -1317,7 +1317,7 @@ h2 em {
 
 .account-form label {
   color: #6b5549;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .account-form input {
@@ -1329,7 +1329,7 @@ h2 em {
   outline-color: #9e7460;
   background: #fff;
   color: #46332a;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .account-form .button {
@@ -1349,7 +1349,7 @@ h2 em {
   background: transparent;
   color: #805744;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -1358,7 +1358,7 @@ h2 em {
   min-height: 18px;
   margin: 16px 0 0;
   color: #416443;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -1407,13 +1407,13 @@ h2 em {
   justify-content: space-between;
   gap: 8px;
   color: #493027;
-  font-size: 11px;
+  font-size: 12px;
   overflow-wrap: anywhere;
 }
 
 .order-paid {
   color: #416443;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -1422,7 +1422,7 @@ h2 em {
 .account-empty {
   margin: 8px 0;
   color: #89786d;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -1432,7 +1432,7 @@ h2 em {
   margin: 10px 0 0;
   padding-left: 17px;
   color: #6f5d51;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .policy-page-nav {
@@ -1442,7 +1442,7 @@ h2 em {
   margin-top: 35px;
   padding-top: 19px;
   border-top: 1px solid var(--line);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .checkout-form .policy-consent {
@@ -1509,7 +1509,7 @@ h2 em {
 .checkout-panel > p:not(.eyebrow) {
   max-width: 570px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.75;
 }
 
@@ -1583,7 +1583,7 @@ h2 em {
 .checkout-signed-in {
   margin: 8px 0 0;
   color: #89786d;
-  font-size: 11px;
+  font-size: 12px;
   overflow-wrap: anywhere;
 }
 
@@ -1593,7 +1593,7 @@ h2 em {
 
 .checkout-form > label:not(.policy-consent) {
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .checkout-form input,
@@ -1627,7 +1627,7 @@ h2 em {
   padding-bottom: 13px;
   border-bottom: 1px solid var(--line);
   color: #654a3d;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .checkout-order-line > div {
@@ -1663,14 +1663,14 @@ h2 em {
 .checkout-order-panel .text-link {
   display: inline-block;
   margin-top: 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .checkout-status {
   min-height: 16px;
   margin: 12px 0 0;
   color: #725543;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -1712,7 +1712,7 @@ h2 em {
 .thank-you-status {
   margin: 13px 0 22px;
   color: #6e5a4e;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -1728,7 +1728,7 @@ h2 em {
 .thank-you-meta {
   margin: 8px 0 18px;
   color: #89786d;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .thank-you-items {
@@ -1747,7 +1747,7 @@ h2 em {
   padding-bottom: 13px;
   border-bottom: 1px solid var(--line);
   color: #654a3d;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .thank-you-items li > div {
@@ -1784,7 +1784,7 @@ h2 em {
 .thank-you-delivery p {
   margin: 5px 0;
   color: #6e5a4e;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -1838,7 +1838,7 @@ h2 em {
 
 .drawer-header .eyebrow {
   margin-bottom: 5px;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .drawer-header h2 {
@@ -1896,7 +1896,7 @@ h2 em {
 
 .cart-line-copy span {
   color: #8c796b;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .cart-quantity {
@@ -1918,7 +1918,7 @@ h2 em {
 
 .cart-quantity span {
   min-width: 12px;
-  font-size: 12px;
+  font-size: 13px;
   text-align: center;
 }
 
@@ -1931,7 +1931,7 @@ h2 em {
   display: flex;
   justify-content: space-between;
   color: #654a3d;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .subtotal-row strong {
@@ -1944,7 +1944,7 @@ h2 em {
 .delivery-note {
   margin: 8px 0 16px;
   color: #938176;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -1957,7 +1957,7 @@ h2 em {
   display: grid;
   gap: 5px;
   color: #6b5549;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .checkout-form input,
@@ -1969,7 +1969,7 @@ h2 em {
   outline-color: #9e7460;
   background: #fffdf9;
   color: #46332a;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .checkout-form textarea {
@@ -1988,7 +1988,7 @@ h2 em {
 .delivery-location legend {
   padding: 0 4px;
   color: #6b5549;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .delivery-location > p,
@@ -1996,7 +1996,7 @@ h2 em {
 .location-or {
   margin: 0;
   color: #8c796b;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -2008,7 +2008,7 @@ h2 em {
   background: #f5eee5;
   color: #644637;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .location-button:hover {
@@ -2027,7 +2027,7 @@ h2 em {
 .map-help-link {
   justify-self: start;
   color: #805744;
-  font-size: 10px;
+  font-size: 11px;
   text-decoration: underline;
   text-decoration-color: #c5a58c;
   text-underline-offset: 3px;
@@ -2040,7 +2040,7 @@ h2 em {
 }
 
 .location-privacy {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .optional-label {
@@ -2061,7 +2061,7 @@ h2 em {
   min-height: 16px;
   margin: 0;
   color: #725543;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -2078,7 +2078,7 @@ h2 em {
   padding-top: 12px;
   border-top: 1px solid var(--line);
   color: #99887c;
-  font-size: 9px;
+  font-size: 10px;
   text-align: center;
 }
 
@@ -2231,7 +2231,7 @@ h2 em {
   .bag-button {
     gap: 7px;
     padding: 6px 8px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .bag-count {
@@ -2253,12 +2253,12 @@ h2 em {
   .hero-description {
     max-width: 380px;
     margin: 18px 0 21px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .hero-proof {
     margin-top: 25px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .hero-art {
@@ -2270,13 +2270,13 @@ h2 em {
     right: -14px;
     width: 78px;
     height: 78px;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .hero-photo-caption {
     right: 0;
     bottom: -24px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .promise-strip {
@@ -2284,7 +2284,7 @@ h2 em {
     flex-wrap: wrap;
     gap: 8px 11px;
     padding: 12px 15px;
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .promise-strip span:nth-child(6),
@@ -2363,7 +2363,7 @@ h2 em {
   .section-heading > p {
     max-width: 340px;
     margin-top: 12px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .product-grid {
@@ -2375,7 +2375,7 @@ h2 em {
     top: 8px;
     left: 8px;
     padding: 5px 7px;
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .product-copy {
@@ -2399,7 +2399,7 @@ h2 em {
   .product-copy > p {
     min-height: 48px;
     margin: 7px 0 10px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .product-buy-row strong {
@@ -2408,7 +2408,7 @@ h2 em {
 
   .add-button {
     gap: 4px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .add-button span {
@@ -2417,7 +2417,7 @@ h2 em {
   }
 
   .catalog-note {
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.6;
   }
 
@@ -2440,7 +2440,7 @@ h2 em {
   }
 
   .story-copy > p:not(.eyebrow) {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .kindness-section {
@@ -2499,7 +2499,7 @@ h2 em {
 
   .policy-links {
     gap: 14px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .policy-page {
@@ -2508,11 +2508,11 @@ h2 em {
 
   .policy-draft-notice {
     padding: 13px 14px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .policy-content {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .policy-content h2 {
@@ -2520,7 +2520,7 @@ h2 em {
   }
 
   .site-footer > a:not(.wordmark) {
-    font-size: 9px;
+    font-size: 10px;
   }
 }
 
