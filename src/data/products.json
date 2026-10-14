@@ -101,7 +101,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 10",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -125,7 +132,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 10",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -306,7 +320,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 30",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -318,7 +339,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 80",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -426,7 +454,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 50",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -438,7 +473,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 10",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -450,7 +492,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 30",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -498,7 +547,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 50",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -522,7 +578,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 20",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -546,7 +609,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 40",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     },
     {
@@ -558,7 +628,14 @@
         "tag":  "Chocolate treats",
         "packSize":  "Pack of 50",
         "flavours":  [
-
+                        "Chocolate",
+                        "Dark Chocolate",
+                        "Crispies",
+                        "Almonds",
+                        "Nuts",
+                        "Butterscotch",
+                        "Strawberry",
+                        "White Chocolate"
                      ]
     }
 ]
