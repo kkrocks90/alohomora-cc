@@ -198,6 +198,7 @@ if (root) {
     } catch (error) {
       if (error instanceof AccountApiError && error.status === 401) {
         sessionStorage.removeItem(sessionKey);
+        window.dispatchEvent(new Event("customer-session-change"));
       }
       throw error;
     } finally {
@@ -234,6 +235,7 @@ if (root) {
       const token = String(result.token ?? "");
       if (!/^[0-9a-f]{64}$/.test(token)) throw new Error("Sign-in returned an invalid session. Please try again.");
       sessionStorage.setItem(sessionKey, token);
+      window.dispatchEvent(new Event("customer-session-change"));
       await loadOrders(token);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not verify the code.", true);
@@ -256,6 +258,7 @@ if (root) {
     try {
       if (token) await post("/auth/logout", undefined, token);
       sessionStorage.removeItem(sessionKey);
+      window.dispatchEvent(new Event("customer-session-change"));
       profileSection.hidden = true;
       ordersSection.hidden = true;
       emailForm.hidden = false;

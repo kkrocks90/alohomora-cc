@@ -126,6 +126,7 @@ async function requestApi(path: string, body?: unknown, token = sessionToken) {
   if (!response.ok) {
     if (response.status === 401 && token) {
       sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+      window.dispatchEvent(new Event("customer-session-change"));
       sessionToken = "";
       customerEmail = "";
       showLogin();
@@ -212,9 +213,11 @@ codeForm.addEventListener("submit", async (event) => {
       throw new Error("Sign-in returned an invalid session. Please try again.");
     }
     sessionStorage.setItem(CUSTOMER_SESSION_KEY, result.token);
+    window.dispatchEvent(new Event("customer-session-change"));
     await loadSession(result.token);
   } catch (error) {
     sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+    window.dispatchEvent(new Event("customer-session-change"));
     sessionToken = "";
     customerEmail = "";
     showLogin();
@@ -240,6 +243,7 @@ signOutButton.addEventListener("click", async () => {
     signOutError = true;
   }
   sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+  window.dispatchEvent(new Event("customer-session-change"));
   sessionToken = "";
   customerEmail = "";
   showLogin();
@@ -412,6 +416,7 @@ if (cart.length > 0) {
   if (token) {
     void loadSession(token).catch((error: unknown) => {
       sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+      window.dispatchEvent(new Event("customer-session-change"));
       sessionToken = "";
       customerEmail = "";
       showLogin();

@@ -4,6 +4,19 @@ function requireMenuElement<T extends Element>(selector: string): T {
   return element;
 }
 
+const accountSessionKey = "cocoa-kind-customer-session";
+const accountLabels = document.querySelectorAll<HTMLElement>("[data-account-label]");
+
+function updateAccountLabels() {
+  const label = sessionStorage.getItem(accountSessionKey) ? "My profile" : "Login";
+  accountLabels.forEach((element) => {
+    element.textContent = label;
+  });
+}
+
+updateAccountLabels();
+window.addEventListener("customer-session-change", updateAccountLabels);
+
 const menuToggle = document.querySelector<HTMLButtonElement>("#open-mobile-menu");
 
 if (menuToggle) {
