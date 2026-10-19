@@ -1,8 +1,6 @@
 name: Deploy website to GitHub Pages
 
 on:
-  push:
-    branches: [kkrocks90-chocolate-shop-website]
   workflow_dispatch:
 
 permissions:
