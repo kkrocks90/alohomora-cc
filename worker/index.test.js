@@ -74,6 +74,77 @@ test("promo quotes accept repeated products with different cart variants", async
   assert.equal(quote.payablePaise, 144000);
 });
 
+test("featured promo endpoint is public and returns a random eligible offer", async () => {
+  let query = "";
+  const database = {
+    prepare(sql) {
+      query = sql;
+      return {
+        bind(...values) {
+          assert.equal(values.length, 2);
+          return {
+            all: async () => ({
+              results: [{
+                name: "Treat yourself",
+                code: "CC-SWEET",
+                type: "percentage",
+                percentage: 15,
+                target_type: "product",
+                target_value: "product-1001",
+                amount_paise: null,
+                minimum_subtotal_paise: null,
+                end_date: "2026-10-31",
+              }],
+            }),
+          };
+        },
+      };
+    },
+  };
+  const response = await worker.fetch(
+    new Request("https://checkout.example.com/promos/featured", {
+      headers: { Origin: "https://shop.example.com" },
+    }),
+    { ALLOWED_ORIGIN: "https://shop.example.com", ORDERS_DB: database },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://shop.example.com");
+  assert.equal(response.headers.get("Cache-Control"), "public, max-age=60, s-maxage=60");
+  assert.match(query, /p\.active = 1/);
+  assert.match(query, /p\.end_date IS NULL OR p\.end_date >= \?/);
+  assert.match(query, /COUNT\(DISTINCT r\.customer_email\)/);
+  assert.deepEqual(await response.json(), {
+    promo: {
+      name: "Treat yourself",
+      code: "CC-SWEET",
+      type: "percentage",
+      percentage: 15,
+      targetType: "product",
+      targetLabel: "Choco Cubes (Pack of 40)",
+      amountPaise: null,
+      minimumSubtotalPaise: null,
+      endDate: "2026-10-31",
+    },
+  });
+});
+
+test("featured promo endpoint returns no offer when none are eligible", async () => {
+  const database = {
+    prepare() {
+      return { bind() { return { all: async () => ({ results: [] }) }; } };
+    },
+  };
+  const response = await worker.fetch(
+    new Request("https://checkout.example.com/promos/featured", {
+      headers: { Origin: "https://shop.example.com" },
+    }),
+    { ALLOWED_ORIGIN: "https://shop.example.com", ORDERS_DB: database },
+  );
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { promo: null });
+});
+
 test("does not create a payment order when the D1 database is not bound", async () => {
   const response = await worker.fetch(
     new Request("https://checkout.example.com/orders", {

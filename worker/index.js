@@ -16,6 +16,7 @@ import {
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
 import {
+  getFeaturedPromo,
   getPromoReservationForOrder,
   quotePromo,
   releasePromoReservation,
@@ -42,7 +43,7 @@ function jsonResponse(body, status, origin) {
   });
   if (origin) {
     headers.set("Access-Control-Allow-Origin", origin);
-    headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     headers.set("Access-Control-Max-Age", "86400");
     headers.set("Vary", "Origin");
@@ -633,15 +634,27 @@ export default {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": configuredOrigin,
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Max-Age": "86400",
         "Vary": "Origin",
       },
     });
+    const path = new URL(request.url).pathname.replace(/\/+$/, "");
+    if (request.method === "GET" && path === "/promos/featured") {
+      if (!env.ORDERS_DB) return errorResponse("The promo service is not configured.", 503, configuredOrigin);
+      try {
+        const promo = await getFeaturedPromo(env.ORDERS_DB);
+        const response = jsonResponse({ promo }, 200, configuredOrigin);
+        response.headers.set("Cache-Control", "public, max-age=60, s-maxage=60");
+        return response;
+      } catch (error) {
+        console.error("Could not load a featured promo.", error);
+        return errorResponse("The featured promo is temporarily unavailable.", 503, configuredOrigin);
+      }
+    }
     if (request.method !== "POST") return errorResponse("Method not allowed.", 405, configuredOrigin);
 
-    const path = new URL(request.url).pathname.replace(/\/+$/, "");
     if (path === "/orders") return handleCreateOrder(request, env, configuredOrigin);
     if (path === "/verify") return handleVerifyPayment(request, env, configuredOrigin);
     if (path === "/promos/quote") return handlePromoQuote(request, env, configuredOrigin);

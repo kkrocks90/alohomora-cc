@@ -297,3 +297,39 @@ export function validatePromoLimits(body) {
 export function getPromoCategories() {
   return categories;
 }
+
+export async function getFeaturedPromo(database, now = new Date()) {
+  const promos = await database.prepare(
+    `SELECT p.name, p.code, p.type, p.percentage, p.target_type, p.target_value,
+            p.amount_paise, p.minimum_subtotal_paise, p.end_date
+     FROM promo_codes p
+     WHERE p.active = 1
+       AND (p.end_date IS NULL OR p.end_date >= ?)
+       AND (
+         p.max_redemptions IS NULL OR (
+           SELECT COUNT(DISTINCT r.customer_email)
+           FROM promo_redemptions r
+           WHERE r.promo_id = p.promo_id AND (
+             r.status = 'redeemed' OR (r.status = 'reserved' AND r.expires_at > ?)
+           )
+         ) < p.max_redemptions
+       )`,
+  ).bind(now.toISOString().slice(0, 10), now.toISOString()).all();
+  if (promos.results.length === 0) return null;
+
+  const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % promos.results.length;
+  const promo = promos.results[randomIndex];
+  return {
+    name: promo.name,
+    code: promo.code,
+    type: promo.type,
+    percentage: promo.percentage,
+    targetType: promo.target_type,
+    targetLabel: promo.target_type === "product"
+      ? productById.get(promo.target_value)?.name ?? promo.target_value
+      : promo.target_value ?? "",
+    amountPaise: promo.amount_paise,
+    minimumSubtotalPaise: promo.minimum_subtotal_paise,
+    endDate: promo.end_date ?? "",
+  };
+}
