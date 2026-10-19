@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.9.2] - 2026-10-20
+
+### Changed
+- Smaller featured product cards on the mobile home page (square photo, compact text, no description).
+
 ## [1.9.1] - 2026-10-20
 
 ### Fixed

@@ -5008,3 +5008,53 @@ h2 em {
     overflow-x: clip;
   }
 }
+
+/* Compact featured cards on phones */
+@media (max-width: 620px) {
+  .featured-slider .product-card,
+  .featured-slider .featured-clone {
+    width: 42vw;
+    max-width: 175px;
+    margin-right: 12px;
+  }
+
+  .featured-slider .product-image-wrap {
+    aspect-ratio: 1;
+  }
+
+  .featured-slider .product-image {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured-slider .product-tag {
+    top: 8px;
+    left: 8px;
+    padding: 3px 7px;
+    font-size: 8px;
+  }
+
+  .featured-slider .product-copy {
+    padding: 10px 10px 12px;
+  }
+
+  .featured-slider .product-copy h3 {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .featured-slider .product-weight,
+  .featured-slider .product-copy > p,
+  .featured-slider .product-card-price span {
+    display: none;
+  }
+
+  .featured-slider .product-card-price strong {
+    font-size: 15px;
+  }
+
+  .featured-slider .add-button {
+    min-height: 38px;
+    font-size: 11px;
+  }
+}
