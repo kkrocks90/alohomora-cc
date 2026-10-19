@@ -3102,32 +3102,30 @@ h2 em {
     position: fixed;
     z-index: 18;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    left: 16px;
-    display: inline-flex;
-    min-height: 48px;
+    right: 16px;
+    display: inline-grid;
+    width: 52px;
+    height: 52px;
     align-items: center;
     justify-content: center;
-    gap: 9px;
-    padding: 0 16px;
-    border: 1px solid rgb(255 255 255 / 28%);
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 32%);
     border-radius: 999px;
-    background: #16845a;
-    box-shadow: 0 4px 16px rgb(36 28 22 / 24%);
+    background: #624234;
+    box-shadow: 0 4px 16px rgb(36 28 22 / 28%);
     color: #fff;
-    font-size: 12px;
-    font-weight: 600;
     text-decoration: none;
     transition: background-color 160ms ease, transform 160ms ease;
   }
 
   .whatsapp-float:hover {
     transform: translateY(-2px);
-    background: #116f4a;
+    background: #4b3026;
   }
 
   .whatsapp-float svg {
-    width: 23px;
-    height: 23px;
+    width: 26px;
+    height: 26px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
