@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.9.0] - 2026-10-20
+
+### Changed
+- Mobile home page redesign: photo-first hero with a full-width pill button, swipeable promise pills, category cards and "Good to know" cards, tighter section spacing, and rounded story and closing cards.
+
 ## [1.8.0] - 2026-10-20
 
 ### Added
