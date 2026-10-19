@@ -142,12 +142,22 @@ const categoryCards = [...new Set(products.map((product) => product.tag))]
         </div>
         <p>Handmade favourites for slow afternoons and big celebrations.</p>
       </div>
-      <div class="product-grid featured-grid">
-        {highlightedProducts.map((product, index) => {
-          const image = imagesByName[product.image];
-          if (!image) throw new Error(`Product image not found: ${product.image}`);
-          return <ProductCard product={product} image={image} index={index} />;
-        })}
+      <div class="featured-slider">
+        <div class="product-grid featured-grid" style={`--featured-count: ${highlightedProducts.length}`}>
+          {highlightedProducts.map((product, index) => {
+            const image = imagesByName[product.image];
+            if (!image) throw new Error(`Product image not found: ${product.image}`);
+            return <ProductCard product={product} image={image} index={index} />;
+          })}
+          {highlightedProducts.map((product, index) => {
+            const image = imagesByName[product.image];
+            return (
+              <div class="featured-clone" aria-hidden="true" inert>
+                <ProductCard product={product} image={image} index={index} />
+              </div>
+            );
+          })}
+        </div>
       </div>
       <p class="catalog-note">
         Everything is made in small batches. If your favourite sells out, it’ll be back soon.

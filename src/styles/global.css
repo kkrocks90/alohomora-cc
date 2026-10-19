@@ -715,6 +715,62 @@ h2 em {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.featured-clone {
+  display: none;
+}
+
+@keyframes featured-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 620px) {
+  .featured-slider {
+    margin: 0 -20px;
+    overflow: hidden;
+  }
+
+  .featured-slider .featured-grid {
+    display: flex;
+    width: max-content;
+    gap: 0;
+    animation: featured-scroll calc(var(--featured-count, 3) * 7s) linear infinite;
+  }
+
+  .featured-slider .featured-grid:active {
+    animation-play-state: paused;
+  }
+
+  .featured-slider .product-card,
+  .featured-slider .featured-clone {
+    display: block;
+    width: 68vw;
+    max-width: 280px;
+    flex: none;
+    margin-right: 16px;
+  }
+
+  .featured-slider .featured-clone .product-card {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 620px) and (prefers-reduced-motion: reduce) {
+  .featured-slider {
+    overflow-x: auto;
+  }
+
+  .featured-slider .featured-grid {
+    animation: none;
+  }
+
+  .featured-slider .featured-clone {
+    display: none;
+  }
+}
+
 .store-grid .product-card {
   animation-delay: 0ms;
 }
