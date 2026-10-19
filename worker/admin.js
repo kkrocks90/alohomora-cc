@@ -57,7 +57,7 @@ export async function getAdminData(request, env) {
         .prepare(
           `SELECT order_id, payment_id, payment_status, payment_method, order_status,
                   customer_id, customer_name, customer_phone, customer_email,
-                  delivery_address, items_json, amount_paise, product_subtotal_paise,
+                  delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
                   discount_paise, promo_code, currency, delivery_method, event_date, created_at
            FROM orders
            ORDER BY created_at DESC`,
@@ -66,7 +66,7 @@ export async function getAdminData(request, env) {
       env.ORDERS_DB
         .prepare(
           `SELECT customer_id, customer_name, customer_phone, customer_email,
-                  default_address, created_at, updated_at
+                  default_address, city, state, pincode, created_at, updated_at
            FROM customers
            ORDER BY CASE WHEN customer_name = '' THEN customer_email ELSE customer_name END COLLATE NOCASE`,
         )
@@ -97,6 +97,9 @@ export async function getAdminData(request, env) {
         customerPhone: order.customer_phone,
         customerEmail: order.customer_email,
         deliveryAddress: order.delivery_address,
+        city: order.city ?? "",
+        state: order.state ?? "",
+        pincode: order.pincode ?? "",
         items: JSON.parse(order.items_json),
         amountPaise: order.amount_paise,
         productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
@@ -113,6 +116,9 @@ export async function getAdminData(request, env) {
         phone: customer.customer_phone,
         email: customer.customer_email,
         address: customer.default_address,
+        city: customer.city ?? "",
+        state: customer.state ?? "",
+        pincode: customer.pincode ?? "",
         createdAt: customer.created_at,
         updatedAt: customer.updated_at,
       })),
@@ -251,6 +257,10 @@ export async function createAdminCustomer(request, env) {
       ? ""
       : normalizeCustomerEmail(body.email);
     const address = requiredText(body?.address, 250, "customer address");
+    const city = requiredText(body?.city, 40, "city");
+    const state = requiredText(body?.state, 40, "state");
+    const pincode = requiredText(body?.pincode, 6, "six-digit Indian PIN code");
+    if (!/^[1-9][0-9]{5}$/.test(pincode)) return result(400, { error: "Enter a valid six-digit Indian PIN code." });
     if (!phonePattern.test(phone)) return result(400, { error: "Enter a valid customer phone number." });
     if (body?.email && !email) {
       return result(400, { error: "Enter a valid customer email address." });
@@ -262,22 +272,25 @@ export async function createAdminCustomer(request, env) {
       .prepare(
         `INSERT INTO customers (
           customer_id, customer_name, customer_phone, customer_email,
-          default_address, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          default_address, city, state, pincode, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> ''
         DO UPDATE SET
           customer_name = excluded.customer_name,
           customer_phone = excluded.customer_phone,
           customer_email = lower(trim(excluded.customer_email)),
           default_address = excluded.default_address,
+          city = excluded.city,
+          state = excluded.state,
+          pincode = excluded.pincode,
           updated_at = excluded.updated_at
         RETURNING customer_id`,
       )
-      .bind(customerId, name, phone, email, address, now, now)
+      .bind(customerId, name, phone, email, address, city, state, pincode, now, now)
       .first();
     if (!savedCustomer?.customer_id) throw new Error("Could not save the customer.");
     return result(201, {
-      customer: { customerId: savedCustomer.customer_id, name, phone, email, address, updatedAt: now },
+      customer: { customerId: savedCustomer.customer_id, name, phone, email, address, city, state, pincode, updatedAt: now },
     });
   } catch (error) {
     console.error("Could not create an admin customer.", error);
@@ -299,27 +312,35 @@ export async function updateAdminCustomer(request, env) {
     let name;
     let phone;
     let address;
+    let city;
+    let state;
+    let pincode;
     try {
       customerId = requiredText(body?.customerId, 80, "customer");
       name = requiredText(body?.name, 80, "customer name");
       phone = requiredText(body?.phone, 20, "phone number");
       address = requiredText(body?.address, 250, "customer address");
+      city = requiredText(body?.city, 40, "city");
+      state = requiredText(body?.state, 40, "state");
+      pincode = requiredText(body?.pincode, 6, "six-digit Indian PIN code");
     } catch (error) {
       return result(400, { error: error.message });
     }
     if (!phonePattern.test(phone)) return result(400, { error: "Enter a valid customer phone number." });
+    if (!/^[1-9][0-9]{5}$/.test(pincode)) return result(400, { error: "Enter a valid six-digit Indian PIN code." });
 
     const now = new Date().toISOString();
     const updated = await env.ORDERS_DB
       .prepare(
         `UPDATE customers
-         SET customer_name = ?, customer_phone = ?, default_address = ?, updated_at = ?
+         SET customer_name = ?, customer_phone = ?, default_address = ?,
+             city = ?, state = ?, pincode = ?, updated_at = ?
          WHERE customer_id = ?`,
       )
-      .bind(name, phone, address, now, customerId)
+      .bind(name, phone, address, city, state, pincode, now, customerId)
       .run();
     if (updated.meta.changes === 0) return result(404, { error: "That customer could not be found." });
-    return result(200, { customer: { customerId, name, phone, address, updatedAt: now } });
+    return result(200, { customer: { customerId, name, phone, address, city, state, pincode, updatedAt: now } });
   } catch (error) {
     console.error("Could not update an admin customer.", error);
     return result(503, { error: "The customer details could not be updated right now. Please try again." });
@@ -339,7 +360,7 @@ export async function createManualOrder(request, env) {
     const customerId = requiredText(body?.customerId, 80, "customer");
     const customer = await env.ORDERS_DB
       .prepare(
-        `SELECT customer_id, customer_name, customer_phone, customer_email, default_address
+        `SELECT customer_id, customer_name, customer_phone, customer_email, default_address, city, state, pincode
          FROM customers WHERE customer_id = ?`,
       )
       .bind(customerId)
@@ -352,6 +373,10 @@ export async function createManualOrder(request, env) {
     }
 
     const deliveryAddress = requiredText(body?.address || customer.default_address, 250, "delivery address");
+    const city = requiredText(body?.city || customer.city, 40, "city");
+    const state = requiredText(body?.state || customer.state, 40, "state");
+    const pincode = requiredText(body?.pincode || customer.pincode, 6, "six-digit Indian PIN code");
+    if (!/^[1-9][0-9]{5}$/.test(pincode)) return result(400, { error: "Enter a valid six-digit Indian PIN code." });
     const deliveryMethod = body?.deliveryMethod;
     if (!DELIVERY_METHODS.includes(deliveryMethod)) {
       return result(400, { error: "Choose a valid delivery method." });
@@ -413,10 +438,10 @@ export async function createManualOrder(request, env) {
         `INSERT INTO orders (
           order_id, payment_id, payment_status, payment_method, order_status,
           customer_id, customer_name, customer_phone, customer_email,
-          delivery_address, items_json, amount_paise, product_subtotal_paise,
+          delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
           discount_paise, promo_code, currency,
           delivery_method, distance_km, policies_accepted, event_date, created_at
-        ) VALUES (?, NULL, 'unpaid', 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, 0, '', 'INR', ?, 0, 'admin_manual_order', ?, ?)`,
+        ) VALUES (?, NULL, 'unpaid', 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, '', 'INR', ?, 0, 'admin_manual_order', ?, ?)`,
       )
       .bind(
         orderId,
@@ -425,6 +450,9 @@ export async function createManualOrder(request, env) {
         customer.customer_phone,
         customer.customer_email,
         deliveryAddress,
+        city,
+        state,
+        pincode,
         JSON.stringify(items),
         amountPaise,
         amountPaise,

@@ -1605,6 +1605,11 @@ h2 em {
   justify-self: start;
 }
 
+.admin-customer-form > .address-map,
+.admin-customer-form > [data-address-map-status] {
+  grid-column: 1 / -1;
+}
+
 .admin-form-hint {
   margin: -8px 0 15px;
   color: #89786d;
@@ -3238,6 +3243,27 @@ h2 em {
 .location-button:disabled {
   cursor: wait;
   opacity: 0.7;
+}
+
+.address-map {
+  width: 100%;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid #ded2c5;
+  border-radius: 3px;
+  background: #f1e9df;
+}
+
+.address-map[hidden] {
+  display: none;
+}
+
+.location-privacy[data-state="error"] {
+  color: #a33428;
+}
+
+.location-privacy[data-state="success"] {
+  color: #5d6e47;
 }
 
 .location-or {

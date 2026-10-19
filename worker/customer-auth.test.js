@@ -55,6 +55,9 @@ test("signed-in customers can save profile details tied to their verified email"
         name: " Customer Example ",
         phone: " +911234567890 ",
         address: " 123 Sample Street ",
+        city: " Chennai ",
+        state: " Tamil Nadu ",
+        pincode: "600001",
       }),
     }),
     { ...configuredEnv, ORDERS_DB: database },
@@ -66,6 +69,9 @@ test("signed-in customers can save profile details tied to their verified email"
     phone: "+911234567890",
     email: "customer@example.com",
     address: "123 Sample Street",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    pincode: "600001",
   });
 });
 

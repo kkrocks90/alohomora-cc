@@ -162,6 +162,43 @@ test("does not create a payment order when the D1 database is not bound", async 
   assert.match((await response.json()).error, /order database is not configured/i);
 });
 
+test("rejects checkout PIN codes that are not six-digit Indian postal codes", async () => {
+  const response = await worker.fetch(
+    new Request("https://checkout.example.com/orders", {
+      method: "POST",
+      headers: {
+        Origin: "https://shop.example.com",
+        "Content-Type": "application/json",
+        ...sessionHeaders,
+      },
+      body: JSON.stringify({
+        items: [{ id: "product-1001", quantity: 1, flavour: "Chocolate", wrapper: "Blue gift wrap" }],
+        customer: {
+          name: "Customer Example",
+          phone: "+911234567890",
+          email: "customer@example.com",
+          address: "123 Sample Street",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: "60001",
+          policyConsent: true,
+        },
+        deliveryLocation: { latitude: 13.08, longitude: 80.27 },
+      }),
+    }),
+    {
+      ALLOWED_ORIGIN: "https://shop.example.com",
+      STORE_LATITUDE: "13.08",
+      STORE_LONGITUDE: "80.27",
+      ORDERS_DB: authenticatedOrdersDb,
+      RAZORPAY_KEY_ID: "test_key",
+      RAZORPAY_KEY_SECRET: "test_secret",
+    },
+  );
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /six-digit Indian PIN code/i);
+});
+
 test("requires flavour and wrapper selections before creating a payment order", async () => {
   const response = await worker.fetch(
     new Request("https://checkout.example.com/orders", {
@@ -178,6 +215,9 @@ test("requires flavour and wrapper selections before creating a payment order", 
           phone: "+911234567890",
           email: "customer@example.com",
           address: "123 Sample Street",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: "600001",
           policyConsent: true,
         },
         deliveryLocation: { latitude: 0, longitude: 0 },
@@ -243,6 +283,9 @@ test("includes different selected variants in the Razorpay order notes", async (
           phone: "+911234567890",
           email: "customer@example.com",
           address: "123 Sample Street",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: "600001",
           policyConsent: true,
         },
         deliveryLocation: { latitude: 0, longitude: 0 },
@@ -284,6 +327,14 @@ test("includes different selected variants in the Razorpay order notes", async (
     "White Chocolate",
     "purple dots and a small gift tag",
   ]);
+  assert.deepEqual(JSON.parse(notes.delivery), {
+    m: "P",
+    d: "0.00",
+    c: "Chennai",
+    s: "Tamil Nadu",
+    p: "600001",
+    ok: "1",
+  });
 });
 
 test("accepts products with no flavour selector when wrapper design is provided", async (context) => {
@@ -320,6 +371,9 @@ test("accepts products with no flavour selector when wrapper design is provided"
           phone: "+911234567890",
           email: "customer@example.com",
           address: "123 Sample Street",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: "600001",
           policyConsent: true,
         },
         deliveryLocation: { latitude: 0, longitude: 0 },
@@ -383,6 +437,9 @@ test("prevents a signed-in customer from ordering under a different email", asyn
           phone: "+911234567890",
           email: "different@example.com",
           address: "123 Sample Street",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: "600001",
           policyConsent: true,
         },
         deliveryLocation: { latitude: 0, longitude: 0 },
@@ -416,6 +473,9 @@ test("validates event dates and includes selected dates in payment notes", async
     phone: "+911234567890",
     email: "customer@example.com",
     address: "123 Sample Street",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    pincode: "600001",
     policyConsent: true,
   };
   const createRequest = (eventDate) => worker.fetch(

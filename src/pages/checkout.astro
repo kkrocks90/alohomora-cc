@@ -2,6 +2,7 @@
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -14,6 +15,7 @@ const base = import.meta.env.BASE_URL;
     class="checkout-page"
     id="checkout-page"
     data-checkout-api={checkoutApiUrl}
+    data-google-maps-key={googleMapsApiKey}
     data-base-url={base}
   >
     <nav class="product-breadcrumb" aria-label="Breadcrumb">
@@ -76,6 +78,15 @@ const base = import.meta.env.BASE_URL;
         <input id="checkout-profile-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" required />
         <label for="checkout-profile-address">Default delivery address</label>
         <textarea id="checkout-profile-address" name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
+        <label for="checkout-profile-city">City</label>
+        <input id="checkout-profile-city" name="city" autocomplete="address-level2" maxlength="40" required />
+        <label for="checkout-profile-state">State</label>
+        <input id="checkout-profile-state" name="state" autocomplete="address-level1" maxlength="40" required />
+        <label for="checkout-profile-pincode">PIN code</label>
+        <input id="checkout-profile-pincode" name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required />
+        <button class="location-button" type="button" data-find-address>Find PIN code on map</button>
+        <div class="address-map" data-address-map hidden></div>
+        <p class="location-privacy" data-address-map-status role="status" aria-live="polite"></p>
         <button class="button button-primary" type="submit">Save details and continue <span aria-hidden="true">↗</span></button>
       </form>
       <p class="account-status" id="checkout-profile-status" role="status" aria-live="polite"></p>
@@ -106,6 +117,18 @@ const base = import.meta.env.BASE_URL;
               <textarea name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
             </label>
             <label>
+              City
+              <input name="city" autocomplete="address-level2" maxlength="40" required />
+            </label>
+            <label>
+              State
+              <input name="state" autocomplete="address-level1" maxlength="40" required />
+            </label>
+            <label>
+              PIN code
+              <input name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required />
+            </label>
+            <label>
               Event date <span class="optional-label">(optional)</span>
               <input name="eventDate" type="date" autocomplete="off" />
               <span class="location-privacy">Choose the date you’d like your chocolates for.</span>
@@ -113,33 +136,20 @@ const base = import.meta.env.BASE_URL;
             <fieldset class="delivery-location">
               <legend>Delivery location</legend>
               <p>
-                We use your delivery pin to estimate the distance from the shop and suggest Porter
-                or a courier. Nothing is booked automatically.
+                Enter your PIN code, then select the delivery address on the map. We use that point
+                to estimate distance and suggest Porter or a courier. Nothing is booked automatically.
+                Google Maps receives the PIN code and selected map point to identify the address.
               </p>
-              <button class="location-button" id="use-delivery-location" type="button">
-                Use this device’s location
-              </button>
-              <span class="location-or">or enter a map pin’s coordinates</span>
-              <a class="map-help-link" href="https://maps.google.com/" target="_blank" rel="noreferrer">
-                Open Google Maps to find your delivery pin ↗
-              </a>
+              <button class="location-button" type="button" data-find-address>Show PIN code on map</button>
+              <div class="address-map" data-address-map hidden></div>
+              <p class="location-privacy" data-address-map-status role="status" aria-live="polite">
+                Choose the exact delivery point on the map. Do not use your current location if it’s somewhere else.
+              </p>
+              <input name="latitude" type="hidden" />
+              <input name="longitude" type="hidden" />
               <span class="location-privacy">
-                Long-press the delivery address on the map to drop a pin, then enter its latitude
-                and longitude below.
-              </span>
-              <div class="coordinate-fields">
-                <label>
-                  Latitude
-                  <input name="latitude" type="number" inputmode="decimal" step="any" min="-90" max="90" required />
-                </label>
-                <label>
-                  Longitude
-                  <input name="longitude" type="number" inputmode="decimal" step="any" min="-180" max="180" required />
-                </label>
-              </div>
-              <span class="location-privacy">
-                Use the delivery address pin, not your current location if it’s somewhere else.
-                Coordinates are used only to estimate delivery distance.
+                Select the delivery point, not your current location if it’s somewhere else. We use
+                its coordinates for the distance estimate and don’t store them.
               </span>
             </fieldset>
             <label class="policy-consent">

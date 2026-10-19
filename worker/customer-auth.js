@@ -261,10 +261,16 @@ export async function updateCustomerProfile(request, env) {
     const name = typeof body?.name === "string" ? body.name.trim() : "";
     const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
     const address = typeof body?.address === "string" ? body.address.trim() : "";
+    const city = typeof body?.city === "string" ? body.city.trim() : "";
+    const state = typeof body?.state === "string" ? body.state.trim() : "";
+    const pincode = typeof body?.pincode === "string" ? body.pincode.trim() : "";
     if (!name || name.length > 80) return result(400, { error: "Enter your name (up to 80 characters)." });
     if (!/^\+?[0-9\s()-]{7,20}$/.test(phone)) return result(400, { error: "Enter a valid mobile number." });
     if (!address || address.length > 250) {
       return result(400, { error: "Enter your default delivery address (up to 250 characters)." });
+    }
+    if (!city || city.length > 40 || !state || state.length > 40 || !/^[1-9][0-9]{5}$/.test(pincode)) {
+      return result(400, { error: "Enter a valid city, state, and six-digit Indian PIN code." });
     }
 
     const now = new Date().toISOString();
@@ -272,21 +278,24 @@ export async function updateCustomerProfile(request, env) {
       .prepare(
         `INSERT INTO customers (
           customer_id, customer_name, customer_phone, customer_email,
-          default_address, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          default_address, city, state, pincode, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> ''
         DO UPDATE SET
           customer_name = excluded.customer_name,
           customer_phone = excluded.customer_phone,
           customer_email = lower(trim(excluded.customer_email)),
           default_address = excluded.default_address,
+          city = excluded.city,
+          state = excluded.state,
+          pincode = excluded.pincode,
           updated_at = excluded.updated_at
         RETURNING customer_id`,
       )
-      .bind(`cus_${crypto.randomUUID()}`, name, phone, email, address, now, now)
+      .bind(`cus_${crypto.randomUUID()}`, name, phone, email, address, city, state, pincode, now, now)
       .first();
     if (!customer?.customer_id) throw new Error("Could not save your customer profile.");
-    return result(200, { profile: { name, phone, email, address } });
+    return result(200, { profile: { name, phone, email, address, city, state, pincode } });
   } catch (error) {
     console.error("Could not update a customer profile.", error);
     return result(503, { error: "Your profile could not be saved right now. Please try again." });
@@ -306,7 +315,7 @@ export async function getCustomerOrders(request, env) {
         `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise,
                 product_subtotal_paise, discount_paise, promo_code, currency,
                 delivery_method, created_at, customer_name, customer_phone,
-                delivery_address, event_date
+                delivery_address, city, state, pincode, event_date
          FROM orders
          WHERE customer_email = ? COLLATE NOCASE
          ORDER BY created_at DESC
@@ -316,7 +325,7 @@ export async function getCustomerOrders(request, env) {
       .all(),
       env.ORDERS_DB
         .prepare(
-          `SELECT customer_name, customer_phone, customer_email, default_address
+          `SELECT customer_name, customer_phone, customer_email, default_address, city, state, pincode
            FROM customers WHERE customer_email = ? COLLATE NOCASE`,
         )
         .bind(email)
@@ -329,6 +338,9 @@ export async function getCustomerOrders(request, env) {
         name: customer?.customer_name ?? "",
         phone: customer?.customer_phone ?? "",
         address: customer?.default_address ?? "",
+        city: customer?.city ?? "",
+        state: customer?.state ?? "",
+        pincode: customer?.pincode ?? "",
       },
       orders: ordersResult.results.map((order) => ({
         orderId: order.order_id,
@@ -346,6 +358,9 @@ export async function getCustomerOrders(request, env) {
         customerName: order.customer_name,
         customerPhone: order.customer_phone,
         deliveryAddress: order.delivery_address,
+        city: order.city ?? "",
+        state: order.state ?? "",
+        pincode: order.pincode ?? "",
         eventDate: order.event_date ?? "",
       })),
     });

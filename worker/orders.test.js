@@ -19,7 +19,7 @@ function createDatabase() {
                 rows.set(orderId, {
                   payment_id: paymentId,
                   customer_name: customerName,
-                  event_date: values[7],
+                  event_date: values[10],
                 });
                 return;
               }
@@ -34,7 +34,7 @@ function createDatabase() {
                 return rows.get(values[0]) ?? null;
               }
               if (query.startsWith("INSERT INTO customers")) {
-                const [customerId, customer_name, customer_phone, customer_email, default_address, created_at, updated_at] =
+                const [customerId, customer_name, customer_phone, customer_email, default_address, city, state, pincode, created_at, updated_at] =
                   values;
                 const existing = customers.get(customer_email);
                 const customer = existing ?? { customer_id: customerId };
@@ -43,6 +43,9 @@ function createDatabase() {
                   customer_phone,
                   customer_email,
                   default_address,
+                  city,
+                  state,
+                  pincode,
                   created_at,
                   updated_at,
                 });
@@ -65,6 +68,9 @@ const paidOrder = {
   customerPhone: "+911234567890",
   customerEmail: "customer@example.com",
   deliveryAddress: "123 Sample Street",
+  city: "Chennai",
+  state: "Tamil Nadu",
+  pincode: "600001",
   eventDate: "2026-12-25",
   items: [{
     id: "product-1001",
@@ -111,6 +117,27 @@ test("reconstructs verified order details from Razorpay order notes", () => {
   assert.equal(order.eventDate, paidOrder.eventDate);
   assert.equal(order.deliveryMethod, paidOrder.deliveryMethod);
   assert.deepEqual(order.items, paidOrder.items);
+});
+
+test("reconstructs address components from delivery notes", () => {
+  const order = parsePaidOrderNotes(
+    paidOrder.orderId,
+    paidOrder.paymentId,
+    createPaidNotes({
+      delivery: JSON.stringify({
+        m: "P",
+        d: "5.25",
+        ok: "1",
+        c: "Chennai",
+        s: "Tamil Nadu",
+        p: "600001",
+      }),
+    }),
+    paidOrder.amountPaise,
+  );
+  assert.equal(order.city, "Chennai");
+  assert.equal(order.state, "Tamil Nadu");
+  assert.equal(order.pincode, "600001");
 });
 
 test("does not accept paid order notes with tampered price or delivery method", () => {

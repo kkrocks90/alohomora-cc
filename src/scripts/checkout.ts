@@ -8,6 +8,7 @@ import {
   saveCart,
   type CartItem,
 } from "./cart";
+import { initializeAddressPicker } from "./address-picker";
 
 interface PaymentOrder {
   id: string;
@@ -86,7 +87,6 @@ const profileStatus = requireElement<HTMLElement>("#checkout-profile-status");
 const eventDateInput = requireElement<HTMLInputElement>("#checkout-form input[name=eventDate]");
 const checkoutStatus = requireElement<HTMLElement>("#checkout-status");
 const checkoutButton = requireElement<HTMLButtonElement>("#checkout-button");
-const locationButton = requireElement<HTMLButtonElement>("#use-delivery-location");
 const signedInEmail = requireElement<HTMLElement>("#checkout-signed-in");
 const signOutButton = requireElement<HTMLButtonElement>("#checkout-sign-out");
 const orderItems = requireElement<HTMLElement>("#checkout-order-items");
@@ -110,6 +110,50 @@ let customerEmail = "";
 let sessionToken = "";
 let profileComplete = false;
 let appliedPromo: AppliedPromo | null = null;
+let selectedDeliveryLocation: { latitude: number; longitude: number } | null = null;
+
+function initializeFormAddressPicker(
+  form: HTMLFormElement,
+  onLocation?: (latitude: number, longitude: number) => void,
+) {
+  const address = form.elements.namedItem("address");
+  const city = form.elements.namedItem("city");
+  const state = form.elements.namedItem("state");
+  const pincode = form.elements.namedItem("pincode");
+  const map = form.querySelector<HTMLElement>("[data-address-map]");
+  const findButton = form.querySelector<HTMLButtonElement>("[data-find-address]");
+  const status = form.querySelector<HTMLElement>("[data-address-map-status]");
+  if (
+    !(address instanceof HTMLTextAreaElement) ||
+    !(city instanceof HTMLInputElement) ||
+    !(state instanceof HTMLInputElement) ||
+    !(pincode instanceof HTMLInputElement) ||
+    !map || !findButton || !status
+  ) throw new Error("The address map form is incomplete.");
+  initializeAddressPicker({ root, address, city, state, pincode, map, findButton, status, onLocation });
+  if (onLocation) {
+    for (const input of [address, city, state, pincode]) {
+      input.addEventListener("input", () => {
+        selectedDeliveryLocation = null;
+        status.textContent = "Address details changed. Select the exact delivery point on the map again.";
+        status.dataset.state = "error";
+        const latitude = checkoutForm.elements.namedItem("latitude");
+        const longitude = checkoutForm.elements.namedItem("longitude");
+        if (latitude instanceof HTMLInputElement) latitude.value = "";
+        if (longitude instanceof HTMLInputElement) longitude.value = "";
+      });
+    }
+  }
+}
+
+initializeFormAddressPicker(profileForm);
+initializeFormAddressPicker(checkoutForm, (latitude, longitude) => {
+  selectedDeliveryLocation = { latitude, longitude };
+  const latitudeInput = checkoutForm.elements.namedItem("latitude");
+  const longitudeInput = checkoutForm.elements.namedItem("longitude");
+  if (latitudeInput instanceof HTMLInputElement) latitudeInput.value = String(latitude);
+  if (longitudeInput instanceof HTMLInputElement) longitudeInput.value = String(longitude);
+});
 
 const today = new Date();
 eventDateInput.min = [
@@ -302,27 +346,48 @@ async function loadSession(token: string) {
   const name = typeof profile.name === "string" ? profile.name : "";
   const phone = typeof profile.phone === "string" ? profile.phone : "";
   const address = typeof profile.address === "string" ? profile.address : "";
-  profileComplete = Boolean(name.trim() && phone.trim() && address.trim());
+  const city = typeof profile.city === "string" ? profile.city : "";
+  const state = typeof profile.state === "string" ? profile.state : "";
+  const pincode = typeof profile.pincode === "string" ? profile.pincode : "";
+  profileComplete = Boolean(name.trim() && phone.trim() && address.trim() && city.trim() && state.trim() && /^[1-9][0-9]{5}$/.test(pincode));
   const setupName = profileForm.elements.namedItem("name");
   const setupPhone = profileForm.elements.namedItem("phone");
   const setupAddress = profileForm.elements.namedItem("address");
+  const setupCity = profileForm.elements.namedItem("city");
+  const setupState = profileForm.elements.namedItem("state");
+  const setupPincode = profileForm.elements.namedItem("pincode");
   const checkoutName = checkoutForm.elements.namedItem("name");
   const checkoutPhone = checkoutForm.elements.namedItem("phone");
   const checkoutAddress = checkoutForm.elements.namedItem("address");
+  const checkoutCity = checkoutForm.elements.namedItem("city");
+  const checkoutState = checkoutForm.elements.namedItem("state");
+  const checkoutPincode = checkoutForm.elements.namedItem("pincode");
   if (
     setupName instanceof HTMLInputElement &&
     setupPhone instanceof HTMLInputElement &&
     setupAddress instanceof HTMLTextAreaElement &&
+    setupCity instanceof HTMLInputElement &&
+    setupState instanceof HTMLInputElement &&
+    setupPincode instanceof HTMLInputElement &&
     checkoutName instanceof HTMLInputElement &&
     checkoutPhone instanceof HTMLInputElement &&
-    checkoutAddress instanceof HTMLTextAreaElement
+    checkoutAddress instanceof HTMLTextAreaElement &&
+    checkoutCity instanceof HTMLInputElement &&
+    checkoutState instanceof HTMLInputElement &&
+    checkoutPincode instanceof HTMLInputElement
   ) {
     setupName.value = name;
     setupPhone.value = phone;
     setupAddress.value = address;
+    setupCity.value = city;
+    setupState.value = state;
+    setupPincode.value = pincode;
     checkoutName.value = name;
     checkoutPhone.value = phone;
     checkoutAddress.value = address;
+    checkoutCity.value = city;
+    checkoutState.value = state;
+    checkoutPincode.value = pincode;
   }
   signedInEmail.textContent = `Signed in as ${customerEmail}`;
   setLoginStatus("");
@@ -395,6 +460,9 @@ profileForm.addEventListener("submit", async (event) => {
       name: formData.get("name"),
       phone: formData.get("phone"),
       address: formData.get("address"),
+      city: formData.get("city"),
+      state: formData.get("state"),
+      pincode: formData.get("pincode"),
     });
     await loadSession(sessionToken);
     setCheckoutStatus("Your saved details are ready. You can edit them for this order.");
@@ -421,38 +489,6 @@ signOutButton.addEventListener("click", async () => {
   profileComplete = false;
   showLogin();
   setLoginStatus(signOutMessage, signOutError);
-});
-
-locationButton.addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    setCheckoutStatus("Location isn’t available in this browser. Enter the delivery pin coordinates instead.", true);
-    return;
-  }
-  locationButton.disabled = true;
-  setCheckoutStatus("Finding this device’s location…");
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const latitudeInput = checkoutForm.elements.namedItem("latitude");
-      const longitudeInput = checkoutForm.elements.namedItem("longitude");
-      if (!(latitudeInput instanceof HTMLInputElement) || !(longitudeInput instanceof HTMLInputElement)) {
-        throw new Error("The delivery coordinate fields are missing.");
-      }
-      latitudeInput.value = position.coords.latitude.toFixed(6);
-      longitudeInput.value = position.coords.longitude.toFixed(6);
-      locationButton.disabled = false;
-      setCheckoutStatus("Location added. Confirm it matches the delivery address pin.");
-    },
-    (error) => {
-      locationButton.disabled = false;
-      const message = error.code === error.PERMISSION_DENIED
-        ? "Location access was denied. Allow access or enter the delivery pin coordinates."
-        : error.code === error.TIMEOUT
-          ? "Couldn’t get your location in time. Try again or enter the pin coordinates."
-          : "Couldn’t get your location. Check device settings or enter the pin coordinates.";
-      setCheckoutStatus(message, true);
-    },
-    { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 },
-  );
 });
 
 function loadRazorpay(): Promise<void> {
@@ -517,21 +553,11 @@ checkoutForm.addEventListener("submit", async (event) => {
   }
 
   const formData = new FormData(checkoutForm);
-  const deliveryLocation = {
-    latitude: Number(formData.get("latitude")),
-    longitude: Number(formData.get("longitude")),
-  };
-  if (
-    !Number.isFinite(deliveryLocation.latitude) ||
-    deliveryLocation.latitude < -90 ||
-    deliveryLocation.latitude > 90 ||
-    !Number.isFinite(deliveryLocation.longitude) ||
-    deliveryLocation.longitude < -180 ||
-    deliveryLocation.longitude > 180
-  ) {
-    setCheckoutStatus("Enter valid latitude and longitude for the delivery address pin.", true);
+  if (!selectedDeliveryLocation) {
+    setCheckoutStatus("Enter your PIN code and select the exact delivery point on the map.", true);
     return;
   }
+  const deliveryLocation = selectedDeliveryLocation;
   checkoutButton.disabled = true;
   setCheckoutStatus("Preparing your secure checkout…");
   let activeReservationId = "";
@@ -544,6 +570,9 @@ checkoutForm.addEventListener("submit", async (event) => {
         phone: String(formData.get("phone") ?? ""),
         email: customerEmail,
         address: String(formData.get("address") ?? ""),
+        city: String(formData.get("city") ?? ""),
+        state: String(formData.get("state") ?? ""),
+        pincode: String(formData.get("pincode") ?? ""),
         eventDate: String(formData.get("eventDate") ?? ""),
         policyConsent: formData.get("policyConsent") === "on",
       },

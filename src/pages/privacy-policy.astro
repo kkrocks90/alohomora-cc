@@ -26,18 +26,21 @@ import PolicyPage from "../components/PolicyPage.astro";
   <h2>2. Information we collect</h2>
   <p>
     When you sign in, we use your email address to send a one-time sign-in code and associate
-    your customer profile and orders. A new customer can save a name, mobile number, and default
-    delivery address. You may edit those details for an individual order; the event date is
-    collected for that order only. We also keep order items, prices, payment and order references,
-    payment/order status, delivery method, and the delivery address used for each order. Manual
-    orders entered by the shop are associated with your profile when they use your email address.
+    your customer profile and orders. A new customer can save a name, mobile number, street
+    address, city, state, and PIN code. You may edit those details for an individual order; the
+    event date is collected for that order only. We also keep order items, prices, payment and
+    order references, payment/order status, delivery method, and the delivery address used for
+    each order. Manual orders entered by the shop are associated with your profile when they use
+    your email address.
   </p>
   <p>
-    At checkout, you provide a delivery pin’s latitude and longitude so the Worker can calculate
+    To choose a delivery location, you enter a PIN code and select the address on a Google Map.
+    Google Maps receives the PIN code to locate the map and the selected map point to return its
+    address components. The resulting street address, city, state, and PIN code are saved with
+    your profile or order. The selected coordinates are sent to the shop’s Worker to calculate
     approximate straight-line distance from the shop and suggest Porter at or within 15 km, or a
-    courier beyond 15 km. The coordinates are used for this calculation and are not saved to the
-    shop’s order database or included in Razorpay order notes. If you use your device’s location,
-    your browser and device location services may process it under their own terms.
+    courier beyond 15 km. Coordinates are not saved in the shop’s order database or included in
+    Razorpay order notes. Google processes map requests under its own terms and privacy notice.
   </p>
 
   <h2>3. How we use and share information</h2>
@@ -50,7 +53,8 @@ import PolicyPage from "../components/PolicyPage.astro";
   </p>
   <p>
     Razorpay processes product payments and receives order information needed to create and
-    verify a payment. Resend delivers sign-in codes. Cloudflare runs the order Worker and stores
+    verify a payment. Google Maps provides PIN-code lookup and reverse geocoding for selected
+    delivery points. Resend delivers sign-in codes. Cloudflare runs the order Worker and stores
     customer and order records in D1. GitHub Pages hosts the static website. Delivery providers
     receive the contact and address details needed to fulfil a delivery after arrangements are
     confirmed. WhatsApp may process messages when you contact or are contacted through WhatsApp.

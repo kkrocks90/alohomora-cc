@@ -33,6 +33,9 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
   }
 
   const deliveryAddress = requireNoteText(notes, "address", 250);
+  let city = "";
+  let state = "";
+  let pincode = "";
   const eventDate = notes?.event_date ?? "";
   if (
     typeof eventDate !== "string" ||
@@ -123,9 +126,18 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     } catch {
       throw new Error("The paid order delivery details could not be read.");
     }
-    distanceText = delivery?.distance_km;
-    deliveryMethodValue = delivery?.delivery_method;
-    policyValue = delivery?.policies_ok;
+    distanceText = delivery?.distance_km ?? delivery?.d;
+    deliveryMethodValue = delivery?.delivery_method ??
+      (delivery?.m === "P" ? "Porter (manual booking)" : delivery?.m === "C" ? "Courier (manual booking)" : undefined);
+    policyValue = delivery?.policies_ok ?? (delivery?.ok === "1"
+      ? "terms_conditions, privacy_policy, shipping_policy"
+      : delivery?.ok);
+    const cityValue = delivery?.city ?? delivery?.c;
+    const stateValue = delivery?.state ?? delivery?.s;
+    const pincodeValue = delivery?.pincode ?? delivery?.p;
+    city = typeof cityValue === "string" ? cityValue.trim() : "";
+    state = typeof stateValue === "string" ? stateValue.trim() : "";
+    pincode = typeof pincodeValue === "string" ? pincodeValue.trim() : "";
   }
   if (typeof distanceText !== "string" || distanceText.trim() === "" || distanceText.length > 32) {
     throw new Error("The paid order is missing valid distance_km details.");
@@ -186,6 +198,9 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     customerPhone,
     customerEmail,
     deliveryAddress,
+    city,
+    state,
+    pincode,
     eventDate,
     items,
     amountPaise,
@@ -211,6 +226,9 @@ export async function savePaidOrder(database, order) {
         customer_phone,
         customer_email,
         delivery_address,
+        city,
+        state,
+        pincode,
         event_date,
         items_json,
         amount_paise,
@@ -222,7 +240,7 @@ export async function savePaidOrder(database, order) {
         distance_km,
         policies_accepted,
         created_at
-      ) VALUES (?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
+      ) VALUES (?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
       ON CONFLICT(order_id) DO NOTHING`;
   const insertValues = [
     order.orderId,
@@ -232,6 +250,9 @@ export async function savePaidOrder(database, order) {
     order.customerPhone,
     order.customerEmail,
     order.deliveryAddress,
+    order.city ?? "",
+    order.state ?? "",
+    order.pincode ?? "",
     order.eventDate ?? "",
     JSON.stringify(order.items),
     order.amountPaise,
@@ -250,11 +271,12 @@ export async function savePaidOrder(database, order) {
     const promoInsertSql = `INSERT INTO orders (
         order_id, payment_id, payment_status, payment_method, order_status,
         customer_name, customer_phone, customer_email, delivery_address,
+        city, state, pincode,
         event_date, items_json, amount_paise, product_subtotal_paise,
         discount_paise, promo_code, currency, delivery_method, distance_km,
         policies_accepted, created_at
       )
-      SELECT ?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?
+      SELECT ?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?
       FROM promo_redemptions r
       WHERE r.reservation_id = ? AND r.order_id = ?
         AND r.customer_email = ? AND r.status = 'redeemed'
@@ -294,14 +316,17 @@ export async function savePaidOrder(database, order) {
       .prepare(
         `INSERT INTO customers (
           customer_id, customer_name, customer_phone, customer_email,
-          default_address, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          default_address, city, state, pincode, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> ''
         DO UPDATE SET
           customer_name = excluded.customer_name,
           customer_phone = excluded.customer_phone,
           customer_email = lower(trim(excluded.customer_email)),
           default_address = excluded.default_address,
+          city = excluded.city,
+          state = excluded.state,
+          pincode = excluded.pincode,
           updated_at = excluded.updated_at
         RETURNING customer_id`,
       )
@@ -311,6 +336,9 @@ export async function savePaidOrder(database, order) {
         order.customerPhone,
         email,
         order.deliveryAddress,
+        order.city ?? "",
+        order.state ?? "",
+        order.pincode ?? "",
         now,
         now,
       )

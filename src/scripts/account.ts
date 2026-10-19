@@ -4,6 +4,7 @@ import {
   getCustomerSessionToken,
   saveCustomerSessionToken,
 } from "./cart";
+import { initializeAddressPicker } from "./address-picker";
 
 function requireElement<T extends Element>(element: T | null, selector: string): T {
   if (!element) throw new Error(`The customer account page is missing ${selector}.`);
@@ -45,6 +46,14 @@ if (root) {
     root.querySelector<HTMLInputElement>("#account-remember-me"),
     "#account-remember-me",
   );
+  const address = requireElement<HTMLTextAreaElement>(profileForm.querySelector<HTMLTextAreaElement>("[name=address]"), "[name=address]");
+  const city = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=city]"), "[name=city]");
+  const state = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=state]"), "[name=state]");
+  const pincode = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=pincode]"), "[name=pincode]");
+  const map = requireElement<HTMLElement>(profileForm.querySelector<HTMLElement>("[data-address-map]"), "[data-address-map]");
+  const findButton = requireElement<HTMLButtonElement>(profileForm.querySelector<HTMLButtonElement>("[data-find-address]"), "[data-find-address]");
+  const mapStatus = requireElement<HTMLElement>(profileForm.querySelector<HTMLElement>("[data-address-map-status]"), "[data-address-map-status]");
+  initializeAddressPicker({ root, address, city, state, pincode, map, findButton, status: mapStatus });
 
   let email = "";
 
@@ -75,12 +84,18 @@ if (root) {
     customerName?: string;
     customerPhone?: string;
     deliveryAddress?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
   }
 
   interface CustomerProfile {
     name: string;
     phone: string;
     address: string;
+    city: string;
+    state: string;
+    pincode: string;
   }
 
   async function post(path: string, body?: unknown, token?: string) {
@@ -110,6 +125,9 @@ if (root) {
       ["Email address", accountEmail],
       ["Name", customerProfile.name || latestOrder?.customerName || ""],
       ["Phone number", customerProfile.phone || latestOrder?.customerPhone || ""],
+      ["City", customerProfile.city],
+      ["State", customerProfile.state],
+      ["PIN code", customerProfile.pincode],
     ];
     for (const [label, value] of details) {
       const term = document.createElement("dt");
@@ -129,10 +147,14 @@ if (root) {
     nameInput.value = customerProfile.name || latestOrder?.customerName || "";
     phoneInput.value = customerProfile.phone || latestOrder?.customerPhone || "";
     addressInput.value = customerProfile.address || "";
+    city.value = customerProfile.city;
+    state.value = customerProfile.state;
+    pincode.value = customerProfile.pincode;
     profileForm.hidden = false;
     const profileTitle = profileForm.querySelector("h3");
     const saveButton = profileForm.querySelector<HTMLButtonElement>("button[type=submit]");
-    const complete = Boolean(customerProfile.name && customerProfile.phone && customerProfile.address);
+    const complete = Boolean(customerProfile.name && customerProfile.phone && customerProfile.address &&
+      customerProfile.city && customerProfile.state && /^[1-9][0-9]{5}$/.test(customerProfile.pincode));
     if (profileTitle) profileTitle.textContent = complete ? "Your details and default address" : "Complete your customer profile";
     if (saveButton) saveButton.textContent = complete ? "Update my details" : "Save my details";
 
@@ -154,7 +176,12 @@ if (root) {
         const card = document.createElement("article");
         card.className = "profile-address-card";
         const addressText = document.createElement("p");
-        addressText.textContent = order.deliveryAddress ?? address;
+        addressText.textContent = [
+          order.deliveryAddress ?? address,
+          order.city,
+          order.state,
+          order.pincode,
+        ].filter(Boolean).join(", ");
         const usedOn = document.createElement("span");
         const date = order.createdAt ? new Date(order.createdAt) : null;
         usedOn.textContent = date && !Number.isNaN(date.valueOf())
@@ -261,6 +288,9 @@ if (root) {
         name: typeof rawProfile.name === "string" ? rawProfile.name : "",
         phone: typeof rawProfile.phone === "string" ? rawProfile.phone : "",
         address: typeof rawProfile.address === "string" ? rawProfile.address : "",
+        city: typeof rawProfile.city === "string" ? rawProfile.city : "",
+        state: typeof rawProfile.state === "string" ? rawProfile.state : "",
+        pincode: typeof rawProfile.pincode === "string" ? rawProfile.pincode : "",
       };
       showProfile(orders, accountEmail, customerProfile);
       showOrderHistory(orders);
@@ -325,6 +355,9 @@ if (root) {
         name: formData.get("name"),
         phone: formData.get("phone"),
         address: formData.get("address"),
+        city: formData.get("city"),
+        state: formData.get("state"),
+        pincode: formData.get("pincode"),
       }, getCustomerSessionToken());
       await loadOrders(getCustomerSessionToken());
       setStatus("Your details and default delivery address are saved.");

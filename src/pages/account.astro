@@ -2,10 +2,11 @@
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
 ---
 
 <SiteLayout title="My profile — Chocolate Circle" description="Sign in securely to view your Chocolate Circle profile, delivery addresses, and orders." noIndex>
-  <main class="account-page" id="customer-account" data-checkout-api={checkoutApiUrl} data-base-url={import.meta.env.BASE_URL}>
+  <main class="account-page" id="customer-account" data-checkout-api={checkoutApiUrl} data-google-maps-key={googleMapsApiKey} data-base-url={import.meta.env.BASE_URL}>
     <section class="account-panel" aria-labelledby="account-title">
       <p class="eyebrow">Your little chocolate corner</p>
       <h1 id="account-title">My profile</h1>
@@ -65,6 +66,15 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <input id="profile-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" required />
           <label for="profile-default-address">Default delivery address</label>
           <textarea id="profile-default-address" name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
+          <label for="profile-city">City</label>
+          <input id="profile-city" name="city" autocomplete="address-level2" maxlength="40" required />
+          <label for="profile-state">State</label>
+          <input id="profile-state" name="state" autocomplete="address-level1" maxlength="40" required />
+          <label for="profile-pincode">PIN code</label>
+          <input id="profile-pincode" name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required />
+          <button class="location-button" type="button" data-find-address>Find PIN code on map</button>
+          <div class="address-map" data-address-map hidden></div>
+          <p class="location-privacy" data-address-map-status role="status" aria-live="polite"></p>
           <button class="button button-primary" type="submit">Save my details <span aria-hidden="true">↗</span></button>
         </form>
         <div class="profile-addresses">

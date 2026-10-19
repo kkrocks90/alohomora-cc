@@ -31,6 +31,7 @@ jobs:
         env:
           GITHUB_ACTIONS: "true"
           PUBLIC_CHECKOUT_API_URL: ${{ vars.PUBLIC_CHECKOUT_API_URL }}
+          PUBLIC_GOOGLE_MAPS_API_KEY: ${{ vars.PUBLIC_GOOGLE_MAPS_API_KEY }}
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload website

@@ -88,6 +88,14 @@ function validateOrder(body, storeLocation) {
     throw new Error("Please enter a valid phone number.");
   }
   if (!isValidText(customer.address, 250)) throw new Error("Please enter a delivery address.");
+  if (!isValidText(customer.city, 40) || !isValidText(customer.state, 40) ||
+      typeof customer.pincode !== "string" || !/^[1-9][0-9]{5}$/.test(customer.pincode.trim())) {
+    throw new Error("Please enter a valid city, state, and six-digit Indian PIN code.");
+  }
+  customer.address = customer.address.trim();
+  customer.city = customer.city.trim();
+  customer.state = customer.state.trim();
+  customer.pincode = customer.pincode.trim();
   if (customer.eventDate !== undefined && customer.eventDate !== "") {
     const eventDate = customer.eventDate;
     const parsedDate = typeof eventDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(eventDate)
@@ -290,6 +298,9 @@ async function handleCreateOrder(request, env, origin) {
         customerPhone: order.customer.phone.trim(),
         customerEmail,
         deliveryAddress: order.customer.address.trim(),
+        city: order.customer.city,
+        state: order.customer.state,
+        pincode: order.customer.pincode,
         eventDate: order.customer.eventDate,
         items: order.items.map(({ product, quantity, flavour, wrapper }) => ({
           id: product.id,
@@ -350,12 +361,18 @@ async function handleCreateOrder(request, env, origin) {
     phone: order.customer.phone.trim(),
     email: order.customer.email.trim().toLowerCase(),
     address: order.customer.address.trim(),
+    city: order.customer.city,
+    state: order.customer.state,
+    pincode: order.customer.pincode,
     event_date: order.customer.eventDate,
     ...itemNotes,
     delivery: JSON.stringify({
-      delivery_method: order.fulfillmentMethod,
-      distance_km: order.distanceKm.toFixed(2),
-      policies_ok: "terms_conditions, privacy_policy, shipping_policy",
+      m: order.fulfillmentMethod === "Porter (manual booking)" ? "P" : "C",
+      d: order.distanceKm.toFixed(2),
+      c: order.customer.city,
+      s: order.customer.state,
+      p: order.customer.pincode,
+      ok: "1",
     }),
   };
   if (promoQuote) {

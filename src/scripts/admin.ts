@@ -1,4 +1,5 @@
 import { ADMIN_SESSION_KEY } from "./cart";
+import { initializeAddressPicker } from "./address-picker";
 
 interface AdminCustomer {
   customerId: string;
@@ -6,6 +7,9 @@ interface AdminCustomer {
   phone: string;
   email: string;
   address: string;
+  city: string;
+  state: string;
+  pincode: string;
 }
 
 interface AdminProduct {
@@ -35,6 +39,9 @@ interface AdminOrder {
   customerPhone: string;
   customerEmail: string;
   deliveryAddress: string;
+  city: string;
+  state: string;
+  pincode: string;
   items: AdminOrderItem[];
   amountPaise: number;
   productSubtotalPaise: number;
@@ -73,6 +80,10 @@ interface AdminData {
   promos: AdminPromo[];
 }
 
+function formatDeliveryAddress(order: Pick<AdminOrder, "deliveryAddress" | "city" | "state" | "pincode">) {
+  return [order.deliveryAddress, order.city, order.state, order.pincode].filter(Boolean).join(", ");
+}
+
 function isAdminProduct(value: unknown): value is AdminProduct {
   if (!value || typeof value !== "object") return false;
   const product = value as Record<string, unknown>;
@@ -90,7 +101,10 @@ function isAdminCustomer(value: unknown): value is AdminCustomer {
     typeof customer.name === "string" &&
     typeof customer.phone === "string" &&
     typeof customer.email === "string" &&
-    typeof customer.address === "string";
+    typeof customer.address === "string" &&
+    typeof customer.city === "string" &&
+    typeof customer.state === "string" &&
+    typeof customer.pincode === "string";
 }
 
 function isAdminOrderItem(value: unknown): value is AdminOrderItem {
@@ -117,6 +131,9 @@ function isAdminOrder(value: unknown): value is AdminOrder {
     typeof order.customerPhone === "string" &&
     typeof order.customerEmail === "string" &&
     typeof order.deliveryAddress === "string" &&
+    typeof order.city === "string" &&
+    typeof order.state === "string" &&
+    typeof order.pincode === "string" &&
     Array.isArray(order.items) &&
     order.items.every(isAdminOrderItem) &&
     typeof order.amountPaise === "number" &&
@@ -214,6 +231,9 @@ if (root) {
   const customerSelectSearch = requireElement<HTMLInputElement>(root, "#admin-order-customer-search");
   const customerSelectHint = requireElement<HTMLElement>(root, "#admin-order-customer-hint");
   const addressInput = requireElement<HTMLTextAreaElement>(root, "#admin-order-address");
+  const orderCityInput = requireElement<HTMLInputElement>(root, "#admin-order-city");
+  const orderStateInput = requireElement<HTMLInputElement>(root, "#admin-order-state");
+  const orderPincodeInput = requireElement<HTMLInputElement>(root, "#admin-order-pincode");
   const orderLines = requireElement<HTMLElement>(root, "#admin-order-lines");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
@@ -234,6 +254,22 @@ if (root) {
     cancelled: "Cancelled",
   };
   let adminData: AdminData | null = null;
+  function setupAddressMap(form: HTMLFormElement) {
+    const address = form.elements.namedItem("address");
+    const city = form.elements.namedItem("city");
+    const state = form.elements.namedItem("state");
+    const pincode = form.elements.namedItem("pincode");
+    const map = requireElement<HTMLElement>(form.querySelector<HTMLElement>("[data-address-map]"), "[data-address-map]");
+    const findButton = requireElement<HTMLButtonElement>(form.querySelector<HTMLButtonElement>("[data-find-address]"), "[data-find-address]");
+    const mapStatus = requireElement<HTMLElement>(form.querySelector<HTMLElement>("[data-address-map-status]"), "[data-address-map-status]");
+    if (!(address instanceof HTMLTextAreaElement) || !(city instanceof HTMLInputElement) ||
+        !(state instanceof HTMLInputElement) || !(pincode instanceof HTMLInputElement)) {
+      throw new Error("The admin address form is incomplete.");
+    }
+    initializeAddressPicker({ root, address, city, state, pincode, map, findButton, status: mapStatus });
+  }
+  setupAddressMap(customerForm);
+  setupAddressMap(orderForm);
   const pageSize = 20;
   const customerPageSize = 50;
   let customerPage = 0;
@@ -356,6 +392,9 @@ if (root) {
     if (!adminData) return;
     const previousSelection = customerSelect.value;
     const previousAddress = addressInput.value;
+    const previousCity = orderCityInput.value;
+    const previousState = orderStateInput.value;
+    const previousPincode = orderPincodeInput.value;
     const query = customerSelectSearch.value.trim().toLocaleLowerCase();
     const matchingCustomers = adminData.customers.filter((customer) =>
       [customer.name, customer.phone, customer.email].some((value) => value.toLocaleLowerCase().includes(query)));
@@ -371,15 +410,20 @@ if (root) {
     if (selectionVisible) {
       customerSelect.value = previousSelection;
       addressInput.value = previousAddress;
+      orderCityInput.value = previousCity;
+      orderStateInput.value = previousState;
+      orderPincodeInput.value = previousPincode;
     } else {
       addressInput.value = "";
+      orderCityInput.value = "";
+      orderStateInput.value = "";
+      orderPincodeInput.value = "";
     }
     customerSelectHint.textContent = matchingCustomers.length > visibleCustomers.length
       ? `Showing the first ${visibleCustomers.length} of ${matchingCustomers.length} matches. Refine your search.`
       : matchingCustomers.length === 0
         ? "No customers match that search."
         : `${matchingCustomers.length} matching customer${matchingCustomers.length === 1 ? "" : "s"}.`;
-    addressInput.value = "";
   }
 
   function startCustomerEdit(customer: AdminCustomer) {
@@ -388,17 +432,26 @@ if (root) {
     const phoneInput = customerForm.elements.namedItem("phone");
     const emailInput = customerForm.elements.namedItem("email");
     const addressField = customerForm.elements.namedItem("address");
+    const cityField = customerForm.elements.namedItem("city");
+    const stateField = customerForm.elements.namedItem("state");
+    const pincodeField = customerForm.elements.namedItem("pincode");
     if (
       !(nameInput instanceof HTMLInputElement) ||
       !(phoneInput instanceof HTMLInputElement) ||
       !(emailInput instanceof HTMLInputElement) ||
-      !(addressField instanceof HTMLTextAreaElement)
+      !(addressField instanceof HTMLTextAreaElement) ||
+      !(cityField instanceof HTMLInputElement) ||
+      !(stateField instanceof HTMLInputElement) ||
+      !(pincodeField instanceof HTMLInputElement)
     ) throw new Error("The customer form is missing a required field.");
     nameInput.value = customer.name;
     phoneInput.value = customer.phone;
     emailInput.value = customer.email;
     emailInput.readOnly = true;
     addressField.value = customer.address;
+    cityField.value = customer.city;
+    stateField.value = customer.state;
+    pincodeField.value = customer.pincode;
     customerFormTitle.textContent = "Edit customer details";
     customerFormHint.textContent = "Update the customer name, mobile number, or default address. Email stays unchanged because it identifies the customer’s sign-in and order history.";
     customerSubmit.textContent = "Update customer";
@@ -424,7 +477,7 @@ if (root) {
     customerList.replaceChildren();
     const query = customerSearch.value.trim().toLocaleLowerCase();
     const matchingCustomers = adminData.customers.filter((customer) =>
-      [customer.name, customer.phone, customer.email, customer.address]
+      [customer.name, customer.phone, customer.email, customer.address, customer.city, customer.state, customer.pincode]
         .some((value) => value.toLocaleLowerCase().includes(query)));
     const pageCount = Math.max(1, Math.ceil(matchingCustomers.length / pageSize));
     customerPage = Math.min(customerPage, pageCount - 1);
@@ -451,7 +504,7 @@ if (root) {
       const name = document.createElement("strong");
       name.textContent = customer.name || customer.email;
       const details = document.createElement("span");
-      details.textContent = [customer.phone, customer.email, customer.address].filter(Boolean).join(" · ");
+      details.textContent = [customer.phone, customer.email, customer.address, customer.city, customer.state, customer.pincode].filter(Boolean).join(" · ");
       const editButton = document.createElement("button");
       editButton.type = "button";
       editButton.className = "button button-secondary";
@@ -567,7 +620,7 @@ if (root) {
     appendText(customerBlock, "p", order.customerName);
     appendText(customerBlock, "p", order.customerPhone);
     if (order.customerEmail) appendText(customerBlock, "p", order.customerEmail);
-    appendText(customerBlock, "p", order.deliveryAddress);
+    appendText(customerBlock, "p", formatDeliveryAddress(order));
     const orderBlock = document.createElement("section");
     appendText(orderBlock, "h2", "Order details");
     appendText(orderBlock, "p", `Date: ${new Date(order.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
@@ -640,6 +693,9 @@ if (root) {
         order.customerPhone,
         order.customerEmail,
         order.deliveryAddress,
+        order.city,
+        order.state,
+        order.pincode,
         ...order.items.flatMap((item) => [item.name, item.flavour, item.wrapper]),
       ];
       return searchable.some((value) => value.toLocaleLowerCase().includes(query));
@@ -686,7 +742,7 @@ if (root) {
       }
       appendText(details, "span", order.customerPhone);
       if (order.customerEmail) appendText(details, "span", order.customerEmail);
-      appendText(details, "span", order.deliveryAddress);
+      appendText(details, "span", formatDeliveryAddress(order));
       appendText(details, "span", order.deliveryMethod);
       if (order.eventDate) appendText(details, "span", `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
       const items = document.createElement("ul");
@@ -950,6 +1006,9 @@ if (root) {
           name: formData.get("name"),
           phone: formData.get("phone"),
           address: formData.get("address"),
+          city: formData.get("city"),
+          state: formData.get("state"),
+          pincode: formData.get("pincode"),
         });
         cancelCustomerEditing();
         await loadDashboard();
@@ -960,6 +1019,9 @@ if (root) {
           phone: formData.get("phone"),
           email: formData.get("email"),
           address: formData.get("address"),
+          city: formData.get("city"),
+          state: formData.get("state"),
+          pincode: formData.get("pincode"),
         });
         customerForm.reset();
         await loadDashboard();
@@ -989,7 +1051,12 @@ if (root) {
 
   customerSelect.addEventListener("change", () => {
     const customer = adminData?.customers.find((entry) => entry.customerId === customerSelect.value);
-    if (customer) addressInput.value = customer.address;
+    if (customer) {
+      addressInput.value = customer.address;
+      orderCityInput.value = customer.city;
+      orderStateInput.value = customer.state;
+      orderPincodeInput.value = customer.pincode;
+    }
   });
 
   requireElement<HTMLButtonElement>(root, "#admin-add-line").addEventListener("click", renderOrderLine);
@@ -1013,6 +1080,9 @@ if (root) {
       const result = await post("/admin/orders/create", {
         customerId: formData.get("customerId"),
         address: formData.get("address"),
+        city: formData.get("city"),
+        state: formData.get("state"),
+        pincode: formData.get("pincode"),
         deliveryMethod: formData.get("deliveryMethod"),
         eventDate: formData.get("eventDate"),
         items,
