@@ -529,7 +529,31 @@ h2 em {
   line-height: 1.5;
 }
 
+.copy-toast {
+  position: fixed;
+  z-index: 60;
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: #2f1d15;
+  color: #fff8ee;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 10px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.copy-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .promo-banner-code {
+  cursor: pointer;
+  background: transparent;
+  font-family: inherit;
   flex: 0 0 auto;
   margin-left: 6px;
   padding: 9px 12px;

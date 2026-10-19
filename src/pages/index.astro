@@ -34,16 +34,15 @@ const categoryCards = [...new Set(products.map((product) => product.tag))]
       <span>A celebration coming up? Add your event date at checkout.</span>
       <span class="announcement-arrow" aria-hidden="true">↗</span>
     </a>
-    <a class="promo-banner promo-banner-home" data-promo-banner href={`${import.meta.env.BASE_URL}store/`} hidden>
+    <div class="promo-banner promo-banner-home" data-promo-banner hidden>
       <span class="promo-banner-sparkle" aria-hidden="true">✳</span>
       <span class="promo-banner-copy">
         <span class="promo-banner-kicker">A little something sweet</span>
         <strong data-promo-name></strong>
         <span data-promo-offer></span>
       </span>
-      <span class="promo-banner-code">Use code <strong data-promo-code></strong></span>
-      <span class="promo-banner-arrow" aria-hidden="true">↗</span>
-    </a>
+      <button class="promo-banner-code" type="button" data-promo-copy>Use code <strong data-promo-code></strong></button>
+    </div>
     <section class="hero-section" id="top">
       <div class="hero-copy">
         <p class="eyebrow"><span class="eyebrow-dot"></span> Little batches, lots of love</p>

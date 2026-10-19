@@ -73,6 +73,43 @@ function describePromo(promo: FeaturedPromo) {
   return `Save ${promo.percentage}% on ${target}.`;
 }
 
+let toastTimer: number | undefined;
+
+function showToast(message: string) {
+  let toast = document.querySelector<HTMLElement>("#copy-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "copy-toast";
+    toast.className = "copy-toast";
+    toast.setAttribute("role", "status");
+    document.body.append(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 1800);
+}
+
+async function copyPromoCode(code: string) {
+  try {
+    await navigator.clipboard.writeText(code);
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = code;
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.append(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    if (!copied) {
+      showToast("Couldn’t copy. Please type the code.");
+      return;
+    }
+  }
+  showToast("Code copied");
+}
+
 async function showFeaturedPromo() {
   if (!apiUrl || banners.length === 0) return;
   try {
@@ -97,7 +134,9 @@ async function showFeaturedPromo() {
       name.textContent = promo.name;
       offer.textContent = describePromo(promo);
       code.textContent = promo.code;
-      banner.setAttribute("aria-label", `${promo.name}. ${offer.textContent} Use code ${promo.code}.`);
+      const copyButton = banner.querySelector<HTMLButtonElement>("[data-promo-copy]");
+      copyButton?.setAttribute("aria-label", `Copy promo code ${promo.code}`);
+      copyButton?.addEventListener("click", () => void copyPromoCode(promo.code));
       banner.hidden = false;
     }
   } catch (error) {
