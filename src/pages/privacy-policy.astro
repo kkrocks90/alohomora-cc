@@ -62,8 +62,11 @@ import PolicyPage from "../components/PolicyPage.astro";
   <h2>4. Storage and retention</h2>
   <p>
     Customer profiles and order records are stored in the shop’s Cloudflare D1 database. Sign-in
-    codes and session tokens are stored as hashes; codes expire after 10 minutes and sign-in
-    sessions after 30 days. The shopping bag is stored in your browser’s local storage. The shop
+    codes and server-side session tokens are stored as hashes; codes expire after 10 minutes and
+    sign-in sessions after 30 days. Your browser stores the session token for the current tab by
+    default. If you select “Remember me on this device,” it is kept in that browser’s local
+    storage until you sign out or the server session expires. The shopping bag is also stored in
+    your browser’s local storage. The shop
     currently has no fixed automatic deletion schedule for customer and order records; records
     are retained for shop operations and applicable Indian legal and recordkeeping requirements.
   </p>

@@ -23,6 +23,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           maxlength="120"
           required
         />
+        <label class="remember-me-option" for="account-remember-me">
+          <input id="account-remember-me" name="rememberMe" type="checkbox" />
+          <span>Remember me on this device</span>
+        </label>
         <button class="button button-primary" type="submit">Send sign-in code <span aria-hidden="true">↗</span></button>
       </form>
 

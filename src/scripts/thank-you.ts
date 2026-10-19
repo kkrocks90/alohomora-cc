@@ -1,4 +1,4 @@
-import { CUSTOMER_SESSION_KEY } from "./cart";
+import { clearCustomerSessionToken, getCustomerSessionToken } from "./cart";
 
 interface OrderItem {
   name: string;
@@ -127,7 +127,7 @@ async function loadOrder() {
     status.textContent = "Your order link is missing its reference. Sign in to view your order history.";
     return;
   }
-  const token = sessionStorage.getItem(CUSTOMER_SESSION_KEY) ?? "";
+  const token = getCustomerSessionToken();
   if (!/^[0-9a-f]{64}$/.test(token)) {
     status.textContent = "Sign in to view your verified order details.";
     return;
@@ -150,7 +150,7 @@ async function loadOrder() {
     throw new Error("Could not read your order details.");
   }
   if (!response.ok) {
-    if (response.status === 401) sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+    if (response.status === 401) clearCustomerSessionToken();
     throw new Error(isRecord(payload) && typeof payload.error === "string"
       ? payload.error
       : "Could not load your order details.");

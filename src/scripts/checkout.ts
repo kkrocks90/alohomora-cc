@@ -1,8 +1,10 @@
 import {
   CART_STORAGE_KEY,
-  CUSTOMER_SESSION_KEY,
+  clearCustomerSessionToken,
+  getCustomerSessionToken,
   loadCart,
   productById,
+  saveCustomerSessionToken,
   saveCart,
   type CartItem,
 } from "./cart";
@@ -64,6 +66,7 @@ const emailForm = requireElement<HTMLFormElement>("#checkout-email-form");
 const codeForm = requireElement<HTMLFormElement>("#checkout-code-form");
 const emailInput = requireElement<HTMLInputElement>("#checkout-email");
 const codeInput = requireElement<HTMLInputElement>("#checkout-code");
+const rememberMeInput = requireElement<HTMLInputElement>("#checkout-remember-me");
 const loginStatus = requireElement<HTMLElement>("#checkout-login-status");
 const checkoutForm = requireElement<HTMLFormElement>("#checkout-form");
 const profileSetup = requireElement<HTMLElement>("#checkout-profile-setup");
@@ -106,8 +109,7 @@ function setCheckoutStatus(message: string, error = false) {
 }
 
 function getToken() {
-  const token = sessionStorage.getItem(CUSTOMER_SESSION_KEY) ?? "";
-  return /^[0-9a-f]{64}$/.test(token) ? token : "";
+  return getCustomerSessionToken();
 }
 
 async function requestApi(path: string, body?: unknown, token = sessionToken) {
@@ -129,7 +131,7 @@ async function requestApi(path: string, body?: unknown, token = sessionToken) {
   if (!isRecord(payload)) throw new Error("The checkout service returned an invalid response.");
   if (!response.ok) {
     if (response.status === 401 && token) {
-      sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+      clearCustomerSessionToken();
       window.dispatchEvent(new Event("customer-session-change"));
       sessionToken = "";
       customerEmail = "";
@@ -189,6 +191,11 @@ async function loadSession(token: string) {
   sessionToken = token;
   const result = await requestApi("/auth/orders", undefined, token);
   if (typeof result.email !== "string") throw new Error("Sign-in returned an invalid email address.");
+  if (result.isAdmin === true) {
+    clearCustomerSessionToken();
+    window.dispatchEvent(new Event("customer-session-change"));
+    throw new Error("Please sign in to the admin workspace at /admin/.");
+  }
   customerEmail = result.email;
   const profile = isRecord(result.profile) ? result.profile : {};
   const name = typeof profile.name === "string" ? profile.name : "";
@@ -254,11 +261,11 @@ codeForm.addEventListener("submit", async (event) => {
     if (typeof result.token !== "string" || !/^[0-9a-f]{64}$/.test(result.token)) {
       throw new Error("Sign-in returned an invalid session. Please try again.");
     }
-    sessionStorage.setItem(CUSTOMER_SESSION_KEY, result.token);
-    window.dispatchEvent(new Event("customer-session-change"));
     await loadSession(result.token);
+    saveCustomerSessionToken(result.token, rememberMeInput.checked);
+    window.dispatchEvent(new Event("customer-session-change"));
   } catch (error) {
-    sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+    clearCustomerSessionToken();
     window.dispatchEvent(new Event("customer-session-change"));
     sessionToken = "";
     customerEmail = "";
@@ -306,7 +313,7 @@ signOutButton.addEventListener("click", async () => {
     signOutMessage = "Signed out on this device, but the session could not be revoked. Please try again.";
     signOutError = true;
   }
-  sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+  clearCustomerSessionToken();
   window.dispatchEvent(new Event("customer-session-change"));
   sessionToken = "";
   customerEmail = "";
@@ -480,7 +487,7 @@ if (cart.length > 0) {
   const token = getToken();
   if (token) {
     void loadSession(token).catch((error: unknown) => {
-      sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+      clearCustomerSessionToken();
       window.dispatchEvent(new Event("customer-session-change"));
       sessionToken = "";
       customerEmail = "";

@@ -2060,6 +2060,26 @@ h2 em {
   font-size: 12px;
 }
 
+.account-form .remember-me-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #79685d;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.account-form .remember-me-option input {
+  width: 16px;
+  min-height: 16px;
+  flex: 0 0 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: #805744;
+}
+
 .account-form input {
   width: 100%;
   min-height: 43px;

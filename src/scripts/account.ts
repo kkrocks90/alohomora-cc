@@ -1,3 +1,10 @@
+import {
+  ADMIN_SESSION_KEY,
+  clearCustomerSessionToken,
+  getCustomerSessionToken,
+  saveCustomerSessionToken,
+} from "./cart";
+
 function requireElement<T extends Element>(element: T | null, selector: string): T {
   if (!element) throw new Error(`The customer account page is missing ${selector}.`);
   return element;
@@ -34,7 +41,10 @@ if (root) {
     "#account-sign-out",
   );
   const submitButtons = root.querySelectorAll<HTMLButtonElement>("button[type=submit]");
-  const sessionKey = "cocoa-kind-customer-session";
+  const rememberMeInput = requireElement(
+    root.querySelector<HTMLInputElement>("#account-remember-me"),
+    "#account-remember-me",
+  );
 
   let email = "";
 
@@ -217,14 +227,19 @@ if (root) {
     ordersSection.hidden = false;
   }
 
-  async function loadOrders(token: string) {
+  async function loadOrders(token: string, rememberMe?: boolean) {
     setBusy(true);
     try {
       const result = await post("/auth/orders", undefined, token);
       if (result.isAdmin === true) {
+        clearCustomerSessionToken();
+        sessionStorage.setItem(ADMIN_SESSION_KEY, token);
+        window.dispatchEvent(new Event("customer-session-change"));
         window.location.assign(`${baseUrl}admin/`);
         return;
       }
+      if (rememberMe !== undefined) saveCustomerSessionToken(token, rememberMe);
+      window.dispatchEvent(new Event("customer-session-change"));
       const orders = Array.isArray(result.orders)
         ? result.orders.filter((value): value is CustomerOrder => Boolean(value && typeof value === "object"))
         : [];
@@ -244,7 +259,7 @@ if (root) {
       setStatus(`Signed in as ${accountEmail}.`);
     } catch (error) {
       if (error instanceof AccountApiError && error.status === 401) {
-        sessionStorage.removeItem(sessionKey);
+        clearCustomerSessionToken();
         window.dispatchEvent(new Event("customer-session-change"));
       }
       throw error;
@@ -281,9 +296,7 @@ if (root) {
       const result = await post("/auth/verify-code", { email, code: codeInput.value.trim() });
       const token = String(result.token ?? "");
       if (!/^[0-9a-f]{64}$/.test(token)) throw new Error("Sign-in returned an invalid session. Please try again.");
-      sessionStorage.setItem(sessionKey, token);
-      window.dispatchEvent(new Event("customer-session-change"));
-      await loadOrders(token);
+      await loadOrders(token, rememberMeInput.checked);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not verify the code.", true);
     } finally {
@@ -302,8 +315,8 @@ if (root) {
         name: formData.get("name"),
         phone: formData.get("phone"),
         address: formData.get("address"),
-      }, sessionStorage.getItem(sessionKey) ?? "");
-      await loadOrders(sessionStorage.getItem(sessionKey) ?? "");
+      }, getCustomerSessionToken());
+      await loadOrders(getCustomerSessionToken());
       setStatus("Your details and default delivery address are saved.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not save your details.", true);
@@ -321,11 +334,11 @@ if (root) {
   });
 
   signOutButton.addEventListener("click", async () => {
-    const token = sessionStorage.getItem(sessionKey);
+    const token = getCustomerSessionToken();
     setBusy(true);
     try {
       if (token) await post("/auth/logout", undefined, token);
-      sessionStorage.removeItem(sessionKey);
+      clearCustomerSessionToken();
       window.dispatchEvent(new Event("customer-session-change"));
       profileSection.hidden = true;
       ordersSection.hidden = true;
@@ -338,7 +351,7 @@ if (root) {
     }
   });
 
-  const existingToken = sessionStorage.getItem(sessionKey);
+  const existingToken = getCustomerSessionToken();
   if (existingToken) {
     void loadOrders(existingToken).catch((error: unknown) => {
       emailForm.hidden = false;

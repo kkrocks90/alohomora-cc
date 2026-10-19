@@ -21,6 +21,27 @@ export interface CartItem {
 
 export const CART_STORAGE_KEY = "cocoa-kind-cart-v1";
 export const CUSTOMER_SESSION_KEY = "cocoa-kind-customer-session";
+export const ADMIN_SESSION_KEY = "cocoa-kind-admin-session";
+
+export function getCustomerSessionToken(): string {
+  const rememberedToken = localStorage.getItem(CUSTOMER_SESSION_KEY) ?? "";
+  if (/^[0-9a-f]{64}$/.test(rememberedToken)) return rememberedToken;
+
+  const sessionToken = sessionStorage.getItem(CUSTOMER_SESSION_KEY) ?? "";
+  return /^[0-9a-f]{64}$/.test(sessionToken) ? sessionToken : "";
+}
+
+export function saveCustomerSessionToken(token: string, rememberMe: boolean) {
+  localStorage.removeItem(CUSTOMER_SESSION_KEY);
+  sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+  if (rememberMe) localStorage.setItem(CUSTOMER_SESSION_KEY, token);
+  else sessionStorage.setItem(CUSTOMER_SESSION_KEY, token);
+}
+
+export function clearCustomerSessionToken() {
+  localStorage.removeItem(CUSTOMER_SESSION_KEY);
+  sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
+}
 
 export const productById = new Map<string, Product>(
   products.map((product): [string, Product] => [product.id, product]),

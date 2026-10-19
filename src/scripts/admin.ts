@@ -1,3 +1,5 @@
+import { ADMIN_SESSION_KEY } from "./cart";
+
 interface AdminCustomer {
   customerId: string;
   name: string;
@@ -151,7 +153,7 @@ if (root) {
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
   const invoice = requireElement<HTMLElement>(root, "#admin-invoice-print");
-  const sessionKey = "cocoa-kind-customer-session";
+  const sessionKey = ADMIN_SESSION_KEY;
   const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
   const statusLabels: Record<string, string> = {
     received: "Received",

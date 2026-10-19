@@ -1,14 +1,15 @@
+import { getCustomerSessionToken } from "./cart";
+
 function requireMenuElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
   if (!element) throw new Error(`The mobile navigation menu is missing ${selector}.`);
   return element;
 }
 
-const accountSessionKey = "cocoa-kind-customer-session";
 const accountLabels = document.querySelectorAll<HTMLElement>("[data-account-label]");
 
 function updateAccountLabels() {
-  const label = sessionStorage.getItem(accountSessionKey) ? "My profile" : "Login";
+  const label = getCustomerSessionToken() ? "My profile" : "Login";
   accountLabels.forEach((element) => {
     element.textContent = label;
   });
@@ -16,6 +17,7 @@ function updateAccountLabels() {
 
 updateAccountLabels();
 window.addEventListener("customer-session-change", updateAccountLabels);
+window.addEventListener("storage", updateAccountLabels);
 
 const menuToggle = document.querySelector<HTMLButtonElement>("#open-mobile-menu");
 
