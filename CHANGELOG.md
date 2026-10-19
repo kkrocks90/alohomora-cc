@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.8.0] - 2026-10-20
+
+### Added
+- New categories (no products yet): Kids B'Day Special, Tradition Specials, Elite Gifting. They appear as store filters and promo targets; they show on the home page once they have products. List lives in `src/data/categories.json`.
+
 ## [1.7.1] - 2026-10-20
 
 ### Removed

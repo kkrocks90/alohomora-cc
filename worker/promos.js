@@ -1,7 +1,8 @@
 import products from "../src/data/products.json" with { type: "json" };
+import extraCategories from "../src/data/categories.json" with { type: "json" };
 
 const productById = new Map(products.map((product) => [product.id, product]));
-const categories = [...new Set(products.map((product) => product.tag))];
+const categories = [...new Set([...products.map((product) => product.tag), ...extraCategories])];
 const RESERVATION_MINUTES = 30;
 
 function validDate(value) {

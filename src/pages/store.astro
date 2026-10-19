@@ -3,6 +3,7 @@ import { Image, type ImageMetadata } from "astro:assets";
 import ProductCard from "../components/ProductCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import products from "../data/products.json";
+import extraCategories from "../data/categories.json";
 
 const productImages = import.meta.glob<{ default: ImageMetadata }>(
   "../assets/products/*.{jpg,jpeg,png,webp,svg}",
@@ -13,7 +14,7 @@ const productImages = import.meta.glob<{ default: ImageMetadata }>(
 const imagesByName = Object.fromEntries(
   Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
 );
-const tags = [...new Set(products.map((product) => product.tag))].sort((a, b) => a.localeCompare(b));
+const tags = [...new Set([...products.map((product) => product.tag), ...extraCategories])].sort((a, b) => a.localeCompare(b));
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
 
