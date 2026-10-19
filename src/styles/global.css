@@ -5058,3 +5058,72 @@ h2 em {
     font-size: 11px;
   }
 }
+
+/* Aligned product cards and a friendlier "Choose options" button */
+.product-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card .product-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.product-card .product-buy-row {
+  margin-top: auto;
+}
+
+.add-button {
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 8px 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #624234;
+  color: #fffaf2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.add-button:hover {
+  background: #4b3026;
+  color: #fffaf2;
+}
+
+.add-button span {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: rgb(255 250 242 / 18%);
+  font-size: 13px;
+  transition: transform 160ms ease;
+}
+
+.add-button:hover span {
+  transform: translateX(2px);
+}
+
+@media (max-width: 620px) {
+  .featured-slider .product-card,
+  .featured-slider .featured-clone {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .featured-slider .featured-clone .product-card {
+    flex: 1;
+  }
+
+  .product-card .add-button {
+    justify-content: space-between;
+    min-height: 40px;
+    padding: 0 8px 0 14px;
+  }
+
+  .featured-slider .add-button {
+    min-height: 36px;
+    padding: 0 6px 0 12px;
+  }
+}

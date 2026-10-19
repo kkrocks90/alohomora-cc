@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.9.3] - 2026-10-20
+
+### Changed
+- Product cards (home featured slider and store) now align their price and "Choose options" button across a row.
+- Redesigned the "Choose options" button as a filled cocoa pill with an arrow chip.
+
 ## [1.9.2] - 2026-10-20
 
 ### Changed
