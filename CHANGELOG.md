@@ -5,6 +5,16 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.2.0] - 2026-10-20
+
+### Added
+- Mobile bottom tab bar (Home, Shop, Bag with item count, Account) with safe-area support.
+- Sticky "Add to bag" button on mobile product pages.
+
+### Changed
+- Mobile product cards: stacked price and full-width, larger "Choose options" button; 2-line description clamp; consistent card heights.
+- WhatsApp button moved above the tab bar; form fields use 16px text to prevent iOS zoom.
+
 ## [1.1.0] - 2026-10-19
 
 ### Changed

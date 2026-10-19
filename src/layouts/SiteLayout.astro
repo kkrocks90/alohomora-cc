@@ -154,6 +154,26 @@ const socialImageUrl = new URL(socialImage, Astro.site);
       <small>© {new Date().getFullYear()} Chocolate Circle. Made in small batches.</small>
     </footer>
 
+    <nav class="tab-bar" id="tab-bar" aria-label="Quick navigation">
+      <a href={base} data-tab-path="/">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v8.5a.5.5 0 0 1-.5.5H15v-6H9v6H4.5a.5.5 0 0 1-.5-.5Z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href={`${base}store/`} data-tab-path="/store/">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"></rect><rect x="13" y="4" width="7" height="7" rx="1.5"></rect><rect x="4" y="13" width="7" height="7" rx="1.5"></rect><rect x="13" y="13" width="7" height="7" rx="1.5"></rect></svg>
+        <span>Shop</span>
+      </a>
+      <button type="button" id="tab-bag" aria-label="Open your shopping bag">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6Z"></path><path d="M9 8V6.5a3 3 0 0 1 6 0V8"></path></svg>
+        <span>Bag</span>
+        <b class="tab-bag-count" id="tab-bag-count" hidden>0</b>
+      </button>
+      <a href={`${base}account/`} data-tab-path="/account/">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.7-3.3 3.2-5 7-5s6.3 1.7 7 5"></path></svg>
+        <span data-account-label>Login</span>
+      </a>
+    </nav>
+
     <a
       class="whatsapp-float"
       href="https://wa.me/919500868468?text=Hi%20Chocolate%20Circle%2C%20I%27d%20like%20to%20ask%20about%20your%20chocolates."

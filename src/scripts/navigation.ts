@@ -19,6 +19,32 @@ updateAccountLabels();
 window.addEventListener("customer-session-change", updateAccountLabels);
 window.addEventListener("storage", updateAccountLabels);
 
+const tabBag = document.querySelector<HTMLButtonElement>("#tab-bag");
+const tabBagCount = document.querySelector<HTMLElement>("#tab-bag-count");
+const headerBag = document.querySelector<HTMLButtonElement>("#open-cart");
+const headerBagCount = document.querySelector<HTMLElement>("#bag-count");
+
+if (tabBag && tabBagCount && headerBag && headerBagCount) {
+  const syncBagCount = () => {
+    const count = Number(headerBagCount.textContent) || 0;
+    tabBagCount.textContent = String(count);
+    tabBagCount.hidden = count === 0;
+  };
+  syncBagCount();
+  new MutationObserver(syncBagCount).observe(headerBagCount, { childList: true, characterData: true, subtree: true });
+  tabBag.addEventListener("click", () => headerBag.click());
+}
+
+const currentPath = window.location.pathname.replace(/\/+$/, "/");
+document.querySelectorAll<HTMLAnchorElement>("#tab-bar a[data-tab-path]").forEach((link) => {
+  const tabPath = link.dataset.tabPath ?? "";
+  const linkPath = new URL(link.href).pathname;
+  const isHome = tabPath === "/";
+  if (isHome ? currentPath === linkPath : currentPath.startsWith(linkPath)) {
+    link.setAttribute("aria-current", "page");
+  }
+});
+
 const menuToggle = document.querySelector<HTMLButtonElement>("#open-mobile-menu");
 
 if (menuToggle) {
