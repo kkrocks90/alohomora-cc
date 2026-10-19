@@ -15,6 +15,7 @@ import {
   isValidDeliveryLocation,
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
+import { isValidPincode, lookupPincode, PincodeLookupError } from "./pincode.js";
 import {
   getFeaturedPromo,
   getPromoReservationForOrder,
@@ -114,7 +115,7 @@ function validateOrder(body, storeLocation) {
     customer.eventDate = "";
   }
   if (!isValidDeliveryLocation(body.deliveryLocation)) {
-    throw new Error("Please enter valid coordinates for your delivery address pin.");
+    throw new Error("Delivery distance could not be determined from the PIN code.");
   }
   if (typeof customer.email !== "string" || customer.email.length > 120 ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email.trim())) {
@@ -266,13 +267,20 @@ async function handleCreateOrder(request, env, origin) {
       return errorResponse("The checkout email must match the signed-in account.", 403, origin);
     }
     body.customer.email = customerEmail;
+    if (isValidPincode(body?.customer?.pincode)) {
+      const deliveryPlace = await lookupPincode(body.customer.pincode);
+      body.deliveryLocation = { latitude: deliveryPlace.latitude, longitude: deliveryPlace.longitude };
+    } else if (body && typeof body === "object") {
+      delete body.deliveryLocation;
+    }
     order = validateOrder(body, storeLocation);
     if (body.promoCode !== undefined && body.promoCode !== null && body.promoCode !== "") {
       promoQuote = await quotePromo(env.ORDERS_DB, body.promoCode, customerEmail, order.items);
       order.amount = promoQuote.payablePaise;
     }
   } catch (error) {
-    return errorResponse(error.message, 400, origin);
+    const status = error instanceof PincodeLookupError ? error.status : 400;
+    return errorResponse(error.message, status, origin);
   }
 
   if (order.amount === 0) {
@@ -668,6 +676,18 @@ export default {
       } catch (error) {
         console.error("Could not load a featured promo.", error);
         return errorResponse("The featured promo is temporarily unavailable.", 503, configuredOrigin);
+      }
+    }
+    const pincodeMatch = path.match(/^\/pincode\/(\d{6})$/);
+    if (request.method === "GET" && pincodeMatch) {
+      try {
+        const { pincode, city, state } = await lookupPincode(pincodeMatch[1]);
+        const response = jsonResponse({ pincode, city, state }, 200, configuredOrigin);
+        response.headers.set("Cache-Control", "public, max-age=86400");
+        return response;
+      } catch (error) {
+        const status = error instanceof PincodeLookupError ? error.status : 503;
+        return errorResponse(error.message, status, configuredOrigin);
       }
     }
     if (request.method !== "POST") return errorResponse("Method not allowed.", 405, configuredOrigin);

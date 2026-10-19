@@ -2,6 +2,24 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import worker from "./index.js";
 
+let testFetch = globalThis.fetch;
+Object.defineProperty(globalThis, "fetch", {
+  configurable: true,
+  get: () => async (url, init) => {
+    const target = String(url);
+    if (target.startsWith("https://api.postalpincode.in/")) {
+      return Response.json([{ Status: "Success", PostOffice: [{ District: "Chennai", State: "Tamil Nadu" }] }]);
+    }
+    if (target.startsWith("https://nominatim.openstreetmap.org/")) {
+      return Response.json([{ lat: "0", lon: "0" }]);
+    }
+    return testFetch(url, init);
+  },
+  set: (replacement) => {
+    testFetch = replacement;
+  },
+});
+
 const authenticatedOrdersDb = {
   prepare(sql) {
     return {

@@ -34,13 +34,12 @@ import PolicyPage from "../components/PolicyPage.astro";
     your email address.
   </p>
   <p>
-    To choose a delivery location, you enter a PIN code and select the address on a Google Map.
-    Google Maps receives the PIN code to locate the map and the selected map point to return its
-    address components. The resulting street address, city, state, and PIN code are saved with
-    your profile or order. The selected coordinates are sent to the shop’s Worker to calculate
-    approximate straight-line distance from the shop and suggest Porter at or within 15 km, or a
-    courier beyond 15 km. Coordinates are not saved in the shop’s order database or included in
-    Razorpay order notes. Google processes map requests under its own terms and privacy notice.
+    When you enter a PIN code, the shop’s Worker looks it up with public PIN-code and map-data
+    services (India Post PIN directory data and OpenStreetMap Nominatim) to fill in your city and
+    state and to find the PIN code’s approximate location. Only the PIN code is sent to those
+    services. The approximate location is used to calculate straight-line distance from the shop
+    and suggest Porter at or within 15 km, or a courier beyond 15 km. Coordinates are not saved in
+    the shop’s order database or included in Razorpay order notes.
   </p>
 
   <h2>3. How we use and share information</h2>
@@ -53,8 +52,8 @@ import PolicyPage from "../components/PolicyPage.astro";
   </p>
   <p>
     Razorpay processes product payments and receives order information needed to create and
-    verify a payment. Google Maps provides PIN-code lookup and reverse geocoding for selected
-    delivery points. Resend delivers sign-in codes. Cloudflare runs the order Worker and stores
+    verify a payment.     India Post PIN directory data and OpenStreetMap Nominatim provide
+        PIN-code lookup. Resend delivers sign-in codes. Cloudflare runs the order Worker and stores
     customer and order records in D1. GitHub Pages hosts the static website. Delivery providers
     receive the contact and address details needed to fulfil a delivery after arrangements are
     confirmed. WhatsApp may process messages when you contact or are contacted through WhatsApp.

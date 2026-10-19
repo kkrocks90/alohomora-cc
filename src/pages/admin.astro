@@ -2,7 +2,6 @@
 import AdminLayout from "../layouts/AdminLayout.astro";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
-const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
 ---
 
 <AdminLayout
@@ -10,7 +9,7 @@ const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "
   description="Private Chocolate Circle customer and order management."
   noIndex
 >
-  <main class="admin-page" id="admin-app" data-checkout-api={checkoutApiUrl} data-google-maps-key={googleMapsApiKey}>
+  <main class="admin-page" id="admin-app" data-checkout-api={checkoutApiUrl}>
     <section class="admin-login-panel" id="admin-login-panel" aria-labelledby="admin-title">
       <p class="eyebrow">Chocolate Circle · private</p>
       <h1 id="admin-title">Order <em>management.</em></h1>
@@ -191,9 +190,7 @@ const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "
             <label>City<input name="city" autocomplete="address-level2" maxlength="40" required /></label>
             <label>State<input name="state" autocomplete="address-level1" maxlength="40" required /></label>
             <label>PIN code<input name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
-            <button class="location-button" type="button" data-find-address>Find PIN code on map</button>
-            <div class="address-map" data-address-map hidden></div>
-            <p class="location-privacy" data-address-map-status role="status" aria-live="polite"></p>
+            <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
             <div class="admin-customer-form-actions">
               <button class="button button-primary" id="admin-customer-submit" type="submit">Save customer</button>
               <button class="button button-secondary" id="admin-customer-cancel-edit" type="button" hidden>Cancel edit</button>
@@ -234,9 +231,7 @@ const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "
             <label>City<input name="city" id="admin-order-city" autocomplete="address-level2" maxlength="40" required /></label>
             <label>State<input name="state" id="admin-order-state" autocomplete="address-level1" maxlength="40" required /></label>
             <label>PIN code<input name="pincode" id="admin-order-pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
-            <button class="location-button" type="button" data-find-address>Find PIN code on map</button>
-            <div class="address-map" data-address-map hidden></div>
-            <p class="location-privacy" data-address-map-status role="status" aria-live="polite"></p>
+            <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
             <div class="admin-order-inline-fields">
               <label>Delivery method<select name="deliveryMethod" required>
                 <option value="Porter (manual booking)">Porter (manual booking)</option>

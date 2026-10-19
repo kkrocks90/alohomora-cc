@@ -4,7 +4,7 @@ import {
   getCustomerSessionToken,
   saveCustomerSessionToken,
 } from "./cart";
-import { initializeAddressPicker } from "./address-picker";
+import { initializePincodeLookup } from "./pincode-lookup";
 
 function requireElement<T extends Element>(element: T | null, selector: string): T {
   if (!element) throw new Error(`The customer account page is missing ${selector}.`);
@@ -50,10 +50,8 @@ if (root) {
   const city = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=city]"), "[name=city]");
   const state = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=state]"), "[name=state]");
   const pincode = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=pincode]"), "[name=pincode]");
-  const map = requireElement<HTMLElement>(profileForm.querySelector<HTMLElement>("[data-address-map]"), "[data-address-map]");
-  const findButton = requireElement<HTMLButtonElement>(profileForm.querySelector<HTMLButtonElement>("[data-find-address]"), "[data-find-address]");
-  const mapStatus = requireElement<HTMLElement>(profileForm.querySelector<HTMLElement>("[data-address-map-status]"), "[data-address-map-status]");
-  initializeAddressPicker({ root, address, city, state, pincode, map, findButton, status: mapStatus });
+  const pincodeStatus = requireElement<HTMLElement>(profileForm.querySelector<HTMLElement>("[data-pincode-status]"), "[data-pincode-status]");
+  initializePincodeLookup({ apiUrl, city, state, pincode, status: pincodeStatus });
 
   let email = "";
 

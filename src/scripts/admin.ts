@@ -1,5 +1,5 @@
 import { ADMIN_SESSION_KEY } from "./cart";
-import { initializeAddressPicker } from "./address-picker";
+import { initializePincodeLookup } from "./pincode-lookup";
 
 interface AdminCustomer {
   customerId: string;
@@ -255,18 +255,15 @@ if (root) {
   };
   let adminData: AdminData | null = null;
   function setupAddressMap(form: HTMLFormElement) {
-    const address = form.elements.namedItem("address");
     const city = form.elements.namedItem("city");
     const state = form.elements.namedItem("state");
     const pincode = form.elements.namedItem("pincode");
-    const map = requireElement<HTMLElement>(form, "[data-address-map]");
-    const findButton = requireElement<HTMLButtonElement>(form, "[data-find-address]");
-    const mapStatus = requireElement<HTMLElement>(form, "[data-address-map-status]");
-    if (!(address instanceof HTMLTextAreaElement) || !(city instanceof HTMLInputElement) ||
-        !(state instanceof HTMLInputElement) || !(pincode instanceof HTMLInputElement)) {
+    const status = requireElement<HTMLElement>(form, "[data-pincode-status]");
+    if (!(city instanceof HTMLInputElement) || !(state instanceof HTMLInputElement) ||
+        !(pincode instanceof HTMLInputElement)) {
       throw new Error("The admin address form is incomplete.");
     }
-    initializeAddressPicker({ root, address, city, state, pincode, map, findButton, status: mapStatus });
+    initializePincodeLookup({ apiUrl, city, state, pincode, status });
   }
   setupAddressMap(customerForm);
   setupAddressMap(orderForm);

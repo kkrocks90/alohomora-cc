@@ -2,7 +2,6 @@
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
-const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -15,7 +14,6 @@ const base = import.meta.env.BASE_URL;
     class="checkout-page"
     id="checkout-page"
     data-checkout-api={checkoutApiUrl}
-    data-google-maps-key={googleMapsApiKey}
     data-base-url={base}
   >
     <nav class="product-breadcrumb" aria-label="Breadcrumb">
@@ -84,9 +82,7 @@ const base = import.meta.env.BASE_URL;
         <input id="checkout-profile-state" name="state" autocomplete="address-level1" maxlength="40" required />
         <label for="checkout-profile-pincode">PIN code</label>
         <input id="checkout-profile-pincode" name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required />
-        <button class="location-button" type="button" data-find-address>Find PIN code on map</button>
-        <div class="address-map" data-address-map hidden></div>
-        <p class="location-privacy" data-address-map-status role="status" aria-live="polite"></p>
+        <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
         <button class="button button-primary" type="submit">Save details and continue <span aria-hidden="true">↗</span></button>
       </form>
       <p class="account-status" id="checkout-profile-status" role="status" aria-live="polite"></p>
@@ -133,25 +129,7 @@ const base = import.meta.env.BASE_URL;
               <input name="eventDate" type="date" autocomplete="off" />
               <span class="location-privacy">Choose the date you’d like your chocolates for.</span>
             </label>
-            <fieldset class="delivery-location">
-              <legend>Delivery location</legend>
-              <p>
-                Enter your PIN code, then select the delivery address on the map. We use that point
-                to estimate distance and suggest Porter or a courier. Nothing is booked automatically.
-                Google Maps receives the PIN code and selected map point to identify the address.
-              </p>
-              <button class="location-button" type="button" data-find-address>Show PIN code on map</button>
-              <div class="address-map" data-address-map hidden></div>
-              <p class="location-privacy" data-address-map-status role="status" aria-live="polite">
-                Choose the exact delivery point on the map. Do not use your current location if it’s somewhere else.
-              </p>
-              <input name="latitude" type="hidden" />
-              <input name="longitude" type="hidden" />
-              <span class="location-privacy">
-                Select the delivery point, not your current location if it’s somewhere else. We use
-                its coordinates for the distance estimate and don’t store them.
-              </span>
-            </fieldset>
+            <p class="location-privacy" data-pincode-status role="status" aria-live="polite">We use your PIN code to fill your city and state and to suggest Porter or a courier. Nothing is booked automatically.</p>
             <label class="policy-consent">
               <input name="policyConsent" type="checkbox" required />
               <span>

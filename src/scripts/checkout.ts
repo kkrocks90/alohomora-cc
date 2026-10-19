@@ -8,7 +8,7 @@ import {
   saveCart,
   type CartItem,
 } from "./cart";
-import { initializeAddressPicker } from "./address-picker";
+import { initializePincodeLookup } from "./pincode-lookup";
 
 interface PaymentOrder {
   id: string;
@@ -110,50 +110,21 @@ let customerEmail = "";
 let sessionToken = "";
 let profileComplete = false;
 let appliedPromo: AppliedPromo | null = null;
-let selectedDeliveryLocation: { latitude: number; longitude: number } | null = null;
 
-function initializeFormAddressPicker(
-  form: HTMLFormElement,
-  onLocation?: (latitude: number, longitude: number) => void,
-) {
-  const address = form.elements.namedItem("address");
+function initializeFormPincodeLookup(form: HTMLFormElement) {
   const city = form.elements.namedItem("city");
   const state = form.elements.namedItem("state");
   const pincode = form.elements.namedItem("pincode");
-  const map = form.querySelector<HTMLElement>("[data-address-map]");
-  const findButton = form.querySelector<HTMLButtonElement>("[data-find-address]");
-  const status = form.querySelector<HTMLElement>("[data-address-map-status]");
-  if (
-    !(address instanceof HTMLTextAreaElement) ||
-    !(city instanceof HTMLInputElement) ||
-    !(state instanceof HTMLInputElement) ||
-    !(pincode instanceof HTMLInputElement) ||
-    !map || !findButton || !status
-  ) throw new Error("The address map form is incomplete.");
-  initializeAddressPicker({ root, address, city, state, pincode, map, findButton, status, onLocation });
-  if (onLocation) {
-    for (const input of [address, city, state, pincode]) {
-      input.addEventListener("input", () => {
-        selectedDeliveryLocation = null;
-        status.textContent = "Address details changed. Select the exact delivery point on the map again.";
-        status.dataset.state = "error";
-        const latitude = checkoutForm.elements.namedItem("latitude");
-        const longitude = checkoutForm.elements.namedItem("longitude");
-        if (latitude instanceof HTMLInputElement) latitude.value = "";
-        if (longitude instanceof HTMLInputElement) longitude.value = "";
-      });
-    }
+  const status = form.querySelector<HTMLElement>("[data-pincode-status]");
+  if (!(city instanceof HTMLInputElement) || !(state instanceof HTMLInputElement) ||
+      !(pincode instanceof HTMLInputElement) || !status) {
+    throw new Error("The address form is incomplete.");
   }
+  initializePincodeLookup({ apiUrl, city, state, pincode, status });
 }
 
-initializeFormAddressPicker(profileForm);
-initializeFormAddressPicker(checkoutForm, (latitude, longitude) => {
-  selectedDeliveryLocation = { latitude, longitude };
-  const latitudeInput = checkoutForm.elements.namedItem("latitude");
-  const longitudeInput = checkoutForm.elements.namedItem("longitude");
-  if (latitudeInput instanceof HTMLInputElement) latitudeInput.value = String(latitude);
-  if (longitudeInput instanceof HTMLInputElement) longitudeInput.value = String(longitude);
-});
+initializeFormPincodeLookup(profileForm);
+initializeFormPincodeLookup(checkoutForm);
 
 const today = new Date();
 eventDateInput.min = [
@@ -553,11 +524,6 @@ checkoutForm.addEventListener("submit", async (event) => {
   }
 
   const formData = new FormData(checkoutForm);
-  if (!selectedDeliveryLocation) {
-    setCheckoutStatus("Enter your PIN code and select the exact delivery point on the map.", true);
-    return;
-  }
-  const deliveryLocation = selectedDeliveryLocation;
   checkoutButton.disabled = true;
   setCheckoutStatus("Preparing your secure checkout…");
   let activeReservationId = "";
@@ -576,7 +542,6 @@ checkoutForm.addEventListener("submit", async (event) => {
         eventDate: String(formData.get("eventDate") ?? ""),
         policyConsent: formData.get("policyConsent") === "on",
       },
-      deliveryLocation,
     });
     if (
       orderResult.freeOrder === true &&
