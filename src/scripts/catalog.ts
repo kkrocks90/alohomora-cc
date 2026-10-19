@@ -16,9 +16,24 @@ if (catalog) {
   const loadButton = requireCatalogElement<HTMLButtonElement>(catalog, "#store-load-more");
   const loadingStatus = requireCatalogElement<HTMLElement>(catalog, "#store-loading");
   const sentinel = requireCatalogElement<HTMLElement>(catalog, "#store-scroll-sentinel");
+  const searchClear = requireCatalogElement<HTMLButtonElement>(catalog, "#store-search-clear");
+  const resetButton = requireCatalogElement<HTMLButtonElement>(catalog, "#store-reset");
+  const chips = Array.from(catalog.querySelectorAll<HTMLButtonElement>(".store-chip"));
   const requestedTag = new URL(window.location.href).searchParams.get("category");
   if (requestedTag && Array.from(filterSelect.options).some((option) => option.value === requestedTag)) {
     filterSelect.value = requestedTag;
+  }
+
+  function syncChips() {
+    chips.forEach((chip) => {
+      const active = (chip.dataset.chip ?? "") === filterSelect.value;
+      chip.classList.toggle("is-active", active);
+      chip.setAttribute("aria-pressed", String(active));
+      if (active) {
+        const rail = chip.parentElement;
+        if (rail) rail.scrollTo({ left: chip.offsetLeft - 16, behavior: "smooth" });
+      }
+    });
   }
 
   const pageSize = 8;
@@ -29,12 +44,14 @@ if (catalog) {
 
   function updateResults() {
     emptyState.hidden = matchingProducts.length > 0;
-    resultCount.textContent = `${matchingProducts.length} ${matchingProducts.length === 1 ? "product" : "products"}`;
+    resultCount.textContent = `Showing ${Math.min(visibleCount, matchingProducts.length)} of ${matchingProducts.length} ${matchingProducts.length === 1 ? "treat" : "treats"}`;
     loadButton.hidden = matchingProducts.length <= visibleCount;
   }
 
   function updateCatalog() {
     visibleCount = pageSize;
+    searchClear.hidden = searchInput.value.length === 0;
+    syncChips();
     const query = searchInput.value.trim().toLocaleLowerCase();
     const selectedTag = filterSelect.value;
     const sort = sortSelect.value;
@@ -94,6 +111,23 @@ if (catalog) {
   filterSelect.addEventListener("change", () => updateCatalog());
   sortSelect.addEventListener("change", () => updateCatalog());
   loadButton.addEventListener("click", loadMore);
+  chips.forEach((chip) =>
+    chip.addEventListener("click", () => {
+      filterSelect.value = chip.dataset.chip ?? "";
+      updateCatalog();
+    }),
+  );
+  searchClear.addEventListener("click", () => {
+    searchInput.value = "";
+    updateCatalog();
+    searchInput.focus();
+  });
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    filterSelect.value = "";
+    sortSelect.value = "featured";
+    updateCatalog();
+  });
 
   if ("IntersectionObserver" in window) {
     const observer = new IntersectionObserver(

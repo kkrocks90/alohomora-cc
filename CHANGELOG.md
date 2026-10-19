@@ -5,6 +5,16 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.3.0] - 2026-10-20
+
+### Added
+- Store: category chips (horizontally scrollable) replace the filter dropdown; rounded search with a clear button; compact sort dropdown.
+- Store: sticky search/filter bar on mobile, "Showing X of Y treats" count, and a "Clear search & filters" button on the empty state.
+- Hover polish on product cards (desktop).
+
+### Changed
+- Compact store heading on mobile so products appear sooner.
+
 ## [1.2.1] - 2026-10-20
 
 ### Changed

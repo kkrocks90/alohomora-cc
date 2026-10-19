@@ -35,27 +35,35 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
     </div>
 
     <section class="store-results" id="store-catalog" aria-label="Shop products">
-      <div class="store-toolbar">
-        <label class="store-search">
-          <span>Search products</span>
-          <input id="store-search" type="search" placeholder="Try cubes or hamper" autocomplete="off" />
-        </label>
-        <label>
-          <span>Filter by</span>
-          <select id="store-filter">
-            <option value="">All products</option>
-            {tags.map((tag) => <option value={tag}>{tag}</option>)}
-          </select>
-        </label>
-        <label>
-          <span>Sort by</span>
-          <select id="store-sort">
-            <option value="featured">Featured</option>
-            <option value="price-low">Price: low to high</option>
-            <option value="price-high">Price: high to low</option>
-            <option value="name">Name: A to Z</option>
-          </select>
-        </label>
+      <div class="store-toolbar-wrap">
+        <div class="store-toolbar">
+          <label class="store-search">
+            <span class="store-label-hidden">Search products</span>
+            <svg class="store-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg>
+            <input id="store-search" type="search" placeholder="Search chocolates, hampers…" autocomplete="off" enterkeyhint="search" />
+            <button class="store-search-clear" id="store-search-clear" type="button" aria-label="Clear search" hidden>×</button>
+          </label>
+          <label class="store-sort">
+            <span class="store-label-hidden">Sort by</span>
+            <select id="store-sort">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: low to high</option>
+              <option value="price-high">Price: high to low</option>
+              <option value="name">Name: A to Z</option>
+            </select>
+          </label>
+          <label class="store-label-hidden">
+            <span>Filter by</span>
+            <select id="store-filter" tabindex="-1">
+              <option value="">All products</option>
+              {tags.map((tag) => <option value={tag}>{tag}</option>)}
+            </select>
+          </label>
+        </div>
+        <div class="store-chips" id="store-chips" role="group" aria-label="Filter by category">
+          <button class="store-chip is-active" type="button" data-chip="" aria-pressed="true">All</button>
+          {tags.map((tag) => <button class="store-chip" type="button" data-chip={tag} aria-pressed="false">{tag}</button>)}
+        </div>
       </div>
 
       <p class="store-count" id="store-count" role="status" aria-live="polite"></p>
@@ -66,7 +74,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           return <ProductCard product={product} image={image} index={index} />;
         })}
       </div>
-      <p class="store-empty" id="store-empty" hidden>No products match those choices. Try a different search or filter.</p>
+      <div class="store-empty" id="store-empty" hidden>
+        <p>No treats match those choices.</p>
+        <button class="button button-primary" id="store-reset" type="button">Clear search &amp; filters</button>
+      </div>
       <div class="store-load-area">
         <span id="store-scroll-sentinel" aria-hidden="true"></span>
         <button class="button button-primary store-load-more" id="store-load-more" type="button">
