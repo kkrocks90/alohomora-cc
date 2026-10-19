@@ -239,8 +239,9 @@ export async function savePaidOrder(database, order) {
         delivery_method,
         distance_km,
         policies_accepted,
-        created_at
-      ) VALUES (?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
+        created_at,
+        razorpay_order_id
+      ) VALUES (?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?, ?)
       ON CONFLICT(order_id) DO NOTHING`;
   const insertValues = [
     order.orderId,
@@ -263,6 +264,7 @@ export async function savePaidOrder(database, order) {
     order.distanceKm,
     "terms_conditions, privacy_policy, shipping_policy",
     createdAt,
+    order.razorpayOrderId ?? null,
   ];
 
   if (order.promoReservation) {
@@ -274,9 +276,9 @@ export async function savePaidOrder(database, order) {
         city, state, pincode,
         event_date, items_json, amount_paise, product_subtotal_paise,
         discount_paise, promo_code, currency, delivery_method, distance_km,
-        policies_accepted, created_at
+        policies_accepted, created_at, razorpay_order_id
       )
-      SELECT ?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?
+      SELECT ?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?, ?
       FROM promo_redemptions r
       WHERE r.reservation_id = ? AND r.order_id = ?
         AND r.customer_email = ? AND r.status = 'redeemed'

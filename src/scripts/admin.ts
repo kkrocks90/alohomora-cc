@@ -31,6 +31,7 @@ interface AdminOrderItem {
 
 interface AdminOrder {
   orderId: string;
+  razorpayOrderId?: string | null;
   paymentId: string | null;
   paymentStatus: "paid" | "unpaid";
   paymentMethod: "razorpay" | "manual" | "promo";
@@ -687,6 +688,7 @@ if (root) {
       if (selectedStatus && order.orderStatus !== selectedStatus) return false;
       const searchable = [
         order.orderId,
+        order.razorpayOrderId ?? "",
         order.customerName,
         order.customerPhone,
         order.customerEmail,
@@ -738,6 +740,8 @@ if (root) {
       if (order.discountPaise > 0) {
         appendText(details, "span", `Promo ${order.promoCode} · saved ${currency.format(order.discountPaise / 100)}`);
       }
+      if (order.razorpayOrderId) appendText(details, "span", `Razorpay order: ${order.razorpayOrderId}`);
+      if (order.paymentId) appendText(details, "span", `Razorpay payment: ${order.paymentId}`);
       appendText(details, "span", order.customerPhone);
       if (order.customerEmail) appendText(details, "span", order.customerEmail);
       appendText(details, "span", formatDeliveryAddress(order));

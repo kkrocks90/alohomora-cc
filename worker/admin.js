@@ -1,5 +1,6 @@
 import products from "../src/data/products.json" with { type: "json" };
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
+import { generateOrderId } from "./order-id.js";
 import { getPromoCategories, validatePromoDefinition, validatePromoLimits } from "./promos.js";
 
 export const ORDER_STATUSES = [
@@ -55,7 +56,7 @@ export async function getAdminData(request, env) {
     const [ordersResult, customersResult, promosResult] = await Promise.all([
       env.ORDERS_DB
         .prepare(
-          `SELECT order_id, payment_id, payment_status, payment_method, order_status,
+          `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
                   customer_id, customer_name, customer_phone, customer_email,
                   delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
                   discount_paise, promo_code, currency, delivery_method, event_date, created_at
@@ -88,6 +89,7 @@ export async function getAdminData(request, env) {
       email: access.email,
       orders: ordersResult.results.map((order) => ({
         orderId: order.order_id,
+        razorpayOrderId: order.razorpay_order_id ?? null,
         paymentId: order.payment_id,
         paymentStatus: order.payment_status,
         paymentMethod: order.payment_method,
@@ -431,7 +433,7 @@ export async function createManualOrder(request, env) {
       return result(400, { error: "The order total is invalid." });
     }
 
-    const orderId = `CC-M-${Date.now()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    const orderId = generateOrderId();
     const createdAt = new Date().toISOString();
     await env.ORDERS_DB
       .prepare(

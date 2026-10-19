@@ -15,6 +15,7 @@ import {
   isValidDeliveryLocation,
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
+import { generateOrderId, ORDER_ID_PATTERN } from "./order-id.js";
 import { isValidPincode, lookupPincode, PincodeLookupError } from "./pincode.js";
 import {
   getFeaturedPromo,
@@ -287,7 +288,7 @@ async function handleCreateOrder(request, env, origin) {
     if (!promoQuote || promoQuote.discountPaise !== promoQuote.subtotalPaise) {
       return errorResponse("A free order requires a valid promo code covering the full product subtotal.", 400, origin);
     }
-    const orderId = `CC-P-${Date.now()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    const orderId = generateOrderId();
     try {
       await reservePromo(env.ORDERS_DB, promoQuote, customerEmail, orderId);
       const redemption = await getPromoReservationForOrder(env.ORDERS_DB, orderId);
@@ -390,10 +391,11 @@ async function handleCreateOrder(request, env, origin) {
       discount_paise: promoQuote.discountPaise,
     });
   }
+  const appOrderId = generateOrderId();
   const payload = {
     amount: order.amount,
     currency: "INR",
-    receipt: `ck_${crypto.randomUUID().replaceAll("-", "").slice(0, 24)}`,
+    receipt: appOrderId,
     notes,
   };
 
@@ -431,7 +433,7 @@ async function handleCreateOrder(request, env, origin) {
   let reservation = null;
   if (promoQuote) {
     try {
-      reservation = await reservePromo(env.ORDERS_DB, promoQuote, customerEmail, providerOrder.id);
+      reservation = await reservePromo(env.ORDERS_DB, promoQuote, customerEmail, appOrderId);
     } catch (error) {
       console.error("Could not reserve the promo code for a new payment order.", error);
       return errorResponse(
@@ -601,6 +603,11 @@ async function handleVerifyPayment(request, env, origin) {
   }
   if (paidOrder.customerEmail !== customerEmail) {
     return errorResponse("This payment belongs to a different signed-in account.", 403, origin);
+  }
+  // Orders created before app order numbers existed have a non-matching receipt and keep the Razorpay id.
+  paidOrder.razorpayOrderId = verifiedOrder.id;
+  if (typeof verifiedOrder.receipt === "string" && ORDER_ID_PATTERN.test(verifiedOrder.receipt)) {
+    paidOrder.orderId = verifiedOrder.receipt;
   }
   if (paidOrder.promoCode) {
     let reservation;

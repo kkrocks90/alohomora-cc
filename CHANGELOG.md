@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.7.0] - 2026-10-20
+
+### Changed
+- Orders now get a shop-generated order number (`CC-YYMMDD-XXXXX`) shown to customers, on the thank-you page, in the account page and on invoices.
+- The Razorpay order ID is stored separately (`razorpay_order_id`) and shown only to admins, alongside the payment ID.
+- Existing Razorpay-ID orders are remapped to new order numbers by migration `0008`.
+
 ## [1.6.0] - 2026-10-20
 
 ### Changed
