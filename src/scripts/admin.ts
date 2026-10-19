@@ -28,7 +28,7 @@ interface AdminOrder {
   orderId: string;
   paymentId: string | null;
   paymentStatus: "paid" | "unpaid";
-  paymentMethod: "razorpay" | "manual";
+  paymentMethod: "razorpay" | "manual" | "promo";
   orderStatus: string;
   customerId: string | null;
   customerName: string;
@@ -37,9 +37,29 @@ interface AdminOrder {
   deliveryAddress: string;
   items: AdminOrderItem[];
   amountPaise: number;
+  productSubtotalPaise: number;
+  discountPaise: number;
+  promoCode: string;
   currency: string;
   deliveryMethod: string;
   eventDate: string;
+  createdAt: string;
+}
+
+interface AdminPromo {
+  promoId: string;
+  name: string;
+  code: string;
+  type: "percentage" | "fixed";
+  percentage: number | null;
+  targetType: string | null;
+  targetValue: string | null;
+  amountPaise: number | null;
+  minimumSubtotalPaise: number | null;
+  maxRedemptions: number | null;
+  redeemedCount: number;
+  endDate: string;
+  active: boolean;
   createdAt: string;
 }
 
@@ -49,6 +69,8 @@ interface AdminData {
   customers: AdminCustomer[];
   orderStatuses: string[];
   products: AdminProduct[];
+  categories: string[];
+  promos: AdminPromo[];
 }
 
 function isAdminProduct(value: unknown): value is AdminProduct {
@@ -88,7 +110,7 @@ function isAdminOrder(value: unknown): value is AdminOrder {
   return typeof order.orderId === "string" &&
     (typeof order.paymentId === "string" || order.paymentId === null) &&
     (order.paymentStatus === "paid" || order.paymentStatus === "unpaid") &&
-    (order.paymentMethod === "razorpay" || order.paymentMethod === "manual") &&
+    (order.paymentMethod === "razorpay" || order.paymentMethod === "manual" || order.paymentMethod === "promo") &&
     typeof order.orderStatus === "string" &&
     (typeof order.customerId === "string" || order.customerId === null) &&
     typeof order.customerName === "string" &&
@@ -98,10 +120,32 @@ function isAdminOrder(value: unknown): value is AdminOrder {
     Array.isArray(order.items) &&
     order.items.every(isAdminOrderItem) &&
     typeof order.amountPaise === "number" &&
+    typeof order.productSubtotalPaise === "number" &&
+    typeof order.discountPaise === "number" &&
+    typeof order.promoCode === "string" &&
     typeof order.currency === "string" &&
     typeof order.deliveryMethod === "string" &&
     typeof order.eventDate === "string" &&
     typeof order.createdAt === "string";
+}
+
+function isAdminPromo(value: unknown): value is AdminPromo {
+  if (!value || typeof value !== "object") return false;
+  const promo = value as Record<string, unknown>;
+  return typeof promo.promoId === "string" &&
+    typeof promo.name === "string" &&
+    typeof promo.code === "string" &&
+    (promo.type === "percentage" || promo.type === "fixed") &&
+    (typeof promo.percentage === "number" || promo.percentage === null) &&
+    (typeof promo.targetType === "string" || promo.targetType === null) &&
+    (typeof promo.targetValue === "string" || promo.targetValue === null) &&
+    (typeof promo.amountPaise === "number" || promo.amountPaise === null) &&
+    (typeof promo.minimumSubtotalPaise === "number" || promo.minimumSubtotalPaise === null) &&
+    (typeof promo.maxRedemptions === "number" || promo.maxRedemptions === null) &&
+    typeof promo.redeemedCount === "number" &&
+    typeof promo.endDate === "string" &&
+    typeof promo.active === "boolean" &&
+    typeof promo.createdAt === "string";
 }
 
 function isAdminData(value: unknown): value is AdminData {
@@ -115,7 +159,11 @@ function isAdminData(value: unknown): value is AdminData {
     Array.isArray(data.orderStatuses) &&
     data.orderStatuses.every((item) => typeof item === "string") &&
     Array.isArray(data.products) &&
-    data.products.every(isAdminProduct);
+    data.products.every(isAdminProduct) &&
+    Array.isArray(data.categories) &&
+    data.categories.every((category) => typeof category === "string") &&
+    Array.isArray(data.promos) &&
+    data.promos.every(isAdminPromo);
 }
 
 function requireElement<T extends Element>(parent: ParentNode, selector: string): T {
@@ -154,6 +202,14 @@ if (root) {
   const customerSubmit = requireElement<HTMLButtonElement>(root, "#admin-customer-submit");
   const cancelCustomerEdit = requireElement<HTMLButtonElement>(root, "#admin-customer-cancel-edit");
   const orderForm = requireElement<HTMLFormElement>(root, "#admin-order-form");
+  const promoForm = requireElement<HTMLFormElement>(root, "#admin-promo-form");
+  const promoType = requireElement<HTMLSelectElement>(root, "#admin-promo-type");
+  const promoPercentFields = requireElement<HTMLElement>(root, "#admin-promo-percentage-fields");
+  const promoFixedFields = requireElement<HTMLElement>(root, "#admin-promo-fixed-fields");
+  const promoTargetType = requireElement<HTMLSelectElement>(root, "#admin-promo-target-type");
+  const promoTargetValueLabel = requireElement<HTMLElement>(root, "#admin-promo-target-value-label");
+  const promoTargetValue = requireElement<HTMLSelectElement>(root, "#admin-promo-target-value");
+  const promoList = requireElement<HTMLElement>(root, "#admin-promo-list");
   const customerSelect = requireElement<HTMLSelectElement>(root, "#admin-order-customer");
   const customerSelectSearch = requireElement<HTMLInputElement>(root, "#admin-order-customer-search");
   const customerSelectHint = requireElement<HTMLElement>(root, "#admin-order-customer-hint");
@@ -516,7 +572,13 @@ if (root) {
     appendText(orderBlock, "h2", "Order details");
     appendText(orderBlock, "p", `Date: ${new Date(order.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
     appendText(orderBlock, "p", `Status: ${statusLabels[order.orderStatus] ?? order.orderStatus}`);
-    appendText(orderBlock, "p", `Payment: ${order.paymentStatus === "paid" ? "Paid" : "Unpaid"} (${order.paymentMethod === "manual" ? "Manual order" : "Razorpay"})`);
+    const paymentLabel = order.paymentMethod === "manual"
+      ? "Manual order"
+      : order.paymentMethod === "promo" ? "Promo code (no payment due)" : "Razorpay";
+    const paymentStatusLabel = order.paymentMethod === "promo"
+      ? "No payment due"
+      : order.paymentStatus === "paid" ? "Paid" : "Unpaid";
+    appendText(orderBlock, "p", `Payment: ${paymentStatusLabel} (${paymentLabel})`);
     if (order.eventDate) appendText(orderBlock, "p", `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
     appendText(orderBlock, "p", order.deliveryMethod);
     meta.append(customerBlock, orderBlock);
@@ -544,8 +606,12 @@ if (root) {
     invoice.append(table);
     const total = document.createElement("p");
     total.className = "invoice-total";
-    total.textContent = `Product total: ${currency.format(order.amountPaise / 100)}`;
+    total.textContent = `Product subtotal: ${currency.format(order.productSubtotalPaise / 100)}`;
     invoice.append(total);
+    if (order.discountPaise > 0) {
+      appendText(invoice, "p", `Promo ${order.promoCode}: −${currency.format(order.discountPaise / 100)}`, "invoice-note");
+      appendText(invoice, "p", `Paid total: ${currency.format(order.amountPaise / 100)}`, "invoice-total");
+    }
     appendText(
       invoice,
       "p",
@@ -608,7 +674,16 @@ if (root) {
 
       const details = document.createElement("div");
       details.className = "admin-order-card-details";
-      appendText(details, "span", `${order.paymentStatus === "paid" ? "Paid" : "Unpaid"} · ${order.paymentMethod === "manual" ? "Manual" : "Razorpay"}`, "admin-payment-badge");
+      const paymentLabel = order.paymentMethod === "manual"
+        ? "Manual"
+        : order.paymentMethod === "promo" ? "Promo-covered" : "Razorpay";
+      const paymentStatusLabel = order.paymentMethod === "promo"
+        ? "No payment due"
+        : order.paymentStatus === "paid" ? "Paid" : "Unpaid";
+      appendText(details, "span", `${paymentStatusLabel} · ${paymentLabel}`, "admin-payment-badge");
+      if (order.discountPaise > 0) {
+        appendText(details, "span", `Promo ${order.promoCode} · saved ${currency.format(order.discountPaise / 100)}`);
+      }
       appendText(details, "span", order.customerPhone);
       if (order.customerEmail) appendText(details, "span", order.customerEmail);
       appendText(details, "span", order.deliveryAddress);
@@ -662,6 +737,102 @@ if (root) {
     }
   }
 
+  function syncPromoTargetOptions() {
+    if (!adminData) return;
+    const targetType = promoTargetType.value;
+    promoTargetValue.replaceChildren();
+    if (targetType === "all") {
+      promoTargetValueLabel.hidden = true;
+      promoTargetValue.disabled = true;
+      promoTargetValue.required = false;
+      return;
+    }
+    promoTargetValueLabel.hidden = false;
+    promoTargetValue.disabled = false;
+    promoTargetValue.required = true;
+    promoTargetValue.append(new Option(
+      targetType === "product" ? "Choose a product" : "Choose a category",
+      "",
+    ));
+    if (targetType === "product") {
+      adminData.products.forEach((product) => {
+        promoTargetValue.append(new Option(product.name, product.id));
+      });
+    } else {
+      adminData.categories.forEach((category) => {
+        promoTargetValue.append(new Option(category, category));
+      });
+    }
+  }
+
+  function syncPromoFormFields() {
+    const percentageType = promoType.value === "percentage";
+    promoPercentFields.hidden = !percentageType;
+    promoFixedFields.hidden = percentageType;
+    promoPercentFields.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input, select").forEach((field) => {
+      field.disabled = !percentageType;
+    });
+    promoFixedFields.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input, select").forEach((field) => {
+      field.disabled = percentageType;
+    });
+    syncPromoTargetOptions();
+  }
+
+  function renderPromos() {
+    if (!adminData) return;
+    promoList.replaceChildren();
+    if (adminData.promos.length === 0) {
+      appendText(promoList, "p", "No promo codes have been created yet.", "admin-empty");
+      return;
+    }
+    for (const promo of adminData.promos) {
+      const card = document.createElement("article");
+      card.className = "admin-promo-card";
+      const heading = document.createElement("div");
+      heading.className = "admin-promo-card-heading";
+      const title = document.createElement("div");
+      appendText(title, "strong", promo.name);
+      appendText(title, "code", promo.code, "admin-promo-code");
+      appendText(heading, "span", promo.active ? "Active" : "Inactive", promo.active ? "admin-promo-active" : "admin-promo-inactive");
+      heading.prepend(title);
+      card.append(heading);
+
+      const targetDescription = promo.type === "fixed"
+        ? `${currency.format((promo.amountPaise ?? 0) / 100)} off when subtotal is greater than ${currency.format((promo.minimumSubtotalPaise ?? 0) / 100)}`
+        : `${promo.percentage}% off ${promo.targetType === "all"
+          ? "all products"
+          : promo.targetType === "product"
+            ? adminData.products.find((product) => product.id === promo.targetValue)?.name ?? "selected product"
+            : promo.targetValue ?? "selected category"}`;
+      appendText(card, "p", targetDescription, "admin-promo-description");
+      const restrictions = [
+        promo.maxRedemptions === null
+          ? "No redemption cap"
+          : `${promo.redeemedCount} of ${promo.maxRedemptions} customers redeemed`,
+        promo.endDate ? `Ends ${new Date(`${promo.endDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}` : "No end date",
+      ];
+      appendText(card, "p", restrictions.join(" · "), "admin-promo-restrictions");
+      const toggleButton = document.createElement("button");
+      toggleButton.type = "button";
+      toggleButton.className = "button button-secondary";
+      toggleButton.textContent = promo.active ? "Deactivate code" : "Activate code";
+      toggleButton.addEventListener("click", async () => {
+        toggleButton.disabled = true;
+        try {
+          await post("/admin/promos/update", { promoId: promo.promoId, active: !promo.active });
+          await loadDashboard();
+          setStatus(`${promo.code} ${promo.active ? "deactivated" : "activated"}.`);
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : "Could not update this promo code.", true);
+        } finally {
+          toggleButton.disabled = false;
+        }
+      });
+      card.append(toggleButton);
+      promoList.append(card);
+    }
+  }
+
   async function loadDashboard(token = sessionStorage.getItem(sessionKey) ?? "") {
     const result = await post("/admin/data", undefined, token);
     if (!isAdminData(result)) throw new Error("The order service returned invalid admin data.");
@@ -670,6 +841,8 @@ if (root) {
     dashboard.hidden = false;
     signedIn.textContent = `Signed in as ${adminData.email}`;
     renderCustomers();
+    renderPromos();
+    syncPromoFormFields();
     orderLines.replaceChildren();
     renderOrderLine();
     renderOrders();
@@ -730,6 +903,39 @@ if (root) {
     codeInput.value = "";
     setLoginStatus("");
     emailInput.focus();
+  });
+
+  promoType.addEventListener("change", syncPromoFormFields);
+  promoTargetType.addEventListener("change", syncPromoTargetOptions);
+  promoForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!promoForm.reportValidity()) return;
+    const formData = new FormData(promoForm);
+    const type = String(formData.get("type"));
+    setBusy(promoForm, true);
+    try {
+      const result = await post("/admin/promos/create", {
+        name: formData.get("name"),
+        type,
+        percentage: formData.get("percentage"),
+        targetType: formData.get("targetType"),
+        targetValue: formData.get("targetValue"),
+        amountRupees: formData.get("amountRupees"),
+        minimumRupees: formData.get("minimumRupees"),
+        maxRedemptions: formData.get("maxRedemptions"),
+        endDate: formData.get("endDate"),
+      });
+      const created = isAdminPromo(result.promo) ? result.promo : null;
+      if (!created) throw new Error("The order service returned invalid promo details.");
+      promoForm.reset();
+      syncPromoFormFields();
+      await loadDashboard();
+      setStatus(`Promo code ${created.code} created.`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not create this promo code.", true);
+    } finally {
+      setBusy(promoForm, false);
+    }
   });
 
   customerForm.addEventListener("submit", async (event) => {

@@ -303,7 +303,8 @@ export async function getCustomerOrders(request, env) {
     const [ordersResult, customer] = await Promise.all([
       env.ORDERS_DB
       .prepare(
-        `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise, currency,
+        `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise,
+                product_subtotal_paise, discount_paise, promo_code, currency,
                 delivery_method, created_at, customer_name, customer_phone,
                 delivery_address, event_date
          FROM orders
@@ -336,6 +337,9 @@ export async function getCustomerOrders(request, env) {
         paymentMethod: order.payment_method,
         items: JSON.parse(order.items_json),
         amountPaise: order.amount_paise,
+        productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
+        discountPaise: order.discount_paise ?? 0,
+        promoCode: order.promo_code ?? "",
         currency: order.currency,
         deliveryMethod: order.delivery_method,
         createdAt: order.created_at,

@@ -13,6 +13,10 @@ interface OrderDetails {
   status: string;
   items: OrderItem[];
   amountPaise: number;
+  productSubtotalPaise: number;
+  discountPaise: number;
+  promoCode: string;
+  paymentMethod: string;
   deliveryMethod: string;
   createdAt: string;
   customerName: string;
@@ -37,6 +41,10 @@ function isOrder(value: unknown): value is OrderDetails {
     typeof value.status === "string" &&
     value.status === "paid" &&
     typeof value.amountPaise === "number" &&
+    typeof value.productSubtotalPaise === "number" &&
+    typeof value.discountPaise === "number" &&
+    typeof value.promoCode === "string" &&
+    typeof value.paymentMethod === "string" &&
     typeof value.deliveryMethod === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.customerName === "string" &&
@@ -79,7 +87,9 @@ function renderOrder(order: OrderDetails) {
   appendText(
     orderContainer,
     "p",
-    Number.isNaN(date.valueOf()) ? "Payment confirmed" : `Payment confirmed · ${date.toLocaleString("en-IN")}`,
+    order.paymentMethod === "promo"
+      ? Number.isNaN(date.valueOf()) ? "Promo order confirmed" : `Promo order confirmed · ${date.toLocaleString("en-IN")}`
+      : Number.isNaN(date.valueOf()) ? "Payment confirmed" : `Payment confirmed · ${date.toLocaleString("en-IN")}`,
     "thank-you-meta",
   );
 
@@ -97,9 +107,21 @@ function renderOrder(order: OrderDetails) {
   }
   orderContainer.append(itemList);
 
+  if (order.discountPaise > 0) {
+    const subtotal = document.createElement("div");
+    subtotal.className = "subtotal-row thank-you-total";
+    appendText(subtotal, "span", "Product subtotal");
+    appendText(subtotal, "strong", currency.format(order.productSubtotalPaise / 100));
+    orderContainer.append(subtotal);
+    const discount = document.createElement("div");
+    discount.className = "subtotal-row thank-you-total";
+    appendText(discount, "span", `Promo ${order.promoCode}`);
+    appendText(discount, "strong", `−${currency.format(order.discountPaise / 100)}`);
+    orderContainer.append(discount);
+  }
   const total = document.createElement("div");
   total.className = "subtotal-row thank-you-total";
-  appendText(total, "span", "Paid");
+  appendText(total, "span", order.paymentMethod === "promo" ? "Total due" : "Paid");
   appendText(total, "strong", currency.format(order.amountPaise / 100));
   orderContainer.append(total);
 
@@ -164,7 +186,9 @@ async function loadOrder() {
     return;
   }
   renderOrder(order);
-  status.textContent = "Your payment has been confirmed. The shop will follow up about delivery.";
+  status.textContent = order.paymentMethod === "promo"
+    ? "Your promo-covered order is confirmed. The shop will follow up about delivery."
+    : "Your payment has been confirmed. The shop will follow up about delivery.";
 }
 
 void loadOrder().catch((error: unknown) => {

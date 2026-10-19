@@ -16,6 +16,17 @@ interface PaymentOrder {
   keyId: string;
   fulfillmentMethod: "Porter (manual booking)" | "Courier (manual booking)";
   distanceKm: number;
+  promoReservationId: string;
+}
+
+interface AppliedPromo {
+  code: string;
+  name: string;
+  subtotalPaise: number;
+  eligibleSubtotalPaise: number;
+  discountPaise: number;
+  payablePaise: number;
+  cartSignature: string;
 }
 
 interface PaymentResponse {
@@ -80,6 +91,14 @@ const signedInEmail = requireElement<HTMLElement>("#checkout-signed-in");
 const signOutButton = requireElement<HTMLButtonElement>("#checkout-sign-out");
 const orderItems = requireElement<HTMLElement>("#checkout-order-items");
 const orderTotal = requireElement<HTMLElement>("#checkout-total");
+const payableTotal = requireElement<HTMLElement>("#checkout-payable");
+const discountRow = requireElement<HTMLElement>("#checkout-discount-row");
+const discountTotal = requireElement<HTMLElement>("#checkout-discount");
+const promoForm = requireElement<HTMLFormElement>("#checkout-promo-form");
+const promoInput = requireElement<HTMLInputElement>("#checkout-promo-code");
+const promoApplyButton = requireElement<HTMLButtonElement>("#checkout-promo-apply");
+const promoStatus = requireElement<HTMLElement>("#checkout-promo-status");
+const promoRemoveButton = requireElement<HTMLButtonElement>("#checkout-promo-remove");
 const currency = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -90,6 +109,7 @@ let cart: CartItem[] = loadCart();
 let customerEmail = "";
 let sessionToken = "";
 let profileComplete = false;
+let appliedPromo: AppliedPromo | null = null;
 
 const today = new Date();
 eventDateInput.min = [
@@ -106,6 +126,31 @@ function setLoginStatus(message: string, error = false) {
 function setCheckoutStatus(message: string, error = false) {
   checkoutStatus.textContent = message;
   checkoutStatus.dataset.state = error ? "error" : "success";
+}
+
+function setPromoStatus(message: string, error = false) {
+  promoStatus.textContent = message;
+  promoStatus.dataset.state = error ? "error" : "success";
+}
+
+function getCartSignature() {
+  return JSON.stringify(cart.map(({ id, quantity }) => [id, quantity]).sort(([a], [b]) => String(a).localeCompare(String(b))));
+}
+
+function renderPromoSummary(subtotalPaise: number) {
+  const validPromo = appliedPromo && appliedPromo.cartSignature === getCartSignature() &&
+    appliedPromo.subtotalPaise === subtotalPaise;
+  if (appliedPromo && !validPromo) {
+    appliedPromo = null;
+    promoInput.value = "";
+    setPromoStatus("Your bag changed, so apply the code again.");
+  }
+  discountRow.hidden = !validPromo;
+  discountTotal.textContent = `−${currency.format((validPromo ? appliedPromo.discountPaise : 0) / 100)}`;
+  payableTotal.textContent = currency.format((validPromo ? appliedPromo.payablePaise : subtotalPaise) / 100);
+  promoRemoveButton.hidden = !validPromo;
+  promoApplyButton.disabled = Boolean(validPromo);
+  promoInput.disabled = Boolean(validPromo);
 }
 
 function getToken() {
@@ -159,8 +204,9 @@ function setProfileStatus(message: string, error = false) {
 function renderOrder() {
   cart = loadCart();
   orderItems.replaceChildren();
-  const total = cart.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity, 0);
-  orderTotal.textContent = currency.format(total);
+  const subtotalPaise = cart.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity * 100, 0);
+  orderTotal.textContent = currency.format(subtotalPaise / 100);
+  renderPromoSummary(subtotalPaise);
   emptyPanel.hidden = cart.length > 0;
   loginPanel.hidden = cart.length === 0 || Boolean(customerEmail);
   profileSetup.hidden = cart.length === 0 || !customerEmail || profileComplete;
@@ -186,6 +232,61 @@ function renderOrder() {
     orderItems.append(row);
   }
 }
+
+promoForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!promoForm.reportValidity()) return;
+  const code = promoInput.value.trim();
+  if (!code) {
+    setPromoStatus("Enter a promo code first.", true);
+    return;
+  }
+  appliedPromo = null;
+  renderOrder();
+  promoApplyButton.disabled = true;
+  setPromoStatus("Checking your promo code…");
+  try {
+    const result = await requestApi("/promos/quote", {
+      code,
+      items: cart.map(({ id, quantity }) => ({ id, quantity })),
+    });
+    if (
+      typeof result.code !== "string" ||
+      typeof result.name !== "string" ||
+      !Number.isSafeInteger(result.subtotalPaise) ||
+      !Number.isSafeInteger(result.eligibleSubtotalPaise) ||
+      !Number.isSafeInteger(result.discountPaise) ||
+      !Number.isSafeInteger(result.payablePaise) ||
+      result.subtotalPaise !== cart.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity * 100, 0) ||
+      result.discountPaise < 0 ||
+      result.discountPaise > result.subtotalPaise ||
+      result.payablePaise !== result.subtotalPaise - result.discountPaise
+    ) throw new Error("The checkout service returned invalid promo details.");
+    appliedPromo = {
+      code: result.code,
+      name: result.name,
+      subtotalPaise: result.subtotalPaise,
+      eligibleSubtotalPaise: result.eligibleSubtotalPaise,
+      discountPaise: result.discountPaise,
+      payablePaise: result.payablePaise,
+      cartSignature: getCartSignature(),
+    };
+    promoInput.value = result.code;
+    setPromoStatus(`${result.name} applied. You save ${currency.format(result.discountPaise / 100)}.`);
+    renderOrder();
+  } catch (error) {
+    setPromoStatus(error instanceof Error ? error.message : "Could not apply that promo code.", true);
+  } finally {
+    promoApplyButton.disabled = Boolean(appliedPromo);
+  }
+});
+
+promoRemoveButton.addEventListener("click", () => {
+  appliedPromo = null;
+  promoInput.value = "";
+  renderOrder();
+  setPromoStatus("Promo code removed.");
+});
 
 async function loadSession(token: string) {
   sessionToken = token;
@@ -378,7 +479,17 @@ function isPaymentOrder(value: unknown): value is PaymentOrder {
       value.fulfillmentMethod === "Courier (manual booking)") &&
     typeof value.distanceKm === "number" &&
     Number.isFinite(value.distanceKm) &&
-    value.distanceKm >= 0;
+    value.distanceKm >= 0 &&
+    typeof value.promoReservationId === "string";
+}
+
+async function releasePromoReservation(reservationId: string) {
+  if (!reservationId) return;
+  try {
+    await requestApi("/promos/release", { reservationId });
+  } catch {
+    setCheckoutStatus("Checkout closed, but the promo could not be released yet. It will become available again shortly.", true);
+  }
 }
 
 async function verifyPayment(payment: PaymentResponse) {
@@ -423,9 +534,11 @@ checkoutForm.addEventListener("submit", async (event) => {
   }
   checkoutButton.disabled = true;
   setCheckoutStatus("Preparing your secure checkout…");
+  let activeReservationId = "";
   try {
     const orderResult = await requestApi("/orders", {
       items: cart.map(({ id, quantity, flavour, wrapper }) => ({ id, quantity, flavour, wrapper })),
+      promoCode: appliedPromo?.code ?? "",
       customer: {
         name: String(formData.get("name") ?? ""),
         phone: String(formData.get("phone") ?? ""),
@@ -436,7 +549,18 @@ checkoutForm.addEventListener("submit", async (event) => {
       },
       deliveryLocation,
     });
+    if (
+      orderResult.freeOrder === true &&
+      orderResult.verified === true &&
+      typeof orderResult.orderId === "string"
+    ) {
+      cart = [];
+      saveCart(cart);
+      window.location.assign(`${baseUrl}thank-you/?order=${encodeURIComponent(orderResult.orderId)}`);
+      return;
+    }
     if (!isPaymentOrder(orderResult)) throw new Error("The checkout service returned incomplete payment details.");
+    activeReservationId = orderResult.promoReservationId;
     await loadRazorpay();
     if (!window.Razorpay) throw new Error("Razorpay checkout is not available. Please try again.");
 
@@ -456,6 +580,7 @@ checkoutForm.addEventListener("submit", async (event) => {
         contact: String(formData.get("phone") ?? ""),
       },
       handler: (payment) => {
+        activeReservationId = "";
         setCheckoutStatus("Payment received. Verifying securely…");
         void verifyPayment(payment).catch((error: unknown) => {
           setCheckoutStatus(
@@ -464,14 +589,23 @@ checkoutForm.addEventListener("submit", async (event) => {
           );
         });
       },
-      modal: { ondismiss: () => setCheckoutStatus("Checkout closed. Your bag is saved whenever you’re ready.") },
+      modal: {
+        ondismiss: () => {
+          setCheckoutStatus("Checkout closed. Your bag is saved whenever you’re ready.");
+          void releasePromoReservation(activeReservationId);
+          activeReservationId = "";
+        },
+      },
       theme: { color: "#624234" },
     });
     razorpay.on("payment.failed", (details) => {
       setCheckoutStatus(details.error?.description || "Payment did not go through. Please try another method.", true);
+      void releasePromoReservation(activeReservationId);
+      activeReservationId = "";
     });
     razorpay.open();
   } catch (error) {
+    if (activeReservationId) await releasePromoReservation(activeReservationId);
     setCheckoutStatus(error instanceof Error ? error.message : "Checkout could not be started. Please try again.", true);
   } finally {
     checkoutButton.disabled = false;

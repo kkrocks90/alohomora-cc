@@ -18,6 +18,62 @@ const authenticatedOrdersDb = {
 
 const sessionHeaders = { Authorization: `Bearer ${"a".repeat(64)}` };
 
+test("promo quotes accept repeated products with different cart variants", async () => {
+  const promo = {
+    promo_id: "promo_quote",
+    name: "All products",
+    code: "CC-ALL",
+    type: "percentage",
+    percentage: 10,
+    target_type: "all",
+    target_value: "",
+    amount_paise: null,
+    minimum_subtotal_paise: null,
+    max_redemptions: null,
+    end_date: null,
+    active: 1,
+  };
+  const database = {
+    prepare(sql) {
+      return {
+        bind() {
+          return {
+            first: async () => {
+              if (/SELECT email FROM customer_sessions/i.test(sql)) return { email: "customer@example.com" };
+              if (/SELECT \* FROM promo_codes/i.test(sql)) return promo;
+              return null;
+            },
+          };
+        },
+      };
+    },
+  };
+  const response = await worker.fetch(
+    new Request("https://checkout.example.com/promos/quote", {
+      method: "POST",
+      headers: {
+        Origin: "https://shop.example.com",
+        "Content-Type": "application/json",
+        ...sessionHeaders,
+      },
+      body: JSON.stringify({
+        code: "CC-ALL",
+        items: [
+          { id: "product-1001", quantity: 1 },
+          { id: "product-1001", quantity: 1 },
+        ],
+      }),
+    }),
+    { ALLOWED_ORIGIN: "https://shop.example.com", ORDERS_DB: database },
+  );
+
+  assert.equal(response.status, 200);
+  const quote = await response.json();
+  assert.equal(quote.subtotalPaise, 160000);
+  assert.equal(quote.discountPaise, 16000);
+  assert.equal(quote.payablePaise, 144000);
+});
+
 test("does not create a payment order when the D1 database is not bound", async () => {
   const response = await worker.fetch(
     new Request("https://checkout.example.com/orders", {

@@ -163,9 +163,26 @@ const base = import.meta.env.BASE_URL;
         <p class="eyebrow">A little something lovely</p>
         <h2 id="checkout-order-title">Your order</h2>
         <div class="checkout-order-items" id="checkout-order-items"></div>
+        <form class="checkout-promo-form" id="checkout-promo-form">
+          <label for="checkout-promo-code">Promo code</label>
+          <div>
+            <input id="checkout-promo-code" name="promoCode" maxlength="32" autocomplete="off" autocapitalize="characters" />
+            <button class="button button-secondary" id="checkout-promo-apply" type="submit">Apply</button>
+          </div>
+          <p class="checkout-promo-status" id="checkout-promo-status" role="status" aria-live="polite"></p>
+          <button class="account-text-button" id="checkout-promo-remove" type="button" hidden>Remove promo code</button>
+        </form>
         <div class="subtotal-row checkout-subtotal">
           <span>Product subtotal</span>
           <strong id="checkout-total">₹0</strong>
+        </div>
+        <div class="subtotal-row checkout-discount" id="checkout-discount-row" hidden>
+          <span>Promo discount</span>
+          <strong id="checkout-discount">−₹0</strong>
+        </div>
+        <div class="subtotal-row checkout-payable-row">
+          <span>Amount to pay</span>
+          <strong id="checkout-payable">₹0</strong>
         </div>
         <p class="delivery-note">
           Delivery arrangements and any delivery charge will be confirmed separately and are not

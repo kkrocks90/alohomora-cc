@@ -1,10 +1,12 @@
 import products from "../src/data/products.json" with { type: "json" };
 import {
+  createAdminPromo,
   createAdminCustomer,
   createManualOrder,
   getAdminData,
   updateAdminCustomer,
   updateAdminOrderStatus,
+  updateAdminPromo,
 } from "./admin.js";
 import {
   getDistanceKm,
@@ -13,6 +15,12 @@ import {
   isValidDeliveryLocation,
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
+import {
+  getPromoReservationForOrder,
+  quotePromo,
+  releasePromoReservation,
+  reservePromo,
+} from "./promos.js";
 import {
   authenticatedEmail,
   getCustomerOrders,
@@ -143,9 +151,76 @@ function validateOrder(body, storeLocation) {
     customer,
     items,
     amount,
+    subtotalPaise: amount,
     distanceKm,
     fulfillmentMethod: getFulfillmentMethod(distanceKm),
   };
+}
+
+function validatePromoCart(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      !Array.isArray(body.items) || body.items.length === 0 || body.items.length > 8) {
+    throw new Error("Your bag does not contain a valid selection.");
+  }
+  const items = body.items.map((item) => {
+    if (!item || typeof item !== "object" || typeof item.id !== "string" ||
+        !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > MAX_QUANTITY) {
+      throw new Error("Each product needs a valid quantity.");
+    }
+    const product = products.find((entry) => entry.id === item.id);
+    if (!product) throw new Error("A product in your bag is no longer available.");
+    return { product, quantity: item.quantity };
+  });
+  return items;
+}
+
+async function handlePromoQuote(request, env, origin) {
+  if (!env.ORDERS_DB) return errorResponse("The order database is not configured yet. Please contact the shop.", 503, origin);
+  let customerEmail;
+  try {
+    customerEmail = await authenticatedEmail(request, env);
+  } catch (error) {
+    console.error("Could not authenticate customer before quoting a promo.", error);
+    return errorResponse("Customer sign-in is temporarily unavailable. Please try again shortly.", 503, origin);
+  }
+  if (!customerEmail) return errorResponse("Please sign in before applying a promo code.", 401, origin);
+
+  let body;
+  try {
+    body = await readBody(request);
+    const items = validatePromoCart(body);
+    const quote = await quotePromo(env.ORDERS_DB, body.code, customerEmail, items);
+    return jsonResponse({
+      code: quote.code,
+      name: quote.name,
+      subtotalPaise: quote.subtotalPaise,
+      eligibleSubtotalPaise: quote.eligibleSubtotalPaise,
+      discountPaise: quote.discountPaise,
+      payablePaise: quote.payablePaise,
+    }, 200, origin);
+  } catch (error) {
+    return errorResponse(error instanceof Error ? error.message : "That promo code could not be applied.", 400, origin);
+  }
+}
+
+async function handleReleasePromo(request, env, origin) {
+  if (!env.ORDERS_DB) return errorResponse("The order database is not configured.", 503, origin);
+  let customerEmail;
+  try {
+    customerEmail = await authenticatedEmail(request, env);
+  } catch (error) {
+    console.error("Could not authenticate customer before releasing a promo.", error);
+    return errorResponse("Customer sign-in is temporarily unavailable.", 503, origin);
+  }
+  if (!customerEmail) return errorResponse("Please sign in before continuing.", 401, origin);
+  try {
+    const body = await readBody(request);
+    await releasePromoReservation(env.ORDERS_DB, body?.reservationId, customerEmail);
+    return jsonResponse({ released: true }, 200, origin);
+  } catch (error) {
+    console.error("Could not release a promo checkout reservation.", error);
+    return errorResponse("The promo reservation could not be released.", 503, origin);
+  }
 }
 
 function hexToBytes(value) {
@@ -156,9 +231,6 @@ function hexToBytes(value) {
 async function handleCreateOrder(request, env, origin) {
   if (!env.ORDERS_DB) {
     return errorResponse("The order database is not configured yet. Please contact the shop.", 503, origin);
-  }
-  if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
-    return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
 
   const storeLocation = getStoreLocation(env);
@@ -176,16 +248,85 @@ async function handleCreateOrder(request, env, origin) {
   if (!customerEmail) return errorResponse("Please sign in before checking out.", 401, origin);
 
   let order;
+  let body;
+  let promoQuote = null;
   try {
-    const body = await readBody(request);
+    body = await readBody(request);
     const submittedEmail = normalizeCustomerEmail(body?.customer?.email);
     if (submittedEmail !== customerEmail) {
       return errorResponse("The checkout email must match the signed-in account.", 403, origin);
     }
     body.customer.email = customerEmail;
     order = validateOrder(body, storeLocation);
+    if (body.promoCode !== undefined && body.promoCode !== null && body.promoCode !== "") {
+      promoQuote = await quotePromo(env.ORDERS_DB, body.promoCode, customerEmail, order.items);
+      order.amount = promoQuote.payablePaise;
+    }
   } catch (error) {
     return errorResponse(error.message, 400, origin);
+  }
+
+  if (order.amount === 0) {
+    if (!promoQuote || promoQuote.discountPaise !== promoQuote.subtotalPaise) {
+      return errorResponse("A free order requires a valid promo code covering the full product subtotal.", 400, origin);
+    }
+    const orderId = `CC-P-${Date.now()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    try {
+      await reservePromo(env.ORDERS_DB, promoQuote, customerEmail, orderId);
+      const redemption = await getPromoReservationForOrder(env.ORDERS_DB, orderId);
+      if (
+        !redemption ||
+        redemption.promo_code !== promoQuote.code ||
+        redemption.customer_email !== customerEmail ||
+        redemption.subtotal_paise !== promoQuote.subtotalPaise ||
+        redemption.discount_paise !== promoQuote.discountPaise
+      ) throw new Error("The promo reservation could not be confirmed.");
+      await savePaidOrder(env.ORDERS_DB, {
+        orderId,
+        paymentId: null,
+        paymentMethod: "promo",
+        customerName: order.customer.name.trim(),
+        customerPhone: order.customer.phone.trim(),
+        customerEmail,
+        deliveryAddress: order.customer.address.trim(),
+        eventDate: order.customer.eventDate,
+        items: order.items.map(({ product, quantity, flavour, wrapper }) => ({
+          id: product.id,
+          name: product.name,
+          quantity,
+          unitPriceRupees: product.price,
+          flavour,
+          wrapper,
+        })),
+        amountPaise: 0,
+        productSubtotalPaise: promoQuote.subtotalPaise,
+        discountPaise: promoQuote.discountPaise,
+        promoCode: promoQuote.code,
+        deliveryMethod: order.fulfillmentMethod,
+        distanceKm: order.distanceKm,
+        policiesAccepted: "terms_conditions, privacy_policy, shipping_policy",
+        promoReservation: redemption,
+      });
+    } catch (error) {
+      console.error("Could not save a promo-covered free order.", error);
+      return errorResponse(
+        "Your promo-covered order could not be saved. Please contact the shop before trying again.",
+        503,
+        origin,
+      );
+    }
+    return jsonResponse({
+      freeOrder: true,
+      verified: true,
+      orderId,
+      fulfillmentMethod: order.fulfillmentMethod,
+      distanceKm: Number(order.distanceKm.toFixed(2)),
+      discountPaise: promoQuote.discountPaise,
+    }, 201, origin);
+  }
+
+  if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+    return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
 
   const serializedItems = JSON.stringify(order.items.map(({ product, quantity, flavour, wrapper }) => [
@@ -210,10 +351,19 @@ async function handleCreateOrder(request, env, origin) {
     address: order.customer.address.trim(),
     event_date: order.customer.eventDate,
     ...itemNotes,
-    delivery_method: order.fulfillmentMethod,
-    distance_km: order.distanceKm.toFixed(2),
-    policies_ok: "terms_conditions, privacy_policy, shipping_policy",
+    delivery: JSON.stringify({
+      delivery_method: order.fulfillmentMethod,
+      distance_km: order.distanceKm.toFixed(2),
+      policies_ok: "terms_conditions, privacy_policy, shipping_policy",
+    }),
   };
+  if (promoQuote) {
+    notes.promo = JSON.stringify({
+      code: promoQuote.code,
+      subtotal_paise: promoQuote.subtotalPaise,
+      discount_paise: promoQuote.discountPaise,
+    });
+  }
   const payload = {
     amount: order.amount,
     currency: "INR",
@@ -252,6 +402,20 @@ async function handleCreateOrder(request, env, origin) {
     return errorResponse("Secure checkout returned an invalid order. Please try again.", 502, origin);
   }
 
+  let reservation = null;
+  if (promoQuote) {
+    try {
+      reservation = await reservePromo(env.ORDERS_DB, promoQuote, customerEmail, providerOrder.id);
+    } catch (error) {
+      console.error("Could not reserve the promo code for a new payment order.", error);
+      return errorResponse(
+        error instanceof Error ? error.message : "That promo code could not be reserved.",
+        409,
+        origin,
+      );
+    }
+  }
+
   return jsonResponse({
     id: providerOrder.id,
     amount: providerOrder.amount,
@@ -259,6 +423,10 @@ async function handleCreateOrder(request, env, origin) {
     keyId: env.RAZORPAY_KEY_ID,
     fulfillmentMethod: order.fulfillmentMethod,
     distanceKm: Number(order.distanceKm.toFixed(2)),
+    productSubtotalPaise: promoQuote?.subtotalPaise ?? order.subtotalPaise,
+    discountPaise: promoQuote?.discountPaise ?? 0,
+    promoCode: promoQuote?.code ?? "",
+    promoReservationId: reservation?.reservationId ?? "",
   }, 201, origin);
 }
 
@@ -408,6 +576,29 @@ async function handleVerifyPayment(request, env, origin) {
   if (paidOrder.customerEmail !== customerEmail) {
     return errorResponse("This payment belongs to a different signed-in account.", 403, origin);
   }
+  if (paidOrder.promoCode) {
+    let reservation;
+    try {
+      reservation = await getPromoReservationForOrder(env.ORDERS_DB, paidOrder.orderId);
+      if (
+        !reservation ||
+        reservation.promo_code !== paidOrder.promoCode ||
+        reservation.customer_email !== customerEmail ||
+        reservation.subtotal_paise !== paidOrder.productSubtotalPaise ||
+        reservation.discount_paise !== paidOrder.discountPaise
+      ) {
+        throw new Error("The promo checkout reservation does not match this captured payment.");
+      }
+      paidOrder.promoReservation = reservation;
+    } catch (error) {
+      console.error("The captured payment promo could not be reconciled.", error);
+      return errorResponse(
+        "Your payment was received, but the promo order could not be confirmed. Please do not pay again; contact the shop with your Razorpay order ID.",
+        502,
+        origin,
+      );
+    }
+  }
 
   try {
     await savePaidOrder(env.ORDERS_DB, paidOrder);
@@ -453,6 +644,8 @@ export default {
     const path = new URL(request.url).pathname.replace(/\/+$/, "");
     if (path === "/orders") return handleCreateOrder(request, env, configuredOrigin);
     if (path === "/verify") return handleVerifyPayment(request, env, configuredOrigin);
+    if (path === "/promos/quote") return handlePromoQuote(request, env, configuredOrigin);
+    if (path === "/promos/release") return handleReleasePromo(request, env, configuredOrigin);
     if (path === "/auth/request-code") {
       const result = await requestLoginCode(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
@@ -475,6 +668,14 @@ export default {
     }
     if (path === "/admin/data") {
       const result = await getAdminData(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/promos/create") {
+      const result = await createAdminPromo(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/promos/update") {
+      const result = await updateAdminPromo(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/customers/create") {

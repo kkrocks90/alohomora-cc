@@ -64,6 +64,10 @@ if (root) {
     status?: string;
     items?: { name?: string; quantity?: number; flavour?: string; wrapper?: string }[];
     amountPaise?: number;
+    productSubtotalPaise?: number;
+    discountPaise?: number;
+    promoCode?: string;
+    paymentMethod?: string;
     createdAt?: string;
     deliveryMethod?: string;
     eventDate?: string;
@@ -168,7 +172,7 @@ if (root) {
     if (orders.length === 0) {
       const empty = document.createElement("p");
       empty.className = "account-empty";
-      empty.textContent = "No paid orders were found for this email yet.";
+      empty.textContent = "No orders were found for this email yet.";
       orderList.append(empty);
       ordersSection.hidden = false;
       return;
@@ -198,7 +202,10 @@ if (root) {
         delivered: "Delivered",
         cancelled: "Cancelled",
       };
-      paid.textContent = `${order.status === "paid" ? "Paid" : "Unpaid"} · ${orderStatusLabels[order.orderStatus ?? ""] ?? "Processing"}`;
+      const paymentLabel = order.paymentMethod === "promo"
+        ? "No payment due"
+        : order.status === "paid" ? "Paid" : "Unpaid";
+      paid.textContent = `${paymentLabel} · ${orderStatusLabels[order.orderStatus ?? ""] ?? "Processing"}`;
       heading.append(reference, paid);
 
       const details = document.createElement("p");
@@ -206,7 +213,10 @@ if (root) {
       const date = order.createdAt ? new Date(order.createdAt) : null;
       details.textContent = [
         date && !Number.isNaN(date.valueOf()) ? date.toLocaleDateString("en-IN", { dateStyle: "medium" }) : "",
-        typeof order.amountPaise === "number" ? formatPrice.format(order.amountPaise / 100) : "",
+        typeof order.amountPaise === "number"
+          ? `${order.paymentMethod === "promo" ? "Promo-covered" : "Paid"} ${formatPrice.format(order.amountPaise / 100)}`
+          : "",
+        order.discountPaise ? `Promo ${order.promoCode ?? ""}: saved ${formatPrice.format(order.discountPaise / 100)}` : "",
         order.deliveryMethod ?? "",
         order.eventDate ? `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}` : "",
       ].filter(Boolean).join(" · ");

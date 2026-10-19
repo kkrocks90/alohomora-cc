@@ -1,5 +1,6 @@
 import products from "../src/data/products.json" with { type: "json" };
 import { getFulfillmentMethod } from "./delivery.js";
+import { preparePromoRedemption } from "./promos.js";
 
 const productById = new Map(products.map((product) => [product.id, product]));
 const MAX_QUANTITY = 20;
@@ -13,7 +14,7 @@ function requireNoteText(notes, field, maximum) {
 }
 
 export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
-  if (!Number.isSafeInteger(amountPaise) || amountPaise <= 0) {
+  if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) {
     throw new Error("The verified payment amount is invalid.");
   }
 
@@ -111,17 +112,32 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     };
   });
 
-  const expectedAmountPaise = items.reduce((sum, item) => sum + item.unitPriceRupees * item.quantity * 100, 0);
-  if (expectedAmountPaise !== amountPaise) {
-    throw new Error("The paid order amount does not match the current product prices.");
+  const productSubtotalPaise = items.reduce((sum, item) => sum + item.unitPriceRupees * item.quantity * 100, 0);
+  let distanceText = notes?.distance_km;
+  let deliveryMethodValue = notes?.delivery_method;
+  let policyValue = notes?.policies_ok;
+  if (notes?.delivery !== undefined) {
+    let delivery;
+    try {
+      delivery = JSON.parse(notes.delivery);
+    } catch {
+      throw new Error("The paid order delivery details could not be read.");
+    }
+    distanceText = delivery?.distance_km;
+    deliveryMethodValue = delivery?.delivery_method;
+    policyValue = delivery?.policies_ok;
   }
-
-  const distanceText = requireNoteText(notes, "distance_km", 32);
+  if (typeof distanceText !== "string" || distanceText.trim() === "" || distanceText.length > 32) {
+    throw new Error("The paid order is missing valid distance_km details.");
+  }
   const distanceKm = Number(distanceText);
   if (!Number.isFinite(distanceKm) || distanceKm < 0) {
     throw new Error("The paid order has an invalid delivery distance.");
   }
-  const deliveryMethod = requireNoteText(notes, "delivery_method", 64);
+  if (typeof deliveryMethodValue !== "string" || deliveryMethodValue.trim() === "" || deliveryMethodValue.length > 64) {
+    throw new Error("The paid order is missing valid delivery_method details.");
+  }
+  const deliveryMethod = deliveryMethodValue.trim();
   if (
     (deliveryMethod !== "Porter (manual booking)" && deliveryMethod !== "Courier (manual booking)") ||
     deliveryMethod !== getFulfillmentMethod(distanceKm)
@@ -129,9 +145,38 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     throw new Error("The paid order has an invalid delivery method.");
   }
 
-  const policiesAccepted = requireNoteText(notes, "policies_ok", 128);
+  if (typeof policyValue !== "string" || policyValue.trim() === "" || policyValue.length > 128) {
+    throw new Error("The paid order is missing valid policies_ok details.");
+  }
+  const policiesAccepted = policyValue.trim();
   if (policiesAccepted !== "terms_conditions, privacy_policy, shipping_policy") {
     throw new Error("The paid order policy confirmation could not be validated.");
+  }
+
+  let discountPaise = 0;
+  let promoCode = "";
+  if (notes?.promo !== undefined) {
+    let promo;
+    try {
+      promo = JSON.parse(notes.promo);
+    } catch {
+      throw new Error("The paid order promo details could not be read.");
+    }
+    if (
+      typeof promo.code !== "string" ||
+      !/^[A-Z0-9-]{3,32}$/.test(promo.code) ||
+      promo.subtotal_paise !== productSubtotalPaise ||
+      !Number.isSafeInteger(promo.discount_paise) ||
+      promo.discount_paise < 0 ||
+      promo.discount_paise > productSubtotalPaise
+    ) {
+      throw new Error("The paid order promo details are invalid.");
+    }
+    promoCode = promo.code;
+    discountPaise = promo.discount_paise;
+  }
+  if (productSubtotalPaise - discountPaise !== amountPaise || (amountPaise === 0 && !promoCode)) {
+    throw new Error("The paid order amount does not match its product subtotal and discount.");
   }
 
   return {
@@ -144,6 +189,9 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     eventDate,
     items,
     amountPaise,
+    productSubtotalPaise,
+    discountPaise,
+    promoCode,
     deliveryMethod,
     distanceKm,
     policiesAccepted,
@@ -153,9 +201,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
 export async function savePaidOrder(database, order) {
   const createdAt = new Date().toISOString();
 
-  await database
-    .prepare(
-      `INSERT INTO orders (
+  const insertSql = `INSERT INTO orders (
         order_id,
         payment_id,
         payment_status,
@@ -168,30 +214,68 @@ export async function savePaidOrder(database, order) {
         event_date,
         items_json,
         amount_paise,
+        product_subtotal_paise,
+        discount_paise,
+        promo_code,
         currency,
         delivery_method,
         distance_km,
         policies_accepted,
         created_at
-      ) VALUES (?, ?, 'paid', 'razorpay', 'received', ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
-      ON CONFLICT(order_id) DO NOTHING`,
-    )
-    .bind(
-      order.orderId,
-      order.paymentId,
-      order.customerName,
-      order.customerPhone,
-      order.customerEmail,
-      order.deliveryAddress,
-      order.eventDate ?? "",
-      JSON.stringify(order.items),
-      order.amountPaise,
-      order.deliveryMethod,
-      order.distanceKm,
-      "terms_conditions, privacy_policy, shipping_policy",
-      createdAt,
-    )
-    .run();
+      ) VALUES (?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
+      ON CONFLICT(order_id) DO NOTHING`;
+  const insertValues = [
+    order.orderId,
+    order.paymentId,
+    order.paymentMethod ?? "razorpay",
+    order.customerName,
+    order.customerPhone,
+    order.customerEmail,
+    order.deliveryAddress,
+    order.eventDate ?? "",
+    JSON.stringify(order.items),
+    order.amountPaise,
+    order.productSubtotalPaise ?? order.amountPaise,
+    order.discountPaise ?? 0,
+    order.promoCode ?? "",
+    order.deliveryMethod,
+    order.distanceKm,
+    "terms_conditions, privacy_policy, shipping_policy",
+    createdAt,
+  ];
+
+  if (order.promoReservation) {
+    const email = order.customerEmail.trim().toLowerCase();
+    const reservation = order.promoReservation;
+    const promoInsertSql = `INSERT INTO orders (
+        order_id, payment_id, payment_status, payment_method, order_status,
+        customer_name, customer_phone, customer_email, delivery_address,
+        event_date, items_json, amount_paise, product_subtotal_paise,
+        discount_paise, promo_code, currency, delivery_method, distance_km,
+        policies_accepted, created_at
+      )
+      SELECT ?, ?, 'paid', ?, 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?
+      FROM promo_redemptions r
+      WHERE r.reservation_id = ? AND r.order_id = ?
+        AND r.customer_email = ? AND r.status = 'redeemed'
+      ON CONFLICT(order_id) DO NOTHING`;
+    await database.batch([
+      preparePromoRedemption(database, reservation, order.orderId, email),
+      database.prepare(promoInsertSql).bind(...insertValues, reservation.reservation_id, order.orderId, email),
+    ]);
+    const redeemedReservation = await database
+      .prepare(
+        `SELECT status FROM promo_redemptions
+         WHERE reservation_id = ? AND order_id = ? AND customer_email = ?`,
+      )
+      .bind(reservation.reservation_id, order.orderId, email)
+      .first();
+    if (redeemedReservation?.status !== "redeemed") {
+      throw new Error("The promo reservation expired or could not be redeemed.");
+    }
+  } else {
+    await database.prepare(insertSql).bind(...insertValues).run();
+  }
 
   const saved = await database
     .prepare("SELECT payment_id FROM orders WHERE order_id = ?")

@@ -1354,9 +1354,124 @@ h2 em {
 }
 
 .admin-customer-form,
-.admin-order-form {
+.admin-order-form,
+.admin-promo-form {
   display: grid;
   gap: 13px;
+}
+
+.admin-promo-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-promo-form > label,
+.admin-promo-fields label,
+.admin-promo-limits label {
+  display: grid;
+  gap: 6px;
+  color: #6b5549;
+  font-size: 11px;
+}
+
+.admin-promo-form input,
+.admin-promo-form select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  outline-color: #9e7460;
+  background: #fff;
+  color: #46332a;
+  font-size: 13px;
+}
+
+.admin-promo-fields,
+.admin-promo-limits {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  padding: 13px;
+  border: 1px solid #eee6de;
+}
+
+.admin-promo-fields[hidden],
+.admin-promo-form label[hidden] {
+  display: none;
+}
+
+.admin-promo-form > .button {
+  justify-self: start;
+}
+
+.admin-promo-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.admin-promo-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #e8ded3;
+  background: #fff;
+}
+
+.admin-promo-card-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-promo-card-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-promo-card-heading strong {
+  color: #493027;
+  font-size: 13px;
+}
+
+.admin-promo-code {
+  color: #624234;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.admin-promo-active,
+.admin-promo-inactive {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.admin-promo-active {
+  color: #416443;
+}
+
+.admin-promo-inactive {
+  color: #a43c31;
+}
+
+.admin-promo-description,
+.admin-promo-restrictions {
+  margin: 0;
+  color: #89786d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.admin-promo-card .button {
+  justify-self: start;
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 10px;
 }
 
 .admin-customer-form {
@@ -2606,6 +2721,78 @@ h2 em {
   margin-top: 19px;
 }
 
+.checkout-promo-form {
+  display: grid;
+  gap: 7px;
+  margin-top: 18px;
+  padding: 14px 0;
+  border-top: 1px solid #eee6de;
+  border-bottom: 1px solid #eee6de;
+}
+
+.checkout-promo-form > label {
+  color: #6b5549;
+  font-size: 11px;
+}
+
+.checkout-promo-form > div {
+  display: flex;
+  gap: 8px;
+}
+
+.checkout-promo-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  outline-color: #9e7460;
+  background: #fff;
+  color: #46332a;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.checkout-promo-form .button {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 11px;
+}
+
+.checkout-promo-status {
+  min-height: 15px;
+  margin: 0;
+  color: #416443;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.checkout-promo-status[data-state="error"] {
+  color: #a43c31;
+}
+
+.checkout-promo-form [hidden],
+.checkout-discount[hidden] {
+  display: none;
+}
+
+.checkout-discount {
+  margin-top: 10px;
+  color: #416443;
+}
+
+.checkout-discount strong {
+  color: #416443;
+}
+
+.checkout-payable-row {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid #e8ded3;
+  font-weight: 600;
+}
+
 .checkout-order-panel .delivery-note {
   margin-top: 11px;
 }
@@ -3186,7 +3373,10 @@ h2 em {
 
   .admin-customer-form,
   .admin-customer-list,
-  .admin-order-inline-fields {
+  .admin-order-inline-fields,
+  .admin-promo-form,
+  .admin-promo-fields,
+  .admin-promo-limits {
     grid-template-columns: 1fr;
   }
 

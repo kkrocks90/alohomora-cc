@@ -1,5 +1,6 @@
 import products from "../src/data/products.json" with { type: "json" };
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
+import { getPromoCategories, validatePromoDefinition, validatePromoLimits } from "./promos.js";
 
 export const ORDER_STATUSES = [
   "received",
@@ -51,13 +52,13 @@ export async function getAdminData(request, env) {
   try {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
-    const [ordersResult, customersResult] = await Promise.all([
+    const [ordersResult, customersResult, promosResult] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, payment_id, payment_status, payment_method, order_status,
                   customer_id, customer_name, customer_phone, customer_email,
-                  delivery_address, items_json, amount_paise, currency,
-                  delivery_method, event_date, created_at
+                  delivery_address, items_json, amount_paise, product_subtotal_paise,
+                  discount_paise, promo_code, currency, delivery_method, event_date, created_at
            FROM orders
            ORDER BY created_at DESC`,
         )
@@ -68,6 +69,18 @@ export async function getAdminData(request, env) {
                   default_address, created_at, updated_at
            FROM customers
            ORDER BY CASE WHEN customer_name = '' THEN customer_email ELSE customer_name END COLLATE NOCASE`,
+        )
+        .all(),
+      env.ORDERS_DB
+        .prepare(
+          `SELECT p.promo_id, p.name, p.code, p.type, p.percentage, p.target_type,
+                  p.target_value, p.amount_paise, p.minimum_subtotal_paise,
+                  p.max_redemptions, p.end_date, p.active, p.created_at,
+                  COUNT(DISTINCT CASE WHEN r.status = 'redeemed' THEN r.customer_email END) AS redeemed_count
+           FROM promo_codes p
+           LEFT JOIN promo_redemptions r ON r.promo_id = p.promo_id
+           GROUP BY p.promo_id
+           ORDER BY p.created_at DESC`,
         )
         .all(),
     ]);
@@ -86,6 +99,9 @@ export async function getAdminData(request, env) {
         deliveryAddress: order.delivery_address,
         items: JSON.parse(order.items_json),
         amountPaise: order.amount_paise,
+        productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
+        discountPaise: order.discount_paise ?? 0,
+        promoCode: order.promo_code ?? "",
         currency: order.currency,
         deliveryMethod: order.delivery_method,
         eventDate: order.event_date ?? "",
@@ -102,10 +118,120 @@ export async function getAdminData(request, env) {
       })),
       orderStatuses: ORDER_STATUSES,
       products: products.map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
+      categories: getPromoCategories(),
+      promos: promosResult.results.map((promo) => ({
+        promoId: promo.promo_id,
+        name: promo.name,
+        code: promo.code,
+        type: promo.type,
+        percentage: promo.percentage,
+        targetType: promo.target_type,
+        targetValue: promo.target_value,
+        amountPaise: promo.amount_paise,
+        minimumSubtotalPaise: promo.minimum_subtotal_paise,
+        maxRedemptions: promo.max_redemptions,
+        redeemedCount: promo.redeemed_count,
+        endDate: promo.end_date ?? "",
+        active: promo.active === 1,
+        createdAt: promo.created_at,
+      })),
     });
   } catch (error) {
     console.error("Could not load the admin dashboard.", error);
     return result(503, { error: "The admin dashboard is temporarily unavailable." });
+  }
+}
+
+function generatePromoCode() {
+  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const bytes = crypto.getRandomValues(new Uint8Array(10));
+  return `CC${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}`;
+}
+
+export async function createAdminPromo(request, env) {
+    let body;
+    try {
+      body = await readBody(request);
+    } catch (error) {
+      return result(400, { error: error.message });
+    }
+    try {
+      const access = await requireAdmin(request, env);
+      if (access.error) return access.error;
+      let definition;
+      let limits;
+      try {
+        definition = validatePromoDefinition(body);
+        limits = validatePromoLimits(body);
+      } catch (error) {
+        return result(400, { error: error.message });
+      }
+      const promoId = `promo_${crypto.randomUUID()}`;
+      const code = generatePromoCode();
+      const createdAt = new Date().toISOString();
+      await env.ORDERS_DB.prepare(
+        `INSERT INTO promo_codes (
+          promo_id, name, code, type, percentage, target_type, target_value,
+          amount_paise, minimum_subtotal_paise, max_redemptions, end_date, active, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+      ).bind(
+        promoId,
+        definition.name,
+        code,
+        definition.type,
+        definition.percentage,
+        definition.targetType,
+        definition.targetValue,
+        definition.amountPaise,
+        definition.minimumSubtotalPaise,
+        limits.maxRedemptions,
+        limits.endDate,
+        createdAt,
+      ).run();
+      return result(201, {
+        promo: {
+          promoId,
+          name: definition.name,
+          code,
+          type: definition.type,
+          percentage: definition.percentage,
+          targetType: definition.targetType,
+          targetValue: definition.targetValue,
+          amountPaise: definition.amountPaise,
+          minimumSubtotalPaise: definition.minimumSubtotalPaise,
+          maxRedemptions: limits.maxRedemptions,
+          redeemedCount: 0,
+          endDate: limits.endDate ?? "",
+          active: true,
+          createdAt,
+        },
+      });
+    } catch (error) {
+      console.error("Could not create an admin promo code.", error);
+      return result(503, { error: "The promo code could not be created right now. Please try again." });
+    }
+}
+
+export async function updateAdminPromo(request, env) {
+    let body;
+    try {
+      body = await readBody(request);
+    } catch (error) {
+      return result(400, { error: error.message });
+    }
+    try {
+      const access = await requireAdmin(request, env);
+      if (access.error) return access.error;
+      const promoId = requiredText(body?.promoId, 80, "promo code");
+      if (typeof body?.active !== "boolean") return result(400, { error: "Choose whether this promo code is active." });
+      const updated = await env.ORDERS_DB.prepare(
+        "UPDATE promo_codes SET active = ? WHERE promo_id = ?",
+      ).bind(body.active ? 1 : 0, promoId).run();
+      if (updated.meta?.changes === 0) return result(404, { error: "That promo code could not be found." });
+      return result(200, { promoId, active: body.active });
+    } catch (error) {
+      console.error("Could not update an admin promo code.", error);
+      return result(503, { error: "The promo code could not be updated right now. Please try again." });
   }
 }
 
@@ -287,9 +413,10 @@ export async function createManualOrder(request, env) {
         `INSERT INTO orders (
           order_id, payment_id, payment_status, payment_method, order_status,
           customer_id, customer_name, customer_phone, customer_email,
-          delivery_address, items_json, amount_paise, currency,
+          delivery_address, items_json, amount_paise, product_subtotal_paise,
+          discount_paise, promo_code, currency,
           delivery_method, distance_km, policies_accepted, event_date, created_at
-        ) VALUES (?, NULL, 'unpaid', 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, 'INR', ?, 0, 'admin_manual_order', ?, ?)`,
+        ) VALUES (?, NULL, 'unpaid', 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, 0, '', 'INR', ?, 0, 'admin_manual_order', ?, ?)`,
       )
       .bind(
         orderId,
@@ -299,6 +426,7 @@ export async function createManualOrder(request, env) {
         customer.customer_email,
         deliveryAddress,
         JSON.stringify(items),
+        amountPaise,
         amountPaise,
         deliveryMethod,
         eventDate,

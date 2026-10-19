@@ -82,6 +82,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="create-order"
         >Create manual order</button>
+        <button
+          class="admin-tab"
+          id="admin-promos-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-promos-panel"
+          tabindex="-1"
+          data-admin-tab="promos"
+        >Promo codes</button>
       </div>
 
       <section
@@ -106,6 +116,52 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           </div>
           <div class="admin-order-list" id="admin-order-list"></div>
           <nav class="admin-pagination" id="admin-order-pagination" aria-label="Order pages"></nav>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-promos-panel"
+        role="tabpanel"
+        aria-labelledby="admin-promos-tab"
+        data-admin-panel="promos"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-promos-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Customer offers</p>
+              <h2 id="admin-promos-title">Create promo code</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Codes are generated automatically. Limited-use codes are reserved during checkout and count once per signed-in customer after a successful order.</p>
+          <form class="admin-promo-form" id="admin-promo-form">
+            <label>Promo name<input name="name" maxlength="80" required placeholder="Summer chocolate treat" /></label>
+            <label>Discount type<select name="type" id="admin-promo-type" required>
+              <option value="percentage">Percentage off</option>
+              <option value="fixed">Fixed amount off subtotal</option>
+            </select></label>
+            <div class="admin-promo-fields" id="admin-promo-percentage-fields">
+              <label>Percentage off<input name="percentage" type="number" min="1" max="100" step="1" value="10" required /></label>
+              <label>Applies to<select name="targetType" id="admin-promo-target-type">
+                <option value="all">All products</option>
+                <option value="product">One product</option>
+                <option value="category">One category</option>
+              </select></label>
+              <label id="admin-promo-target-value-label" hidden>Product or category<select name="targetValue" id="admin-promo-target-value" disabled></select></label>
+            </div>
+            <div class="admin-promo-fields" id="admin-promo-fixed-fields" hidden>
+              <label>Amount off (₹)<input name="amountRupees" type="number" min="1" max="1000000" step="1" value="100" disabled required /></label>
+              <label>Product subtotal must be greater than (₹)<input name="minimumRupees" type="number" min="0" max="1000000" step="1" value="0" disabled required /></label>
+            </div>
+            <div class="admin-promo-limits">
+              <label>Maximum distinct customers (optional)<input name="maxRedemptions" type="number" min="1" max="1000000" step="1" placeholder="No limit" /></label>
+              <label>End date (optional)<input name="endDate" type="date" /></label>
+            </div>
+            <button class="button button-primary" type="submit">Generate promo code</button>
+          </form>
+          <div class="admin-promo-list" id="admin-promo-list" aria-live="polite"></div>
         </section>
       </section>
 

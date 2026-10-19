@@ -14,12 +14,12 @@ function createDatabase() {
           return {
             run: async () => {
               if (query.startsWith("INSERT INTO orders")) {
-                const [orderId, paymentId, customerName] = values;
+                const [orderId, paymentId, , customerName] = values;
                 if (rows.has(orderId)) return;
                 rows.set(orderId, {
                   payment_id: paymentId,
                   customer_name: customerName,
-                  event_date: values[6],
+                  event_date: values[7],
                 });
                 return;
               }
