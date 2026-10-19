@@ -3,6 +3,7 @@ import {
   createAdminCustomer,
   createManualOrder,
   getAdminData,
+  updateAdminCustomer,
   updateAdminOrderStatus,
 } from "./admin.js";
 import {
@@ -478,6 +479,10 @@ export default {
     }
     if (path === "/admin/customers/create") {
       const result = await createAdminCustomer(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/customers/update") {
+      const result = await updateAdminCustomer(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/orders/create") {

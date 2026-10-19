@@ -146,12 +146,25 @@ if (root) {
   const status = requireElement<HTMLElement>(root, "#admin-status");
   const customerForm = requireElement<HTMLFormElement>(root, "#admin-customer-form");
   const customerList = requireElement<HTMLElement>(root, "#admin-customer-list");
+  const customerSearch = requireElement<HTMLInputElement>(root, "#admin-customer-search");
+  const customerCount = requireElement<HTMLElement>(root, "#admin-customer-count");
+  const customerPagination = requireElement<HTMLElement>(root, "#admin-customer-pagination");
+  const customerFormTitle = requireElement<HTMLElement>(root, "#admin-customers-title");
+  const customerFormHint = requireElement<HTMLElement>(root, "#admin-customer-form-hint");
+  const customerSubmit = requireElement<HTMLButtonElement>(root, "#admin-customer-submit");
+  const cancelCustomerEdit = requireElement<HTMLButtonElement>(root, "#admin-customer-cancel-edit");
   const orderForm = requireElement<HTMLFormElement>(root, "#admin-order-form");
   const customerSelect = requireElement<HTMLSelectElement>(root, "#admin-order-customer");
+  const customerSelectSearch = requireElement<HTMLInputElement>(root, "#admin-order-customer-search");
+  const customerSelectHint = requireElement<HTMLElement>(root, "#admin-order-customer-hint");
   const addressInput = requireElement<HTMLTextAreaElement>(root, "#admin-order-address");
   const orderLines = requireElement<HTMLElement>(root, "#admin-order-lines");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
+  const orderSearch = requireElement<HTMLInputElement>(root, "#admin-order-search");
+  const orderStatusFilter = requireElement<HTMLSelectElement>(root, "#admin-order-status-filter");
+  const orderCount = requireElement<HTMLElement>(root, "#admin-order-count");
+  const orderPagination = requireElement<HTMLElement>(root, "#admin-order-pagination");
   const invoice = requireElement<HTMLElement>(root, "#admin-invoice-print");
   const sessionKey = ADMIN_SESSION_KEY;
   const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -165,6 +178,11 @@ if (root) {
     cancelled: "Cancelled",
   };
   let adminData: AdminData | null = null;
+  const pageSize = 20;
+  const customerPageSize = 50;
+  let customerPage = 0;
+  let orderPage = 0;
+  let editingCustomerId: string | null = null;
 
   function activateAdminTab(tab: HTMLButtonElement, moveFocus = false) {
     const selectedTab = tab.dataset.adminTab;
@@ -248,31 +266,143 @@ if (root) {
     setLoginStatus(message);
   }
 
+  function renderPagination(
+    container: HTMLElement,
+    page: number,
+    itemCount: number,
+    changePage: (page: number) => void,
+  ) {
+    container.replaceChildren();
+    const pageCount = Math.max(1, Math.ceil(itemCount / pageSize));
+    if (pageCount <= 1) return;
+    const previous = document.createElement("button");
+    previous.type = "button";
+    previous.textContent = "Previous";
+    previous.disabled = page === 0;
+    previous.addEventListener("click", () => changePage(page - 1));
+    const label = document.createElement("span");
+    label.textContent = `Page ${page + 1} of ${pageCount}`;
+    const next = document.createElement("button");
+    next.type = "button";
+    next.textContent = "Next";
+    next.disabled = page + 1 >= pageCount;
+    next.addEventListener("click", () => changePage(page + 1));
+    container.append(previous, label, next);
+  }
+
+  function updateListCount(element: HTMLElement, page: number, itemCount: number, label: string) {
+    const first = itemCount === 0 ? 0 : page * pageSize + 1;
+    const last = Math.min((page + 1) * pageSize, itemCount);
+    element.textContent = `Showing ${first}–${last} of ${itemCount} ${label}`;
+  }
+
+  function renderCustomerSelect() {
+    if (!adminData) return;
+    const previousSelection = customerSelect.value;
+    const previousAddress = addressInput.value;
+    const query = customerSelectSearch.value.trim().toLocaleLowerCase();
+    const matchingCustomers = adminData.customers.filter((customer) =>
+      [customer.name, customer.phone, customer.email].some((value) => value.toLocaleLowerCase().includes(query)));
+    const visibleCustomers = matchingCustomers.slice(0, customerPageSize);
+    customerSelect.replaceChildren(new Option("Choose a saved customer", ""));
+    visibleCustomers.forEach((customer) => {
+      customerSelect.append(new Option(
+        [customer.name || customer.email, customer.phone].filter(Boolean).join(" · "),
+        customer.customerId,
+      ));
+    });
+    const selectionVisible = visibleCustomers.some((customer) => customer.customerId === previousSelection);
+    if (selectionVisible) {
+      customerSelect.value = previousSelection;
+      addressInput.value = previousAddress;
+    } else {
+      addressInput.value = "";
+    }
+    customerSelectHint.textContent = matchingCustomers.length > visibleCustomers.length
+      ? `Showing the first ${visibleCustomers.length} of ${matchingCustomers.length} matches. Refine your search.`
+      : matchingCustomers.length === 0
+        ? "No customers match that search."
+        : `${matchingCustomers.length} matching customer${matchingCustomers.length === 1 ? "" : "s"}.`;
+    addressInput.value = "";
+  }
+
+  function startCustomerEdit(customer: AdminCustomer) {
+    editingCustomerId = customer.customerId;
+    const nameInput = customerForm.elements.namedItem("name");
+    const phoneInput = customerForm.elements.namedItem("phone");
+    const emailInput = customerForm.elements.namedItem("email");
+    const addressField = customerForm.elements.namedItem("address");
+    if (
+      !(nameInput instanceof HTMLInputElement) ||
+      !(phoneInput instanceof HTMLInputElement) ||
+      !(emailInput instanceof HTMLInputElement) ||
+      !(addressField instanceof HTMLTextAreaElement)
+    ) throw new Error("The customer form is missing a required field.");
+    nameInput.value = customer.name;
+    phoneInput.value = customer.phone;
+    emailInput.value = customer.email;
+    emailInput.readOnly = true;
+    addressField.value = customer.address;
+    customerFormTitle.textContent = "Edit customer details";
+    customerFormHint.textContent = "Update the customer name, mobile number, or default address. Email stays unchanged because it identifies the customer’s sign-in and order history.";
+    customerSubmit.textContent = "Update customer";
+    cancelCustomerEdit.hidden = false;
+    nameInput.focus();
+    customerForm.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function cancelCustomerEditing() {
+    editingCustomerId = null;
+    customerForm.reset();
+    const emailInput = customerForm.elements.namedItem("email");
+    if (emailInput instanceof HTMLInputElement) emailInput.readOnly = false;
+    customerFormTitle.textContent = "Customer details";
+    customerFormHint.textContent = "Add a customer profile or edit saved details. Customer email is the sign-in identity and cannot be changed here.";
+    customerSubmit.textContent = "Save customer";
+    cancelCustomerEdit.hidden = true;
+  }
+
   function renderCustomers() {
     if (!adminData) return;
-    customerSelect.replaceChildren(new Option("Choose a saved customer", ""));
+    renderCustomerSelect();
     customerList.replaceChildren();
-    if (adminData.customers.length === 0) {
+    const query = customerSearch.value.trim().toLocaleLowerCase();
+    const matchingCustomers = adminData.customers.filter((customer) =>
+      [customer.name, customer.phone, customer.email, customer.address]
+        .some((value) => value.toLocaleLowerCase().includes(query)));
+    const pageCount = Math.max(1, Math.ceil(matchingCustomers.length / pageSize));
+    customerPage = Math.min(customerPage, pageCount - 1);
+    const start = customerPage * pageSize;
+    const visibleCustomers = matchingCustomers.slice(start, start + pageSize);
+    updateListCount(customerCount, customerPage, matchingCustomers.length, "customers");
+    renderPagination(customerPagination, customerPage, matchingCustomers.length, (page) => {
+      customerPage = page;
+      renderCustomers();
+    });
+    if (matchingCustomers.length === 0) {
       const empty = document.createElement("p");
       empty.className = "admin-empty";
-      empty.textContent = "No saved customers yet. Add a customer above to create a manual order.";
+      empty.textContent = query
+        ? "No customers match that search."
+        : "No saved customers yet. Add a customer above to create a manual order.";
       customerList.append(empty);
       return;
     }
-    for (const customer of adminData.customers) {
+    for (const customer of visibleCustomers) {
       const label = customer.name || customer.email;
-      const option = new Option(
-        [label, customer.phone].filter(Boolean).join(" · "),
-        customer.customerId,
-      );
-      customerSelect.append(option);
       const card = document.createElement("article");
       card.className = "admin-customer-card";
       const name = document.createElement("strong");
       name.textContent = customer.name || customer.email;
       const details = document.createElement("span");
       details.textContent = [customer.phone, customer.email, customer.address].filter(Boolean).join(" · ");
-      card.append(name, details);
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.className = "button button-secondary";
+      editButton.textContent = "Edit details";
+      editButton.setAttribute("aria-label", `Edit details for ${label}`);
+      editButton.addEventListener("click", () => startCustomerEdit(customer));
+      card.append(name, details, editButton);
       customerList.append(card);
     }
   }
@@ -429,14 +559,43 @@ if (root) {
   function renderOrders() {
     if (!adminData) return;
     orderList.replaceChildren();
-    if (adminData.orders.length === 0) {
+    if (orderStatusFilter.options.length === 1) {
+      adminData.orderStatuses.forEach((value) => {
+        orderStatusFilter.append(new Option(statusLabels[value] ?? value, value));
+      });
+    }
+    const query = orderSearch.value.trim().toLocaleLowerCase();
+    const selectedStatus = orderStatusFilter.value;
+    const matchingOrders = adminData.orders.filter((order) => {
+      if (selectedStatus && order.orderStatus !== selectedStatus) return false;
+      const searchable = [
+        order.orderId,
+        order.customerName,
+        order.customerPhone,
+        order.customerEmail,
+        order.deliveryAddress,
+        ...order.items.flatMap((item) => [item.name, item.flavour, item.wrapper]),
+      ];
+      return searchable.some((value) => value.toLocaleLowerCase().includes(query));
+    });
+    const pageCount = Math.max(1, Math.ceil(matchingOrders.length / pageSize));
+    orderPage = Math.min(orderPage, pageCount - 1);
+    const start = orderPage * pageSize;
+    updateListCount(orderCount, orderPage, matchingOrders.length, "orders");
+    renderPagination(orderPagination, orderPage, matchingOrders.length, (page) => {
+      orderPage = page;
+      renderOrders();
+    });
+    if (matchingOrders.length === 0) {
       const empty = document.createElement("p");
       empty.className = "admin-empty";
-      empty.textContent = "No orders have been recorded yet.";
+      empty.textContent = adminData.orders.length === 0
+        ? "No orders have been recorded yet."
+        : "No orders match those filters.";
       orderList.append(empty);
       return;
     }
-    for (const order of adminData.orders) {
+    for (const order of matchingOrders.slice(start, start + pageSize)) {
       const card = document.createElement("article");
       card.className = "admin-order-card";
       const heading = document.createElement("div");
@@ -579,20 +738,47 @@ if (root) {
     setBusy(customerForm, true);
     const formData = new FormData(customerForm);
     try {
-      await post("/admin/customers/create", {
-        name: formData.get("name"),
-        phone: formData.get("phone"),
-        email: formData.get("email"),
-        address: formData.get("address"),
-      });
-      customerForm.reset();
-      await loadDashboard();
-      setStatus("Customer saved. You can now select them for a manual order.");
+      if (editingCustomerId) {
+        await post("/admin/customers/update", {
+          customerId: editingCustomerId,
+          name: formData.get("name"),
+          phone: formData.get("phone"),
+          address: formData.get("address"),
+        });
+        cancelCustomerEditing();
+        await loadDashboard();
+        setStatus("Customer details updated. Existing orders remain unchanged.");
+      } else {
+        await post("/admin/customers/create", {
+          name: formData.get("name"),
+          phone: formData.get("phone"),
+          email: formData.get("email"),
+          address: formData.get("address"),
+        });
+        customerForm.reset();
+        await loadDashboard();
+        setStatus("Customer saved. You can now select them for a manual order.");
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not save this customer.", true);
     } finally {
       setBusy(customerForm, false);
     }
+  });
+
+  cancelCustomerEdit.addEventListener("click", cancelCustomerEditing);
+  customerSearch.addEventListener("input", () => {
+    customerPage = 0;
+    renderCustomers();
+  });
+  customerSelectSearch.addEventListener("input", renderCustomerSelect);
+  orderSearch.addEventListener("input", () => {
+    orderPage = 0;
+    renderOrders();
+  });
+  orderStatusFilter.addEventListener("change", () => {
+    orderPage = 0;
+    renderOrders();
   });
 
   customerSelect.addEventListener("change", () => {

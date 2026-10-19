@@ -1275,6 +1275,75 @@ h2 em {
   margin-bottom: 18px;
 }
 
+.admin-list-tools {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(170px, 0.45fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.admin-list-tools label {
+  display: grid;
+  gap: 6px;
+  color: #6b5549;
+  font-size: 11px;
+}
+
+.admin-list-tools input,
+.admin-list-tools select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  outline-color: #9e7460;
+  background: #fff;
+  color: #46332a;
+  font-size: 13px;
+}
+
+.admin-list-count {
+  margin: 0 0 10px;
+  color: #89786d;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.admin-pagination:empty {
+  display: none;
+}
+
+.admin-pagination button {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  background: #fff;
+  color: #624234;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+}
+
+.admin-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.admin-pagination span {
+  color: #89786d;
+  font-size: 11px;
+}
+
 .admin-panel-heading h2 {
   margin: 0;
   color: var(--cocoa-dark);
@@ -1338,6 +1407,20 @@ h2 em {
   justify-self: start;
 }
 
+.admin-form-hint {
+  margin: -8px 0 15px;
+  color: #89786d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.admin-customer-form-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
 .admin-customer-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1347,7 +1430,7 @@ h2 em {
 
 .admin-customer-card {
   display: grid;
-  gap: 4px;
+  gap: 9px;
   padding: 11px 13px;
   border: 1px solid #e8ded3;
   background: #fff;
@@ -1363,6 +1446,13 @@ h2 em {
   font-size: 10px;
   line-height: 1.55;
   overflow-wrap: anywhere;
+}
+
+.admin-customer-card .button {
+  justify-self: start;
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 10px;
 }
 
 .admin-order-inline-fields {
@@ -1913,6 +2003,10 @@ h2 em {
 .footer-social-links a:last-child svg path:last-child {
   fill: currentColor;
   stroke: none;
+}
+
+.whatsapp-float {
+  display: none;
 }
 
 .site-footer > small {
@@ -3004,6 +3098,48 @@ h2 em {
 }
 
 @media (max-width: 620px) {
+  .whatsapp-float {
+    position: fixed;
+    z-index: 18;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 16px;
+    border: 1px solid rgb(255 255 255 / 28%);
+    border-radius: 999px;
+    background: #16845a;
+    box-shadow: 0 4px 16px rgb(36 28 22 / 24%);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+
+  .whatsapp-float:hover {
+    transform: translateY(-2px);
+    background: #116f4a;
+  }
+
+  .whatsapp-float svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .whatsapp-float svg path:last-child {
+    fill: currentColor;
+    stroke: none;
+  }
+
   html {
     scroll-padding-top: 75px;
   }
@@ -3054,6 +3190,23 @@ h2 em {
   .admin-customer-list,
   .admin-order-inline-fields {
     grid-template-columns: 1fr;
+  }
+
+  .admin-list-tools {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .admin-list-count {
+    margin-bottom: 0;
+  }
+
+  .admin-customer-list {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-customer-form-actions {
+    grid-column: auto;
   }
 
   .admin-order-line {

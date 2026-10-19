@@ -59,8 +59,7 @@ export async function getAdminData(request, env) {
                   delivery_address, items_json, amount_paise, currency,
                   delivery_method, event_date, created_at
            FROM orders
-           ORDER BY created_at DESC
-           LIMIT 500`,
+           ORDER BY created_at DESC`,
         )
         .all(),
       env.ORDERS_DB
@@ -68,8 +67,7 @@ export async function getAdminData(request, env) {
           `SELECT customer_id, customer_name, customer_phone, customer_email,
                   default_address, created_at, updated_at
            FROM customers
-           ORDER BY CASE WHEN customer_name = '' THEN customer_email ELSE customer_name END COLLATE NOCASE
-           LIMIT 500`,
+           ORDER BY CASE WHEN customer_name = '' THEN customer_email ELSE customer_name END COLLATE NOCASE`,
         )
         .all(),
     ]);
@@ -158,6 +156,47 @@ export async function createAdminCustomer(request, env) {
   } catch (error) {
     console.error("Could not create an admin customer.", error);
     return result(400, { error: error instanceof Error ? error.message : "Could not create the customer." });
+  }
+}
+
+export async function updateAdminCustomer(request, env) {
+  let body;
+  try {
+    body = await readBody(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const access = await requireAdmin(request, env);
+    if (access.error) return access.error;
+    let customerId;
+    let name;
+    let phone;
+    let address;
+    try {
+      customerId = requiredText(body?.customerId, 80, "customer");
+      name = requiredText(body?.name, 80, "customer name");
+      phone = requiredText(body?.phone, 20, "phone number");
+      address = requiredText(body?.address, 250, "customer address");
+    } catch (error) {
+      return result(400, { error: error.message });
+    }
+    if (!phonePattern.test(phone)) return result(400, { error: "Enter a valid customer phone number." });
+
+    const now = new Date().toISOString();
+    const updated = await env.ORDERS_DB
+      .prepare(
+        `UPDATE customers
+         SET customer_name = ?, customer_phone = ?, default_address = ?, updated_at = ?
+         WHERE customer_id = ?`,
+      )
+      .bind(name, phone, address, now, customerId)
+      .run();
+    if (updated.meta.changes === 0) return result(404, { error: "That customer could not be found." });
+    return result(200, { customer: { customerId, name, phone, address, updatedAt: now } });
+  } catch (error) {
+    console.error("Could not update an admin customer.", error);
+    return result(503, { error: "The customer details could not be updated right now. Please try again." });
   }
 }
 

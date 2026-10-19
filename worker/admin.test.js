@@ -52,6 +52,13 @@ function makeDatabase(email) {
           return { results: [] };
         },
         async run() {
+          if (/UPDATE customers/i.test(sql)) {
+            const [customer_name, customer_phone, default_address, updated_at, customerId] = this.values;
+            const customer = database.customers.get(customerId);
+            if (!customer) return { meta: { changes: 0 } };
+            Object.assign(customer, { customer_name, customer_phone, default_address, updated_at });
+            return { meta: { changes: 1 } };
+          }
           if (/INSERT INTO customers/i.test(sql)) {
             const [customerId, customer_name, customer_phone, customer_email, default_address, created_at, updated_at] =
               this.values;
@@ -129,6 +136,61 @@ test("admin endpoints reject signed-in non-admin accounts", async () => {
   const response = await worker.fetch(makeRequest("/admin/data", { token: nonAdminToken }), env);
   assert.equal(response.status, 403);
   assert.match((await response.json()).error, /admin access/i);
+});
+
+test("admin can update customer contact details without changing the email identity", async () => {
+  const database = makeDatabase("alohomora.chocolatecircle@gmail.com");
+  database.customers.set("cus_edit", {
+    customer_id: "cus_edit",
+    customer_name: "Before Name",
+    customer_phone: "+911111111111",
+    customer_email: "customer@example.com",
+    default_address: "Old address",
+  });
+  const env = {
+    ALLOWED_ORIGIN: origin,
+    ADMIN_EMAIL: "alohomora.chocolatecircle@gmail.com",
+    AUTH_TOKEN_SECRET: "test-secret",
+    ORDERS_DB: database,
+  };
+
+  const response = await worker.fetch(makeRequest("/admin/customers/update", {
+    body: {
+      customerId: "cus_edit",
+      name: "Updated Name",
+      phone: "+919876543210",
+      address: "Updated address",
+    },
+  }), env);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    customer: {
+      customerId: "cus_edit",
+      name: "Updated Name",
+      phone: "+919876543210",
+      address: "Updated address",
+      updatedAt: database.customers.get("cus_edit").updated_at,
+    },
+  });
+  assert.equal(database.customers.get("cus_edit").customer_email, "customer@example.com");
+
+  const invalidPhone = await worker.fetch(makeRequest("/admin/customers/update", {
+    body: { customerId: "cus_edit", name: "Updated Name", phone: "invalid", address: "Updated address" },
+  }), env);
+  assert.equal(invalidPhone.status, 400);
+  assert.equal(database.customers.get("cus_edit").customer_phone, "+919876543210");
+
+  const missingCustomer = await worker.fetch(makeRequest("/admin/customers/update", {
+    body: { customerId: "missing", name: "Name", phone: "+911234567890", address: "Address" },
+  }), env);
+  assert.equal(missingCustomer.status, 404);
+
+  database.email = "customer@example.com";
+  const forbidden = await worker.fetch(makeRequest("/admin/customers/update", {
+    token: nonAdminToken,
+    body: { customerId: "cus_edit", name: "Nope", phone: "+911234567890", address: "Nope" },
+  }), env);
+  assert.equal(forbidden.status, 403);
 });
 
 test("admin can save a customer and create an unpaid order at catalog price", async () => {

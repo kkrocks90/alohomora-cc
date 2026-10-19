@@ -99,7 +99,13 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <h2 id="admin-orders-title">Order book</h2>
             </div>
           </div>
+          <div class="admin-list-tools">
+            <label>Search orders<input id="admin-order-search" type="search" placeholder="Order ID, customer, phone, or email" autocomplete="off" /></label>
+            <label>Order status<select id="admin-order-status-filter"><option value="">All statuses</option></select></label>
+            <p class="admin-list-count" id="admin-order-count" aria-live="polite"></p>
+          </div>
           <div class="admin-order-list" id="admin-order-list"></div>
+          <nav class="admin-pagination" id="admin-order-pagination" aria-label="Order pages"></nav>
         </section>
       </section>
 
@@ -116,17 +122,26 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <div class="admin-panel-heading">
             <div>
               <p class="eyebrow">Customer book</p>
-              <h2 id="admin-customers-title">Add a customer</h2>
+              <h2 id="admin-customers-title">Customer details</h2>
             </div>
           </div>
+          <p class="admin-form-hint" id="admin-customer-form-hint">Add a customer profile or edit saved details. Customer email is the sign-in identity and cannot be changed here.</p>
           <form class="admin-customer-form" id="admin-customer-form">
             <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
             <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
             <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
             <label class="admin-address-field">Default address<textarea name="address" autocomplete="street-address" rows="2" maxlength="250" required></textarea></label>
-            <button class="button button-primary" type="submit">Save customer</button>
+            <div class="admin-customer-form-actions">
+              <button class="button button-primary" id="admin-customer-submit" type="submit">Save customer</button>
+              <button class="button button-secondary" id="admin-customer-cancel-edit" type="button" hidden>Cancel edit</button>
+            </div>
           </form>
+          <div class="admin-list-tools admin-customer-list-tools">
+            <label>Search customers<input id="admin-customer-search" type="search" placeholder="Name, phone, email, or address" autocomplete="off" /></label>
+            <p class="admin-list-count" id="admin-customer-count" aria-live="polite"></p>
+          </div>
           <div class="admin-customer-list" id="admin-customer-list"></div>
+          <nav class="admin-pagination" id="admin-customer-pagination" aria-label="Customer pages"></nav>
         </section>
       </section>
 
@@ -147,6 +162,8 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </div>
           <form class="admin-order-form" id="admin-order-form">
+            <label>Find customer<input id="admin-order-customer-search" type="search" placeholder="Search by name, phone, or email" autocomplete="off" /></label>
+            <p class="admin-form-hint" id="admin-order-customer-hint"></p>
             <label>Customer<select name="customerId" id="admin-order-customer" required>
               <option value="">Choose a saved customer</option>
             </select></label>
