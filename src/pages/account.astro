@@ -4,7 +4,7 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
 
-<SiteLayout title="My profile — Chocolate Circle" description="Sign in securely to view your Chocolate Circle profile, delivery addresses, and orders.">
+<SiteLayout title="My profile — Chocolate Circle" description="Sign in securely to view your Chocolate Circle profile, delivery addresses, and orders." noIndex>
   <main class="account-page" id="customer-account" data-checkout-api={checkoutApiUrl} data-base-url={import.meta.env.BASE_URL}>
     <section class="account-panel" aria-labelledby="account-title">
       <p class="eyebrow">Your little chocolate corner</p>

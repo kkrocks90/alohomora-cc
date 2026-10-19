@@ -7,6 +7,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 <AdminLayout
   title="Order management — Chocolate Circle"
   description="Private Chocolate Circle customer and order management."
+  noIndex
 >
   <main class="admin-page" id="admin-app" data-checkout-api={checkoutApiUrl}>
     <section class="admin-login-panel" id="admin-login-panel" aria-labelledby="admin-title">

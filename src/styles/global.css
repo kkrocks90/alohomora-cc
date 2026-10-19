@@ -1879,6 +1879,42 @@ h2 em {
   font-size: 11px;
 }
 
+.footer-social-links {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: center;
+  gap: 22px;
+}
+
+.footer-social-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #725343;
+  font-size: 11px;
+  transition: color 160ms ease;
+}
+
+.footer-social-links a:hover {
+  color: #a25f4c;
+}
+
+.footer-social-links svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.footer-social-links .social-icon-fill,
+.footer-social-links a:last-child svg path:last-child {
+  fill: currentColor;
+  stroke: none;
+}
+
 .site-footer > small {
   grid-column: 1 / -1;
   color: #a08f81;

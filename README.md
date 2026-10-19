@@ -129,3 +129,17 @@ GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates R
 7. Redeploy the Pages workflow. Test a complete payment with Razorpay test mode before switching the Worker secrets to live keys, and test customer sign-in with an email address that can receive mail from the verified sender domain.
 
 Payment processing is not free: Razorpay charges its applicable transaction fees. GitHub Pages and Cloudflare Workers have free plans, each with their own usage limits. Until the Worker URL and Razorpay keys are configured, the storefront remains viewable but checkout clearly reports that it is not ready.
+
+## Social sharing and Meta ads
+
+Public pages include canonical URLs and Open Graph/Twitter sharing metadata. The default share image is `public/social-share.jpg` (1200 × 630); account, checkout, admin, and thank-you pages are marked `noindex`.
+
+The generated `sitemap.xml` lists the public shop, policy, About, and product pages, and `robots.txt` points crawlers to it. After deployment, add `https://chocolatecircle.in/` as a property in Google Search Console and submit `https://chocolatecircle.in/sitemap.xml` to request discovery. Search Console does not guarantee indexing or rankings.
+
+For a Meta Ads Manager campaign or an Instagram boosted post, use the relevant shop page as the destination and add consistent UTM tags, for example:
+
+```text
+https://chocolatecircle.in/store/?utm_source=instagram&utm_medium=paid_social&utm_campaign=campaign_name&utm_content=ad_or_post_name
+```
+
+Replace the campaign and content values with short, consistent names for each campaign and creative. The site does not currently install Meta Pixel or another analytics service, so it does not record website purchases or report UTM-attributed conversions. Add a Meta Pixel only after choosing the Pixel ID and how visitor consent should work; update the Privacy Policy at the same time.
