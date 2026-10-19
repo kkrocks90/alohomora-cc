@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.5.0] - 2026-10-20
+
+### Changed
+- Mobile profile page: sign-in form in a rounded card with a pill button, personal details as a clean card list, rounded order and address cards with a "Paid" pill, larger touch targets.
+
 ## [1.4.0] - 2026-10-20
 
 ### Changed
