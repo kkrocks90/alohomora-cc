@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.7.1] - 2026-10-20
+
+### Removed
+- Jujubes (In a bottle) and Colorful Candy (In a bottle) products.
+
 ## [1.7.0] - 2026-10-20
 
 ### Changed

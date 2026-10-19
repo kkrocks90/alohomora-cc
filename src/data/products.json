@@ -179,30 +179,6 @@
                      ]
     },
     {
-        "id":  "product-1014",
-        "name":  "Jujubes (In a bottle) (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1050,
-        "image":  "product-1014.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
-    },
-    {
-        "id":  "product-1015",
-        "name":  "Colorful Candy (In a bottle) (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1050,
-        "image":  "product-1015.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
-    },
-    {
         "id":  "product-1016",
         "name":  "Dry Grapes (In a bottle) (Pack of 30)",
         "description":  "A ready-to-share pack of 30.",
