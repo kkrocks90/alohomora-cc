@@ -50,61 +50,123 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
       </div>
       <p class="admin-status" id="admin-status" role="status" aria-live="polite"></p>
 
-      <section class="admin-panel" aria-labelledby="admin-customers-title">
-        <div class="admin-panel-heading">
-          <div>
-            <p class="eyebrow">Customer book</p>
-            <h2 id="admin-customers-title">Add a customer</h2>
+      <div class="admin-tabs" role="tablist" aria-label="Order management sections">
+        <button
+          class="admin-tab"
+          id="admin-orders-tab"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="admin-orders-panel"
+          tabindex="0"
+          data-admin-tab="orders"
+        >Order book</button>
+        <button
+          class="admin-tab"
+          id="admin-customers-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-customers-panel"
+          tabindex="-1"
+          data-admin-tab="customers"
+        >Customers</button>
+        <button
+          class="admin-tab"
+          id="admin-create-order-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-create-order-panel"
+          tabindex="-1"
+          data-admin-tab="create-order"
+        >Create manual order</button>
+      </div>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-orders-panel"
+        role="tabpanel"
+        aria-labelledby="admin-orders-tab"
+        data-admin-panel="orders"
+        tabindex="0"
+      >
+        <section class="admin-panel" aria-labelledby="admin-orders-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Latest activity</p>
+              <h2 id="admin-orders-title">Order book</h2>
+            </div>
           </div>
-        </div>
-        <form class="admin-customer-form" id="admin-customer-form">
-          <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
-          <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
-          <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
-          <label class="admin-address-field">Default address<textarea name="address" autocomplete="street-address" rows="2" maxlength="250" required></textarea></label>
-          <button class="button button-primary" type="submit">Save customer</button>
-        </form>
-        <div class="admin-customer-list" id="admin-customer-list"></div>
+          <div class="admin-order-list" id="admin-order-list"></div>
+        </section>
       </section>
 
-      <section class="admin-panel" aria-labelledby="admin-create-order-title">
-        <div class="admin-panel-heading">
-          <div>
-            <p class="eyebrow">In-person, phone, or custom orders</p>
-            <h2 id="admin-create-order-title">Create manual order</h2>
+      <section
+        class="admin-tab-panel"
+        id="admin-customers-panel"
+        role="tabpanel"
+        aria-labelledby="admin-customers-tab"
+        data-admin-panel="customers"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-customers-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Customer book</p>
+              <h2 id="admin-customers-title">Add a customer</h2>
+            </div>
           </div>
-        </div>
-        <form class="admin-order-form" id="admin-order-form">
-          <label>Customer<select name="customerId" id="admin-order-customer" required>
-            <option value="">Choose a saved customer</option>
-          </select></label>
-          <label>Delivery address<textarea name="address" id="admin-order-address" rows="2" maxlength="250" required></textarea></label>
-          <div class="admin-order-inline-fields">
-            <label>Delivery method<select name="deliveryMethod" required>
-              <option value="Porter (manual booking)">Porter (manual booking)</option>
-              <option value="Courier (manual booking)">Courier (manual booking)</option>
+          <form class="admin-customer-form" id="admin-customer-form">
+            <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
+            <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
+            <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
+            <label class="admin-address-field">Default address<textarea name="address" autocomplete="street-address" rows="2" maxlength="250" required></textarea></label>
+            <button class="button button-primary" type="submit">Save customer</button>
+          </form>
+          <div class="admin-customer-list" id="admin-customer-list"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-create-order-panel"
+        role="tabpanel"
+        aria-labelledby="admin-create-order-tab"
+        data-admin-panel="create-order"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-create-order-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">In-person, phone, or custom orders</p>
+              <h2 id="admin-create-order-title">Create manual order</h2>
+            </div>
+          </div>
+          <form class="admin-order-form" id="admin-order-form">
+            <label>Customer<select name="customerId" id="admin-order-customer" required>
+              <option value="">Choose a saved customer</option>
             </select></label>
-            <label>Event date (optional)<input name="eventDate" type="date" /></label>
-          </div>
-          <fieldset class="admin-order-items">
-            <legend>Order items</legend>
-            <div id="admin-order-lines"></div>
-            <button class="button button-secondary" id="admin-add-line" type="button">Add another item <span aria-hidden="true">+</span></button>
-          </fieldset>
-          <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
-          <p class="admin-payment-note">Manual orders are recorded as unpaid. No payment is initiated or collected here.</p>
-          <button class="button button-primary" type="submit">Create unpaid order</button>
-        </form>
-      </section>
-
-      <section class="admin-panel" aria-labelledby="admin-orders-title">
-        <div class="admin-panel-heading">
-          <div>
-            <p class="eyebrow">Latest activity</p>
-            <h2 id="admin-orders-title">Order book</h2>
-          </div>
-        </div>
-        <div class="admin-order-list" id="admin-order-list"></div>
+            <label>Delivery address<textarea name="address" id="admin-order-address" rows="2" maxlength="250" required></textarea></label>
+            <div class="admin-order-inline-fields">
+              <label>Delivery method<select name="deliveryMethod" required>
+                <option value="Porter (manual booking)">Porter (manual booking)</option>
+                <option value="Courier (manual booking)">Courier (manual booking)</option>
+              </select></label>
+              <label>Event date (optional)<input name="eventDate" type="date" /></label>
+            </div>
+            <fieldset class="admin-order-items">
+              <legend>Order items</legend>
+              <div id="admin-order-lines"></div>
+              <button class="button button-secondary" id="admin-add-line" type="button">Add another item <span aria-hidden="true">+</span></button>
+            </fieldset>
+            <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
+            <p class="admin-payment-note">Manual orders are recorded as unpaid. No payment is initiated or collected here.</p>
+            <button class="button button-primary" type="submit">Create unpaid order</button>
+          </form>
+        </section>
       </section>
     </section>
 

@@ -138,6 +138,8 @@ if (root) {
   const loginPanel = requireElement<HTMLElement>(root, "#admin-login-panel");
   const loginStatus = requireElement<HTMLElement>(root, "#admin-login-status");
   const dashboard = requireElement<HTMLElement>(root, "#admin-dashboard");
+  const adminTabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-admin-tab]"));
+  const adminTabPanels = Array.from(root.querySelectorAll<HTMLElement>("[data-admin-panel]"));
   const signedIn = requireElement<HTMLElement>(root, "#admin-signed-in");
   const status = requireElement<HTMLElement>(root, "#admin-status");
   const customerForm = requireElement<HTMLFormElement>(root, "#admin-customer-form");
@@ -161,6 +163,36 @@ if (root) {
     cancelled: "Cancelled",
   };
   let adminData: AdminData | null = null;
+
+  function activateAdminTab(tab: HTMLButtonElement, moveFocus = false) {
+    const selectedTab = tab.dataset.adminTab;
+    if (!selectedTab) return;
+    for (const candidate of adminTabs) {
+      const selected = candidate === tab;
+      candidate.setAttribute("aria-selected", String(selected));
+      candidate.tabIndex = selected ? 0 : -1;
+    }
+    for (const panel of adminTabPanels) {
+      panel.hidden = panel.dataset.adminPanel !== selectedTab;
+    }
+    if (moveFocus) tab.focus();
+  }
+
+  for (const tab of adminTabs) {
+    tab.addEventListener("click", () => activateAdminTab(tab));
+    tab.addEventListener("keydown", (event: KeyboardEvent) => {
+      const currentIndex = adminTabs.indexOf(tab);
+      let nextIndex: number;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % adminTabs.length;
+      else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + adminTabs.length) % adminTabs.length;
+      else if (event.key === "Home") nextIndex = 0;
+      else if (event.key === "End") nextIndex = adminTabs.length - 1;
+      else return;
+      event.preventDefault();
+      const nextTab = adminTabs[nextIndex];
+      if (nextTab) activateAdminTab(nextTab, true);
+    });
+  }
 
   function setLoginStatus(message: string, error = false) {
     loginStatus.textContent = message;

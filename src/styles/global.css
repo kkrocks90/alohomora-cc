@@ -1218,6 +1218,52 @@ h2 em {
   color: #a43c31;
 }
 
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 0;
+  overflow-x: auto;
+  border-bottom: 1px solid #d8c8b8;
+  scrollbar-width: thin;
+}
+
+.admin-tab {
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0 18px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #765f50;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.admin-tab:hover {
+  color: #4d342a;
+}
+
+.admin-tab[aria-selected="true"] {
+  border-bottom-color: #805744;
+  color: #4d342a;
+  font-weight: 700;
+}
+
+.admin-tab:focus-visible,
+.admin-tab-panel:focus-visible {
+  outline: 2px solid #a8715b;
+  outline-offset: 2px;
+}
+
+.admin-tab-panel[hidden] {
+  display: none;
+}
+
+.admin-tab-panel > .admin-panel {
+  margin-top: 16px;
+}
+
 .admin-panel {
   margin-top: 18px;
   padding: clamp(18px, 3vw, 28px);
