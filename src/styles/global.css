@@ -4451,3 +4451,162 @@ h2 em {
     border-bottom: 0;
   }
 }
+
+@media (max-width: 620px) {
+  /* Product page */
+  .product-detail-page {
+    padding: 0 0 40px;
+  }
+
+  .product-breadcrumb {
+    margin: 0;
+    padding: 12px 18px;
+    font-size: 11px;
+  }
+
+  .product-detail {
+    gap: 0;
+  }
+
+  .product-detail-image {
+    aspect-ratio: 1;
+  }
+
+  .product-detail-copy {
+    padding: 20px 18px 0;
+  }
+
+  .product-detail-copy h1 {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+
+  .product-detail-description {
+    margin: 10px 0 14px;
+    font-size: 13px;
+  }
+
+  .product-detail-price {
+    padding: 12px 0;
+  }
+
+  .product-detail-price strong {
+    font-size: 30px;
+  }
+
+  .product-detail-price span {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #f1e8dd;
+    color: #6b5549;
+  }
+
+  .product-options {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .product-options label:has(textarea),
+  .product-options .product-add-button,
+  .product-options:not(:has(select[name="flavour"])) label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .product-options select,
+  .product-options textarea {
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  .product-options textarea {
+    min-height: 92px;
+  }
+
+  .product-add-button {
+    border-radius: 999px;
+  }
+
+  .product-detail-footnote,
+  .product-back-link {
+    margin-right: 18px;
+    margin-left: 18px;
+  }
+
+  .product-back-link {
+    display: inline-block;
+  }
+
+  /* Checkout */
+  body:has(.checkout-page) {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body:has(.checkout-page) .tab-bar,
+  body:has(.checkout-page) .whatsapp-float {
+    display: none;
+  }
+
+  .checkout-page {
+    padding: 8px 14px 36px;
+  }
+
+  .checkout-page .product-breadcrumb {
+    padding: 8px 4px;
+  }
+
+  .checkout-heading {
+    margin-bottom: 14px;
+  }
+
+  .checkout-heading h1 {
+    font-size: 34px;
+  }
+
+  .checkout-heading > p:last-child {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+
+  .checkout-panel {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+
+  .checkout-form {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 10px;
+  }
+
+  .checkout-form > * {
+    grid-column: 1 / -1;
+  }
+
+  .checkout-form > label:nth-of-type(4),
+  .checkout-form > label:nth-of-type(5) {
+    grid-column: auto;
+  }
+
+  .checkout-form input,
+  .checkout-form textarea,
+  .account-form input,
+  .account-form textarea,
+  .checkout-promo-form input {
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  .checkout-button {
+    position: sticky;
+    z-index: 6;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    min-height: 54px;
+    border-radius: 999px;
+    box-shadow: 0 10px 26px rgb(60 38 28 / 30%);
+  }
+
+  .checkout-payable-row {
+    font-size: 15px;
+  }
+}

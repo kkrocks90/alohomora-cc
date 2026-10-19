@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.4.0] - 2026-10-20
+
+### Changed
+- Mobile product page: edge-to-edge square photo, larger price with a pack-size pill, quantity and flavour side by side, rounded 16px fields (no iOS zoom), pill-shaped Add to bag button.
+- Mobile checkout: distraction-free (tab bar and WhatsApp button hidden), compact heading, City and State side by side, larger rounded fields, and a floating "Continue to secure payment" button.
+
 ## [1.3.0] - 2026-10-20
 
 ### Added
