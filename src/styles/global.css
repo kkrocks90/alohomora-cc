@@ -3265,15 +3265,31 @@ h2 em {
 }
 
 .checkout-form input,
+.checkout-form select,
 .checkout-form textarea {
   width: 100%;
+  min-height: 41px;
   padding: 9px 10px;
   border: 1px solid #ded2c5;
   border-radius: 2px;
   outline-color: #9e7460;
   background: #fffdf9;
   color: #46332a;
+  font: inherit;
   font-size: 13px;
+}
+
+.account-form select {
+  width: 100%;
+  min-height: 43px;
+  padding: 9px 11px;
+  border: 1px solid #ded2c5;
+  border-radius: 2px;
+  outline-color: #9e7460;
+  background: #fff;
+  color: #46332a;
+  font: inherit;
+  font-size: 15px;
 }
 
 .checkout-form textarea {
@@ -4588,8 +4604,10 @@ h2 em {
   }
 
   .checkout-form input,
+  .checkout-form select,
   .checkout-form textarea,
   .account-form input,
+  .account-form select,
   .account-form textarea,
   .checkout-promo-form input {
     min-height: 48px;

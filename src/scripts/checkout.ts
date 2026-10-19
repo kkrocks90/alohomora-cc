@@ -9,6 +9,7 @@ import {
   type CartItem,
 } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
+import { normalizeState } from "../data/indian-states";
 
 interface PaymentOrder {
   id: string;
@@ -116,7 +117,7 @@ function initializeFormPincodeLookup(form: HTMLFormElement) {
   const state = form.elements.namedItem("state");
   const pincode = form.elements.namedItem("pincode");
   const status = form.querySelector<HTMLElement>("[data-pincode-status]");
-  if (!(city instanceof HTMLInputElement) || !(state instanceof HTMLInputElement) ||
+  if (!(city instanceof HTMLInputElement) || !(state instanceof HTMLSelectElement) ||
       !(pincode instanceof HTMLInputElement) || !status) {
     throw new Error("The address form is incomplete.");
   }
@@ -318,7 +319,7 @@ async function loadSession(token: string) {
   const phone = typeof profile.phone === "string" ? profile.phone : "";
   const address = typeof profile.address === "string" ? profile.address : "";
   const city = typeof profile.city === "string" ? profile.city : "";
-  const state = typeof profile.state === "string" ? profile.state : "";
+  const state = typeof profile.state === "string" ? normalizeState(profile.state) : "";
   const pincode = typeof profile.pincode === "string" ? profile.pincode : "";
   profileComplete = Boolean(name.trim() && phone.trim() && address.trim() && city.trim() && state.trim() && /^[1-9][0-9]{5}$/.test(pincode));
   const setupName = profileForm.elements.namedItem("name");
@@ -338,13 +339,13 @@ async function loadSession(token: string) {
     setupPhone instanceof HTMLInputElement &&
     setupAddress instanceof HTMLTextAreaElement &&
     setupCity instanceof HTMLInputElement &&
-    setupState instanceof HTMLInputElement &&
+    setupState instanceof HTMLSelectElement &&
     setupPincode instanceof HTMLInputElement &&
     checkoutName instanceof HTMLInputElement &&
     checkoutPhone instanceof HTMLInputElement &&
     checkoutAddress instanceof HTMLTextAreaElement &&
     checkoutCity instanceof HTMLInputElement &&
-    checkoutState instanceof HTMLInputElement &&
+    checkoutState instanceof HTMLSelectElement &&
     checkoutPincode instanceof HTMLInputElement
   ) {
     setupName.value = name;

@@ -5,6 +5,7 @@ import {
   saveCustomerSessionToken,
 } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
+import { normalizeState } from "../data/indian-states";
 
 function requireElement<T extends Element>(element: T | null, selector: string): T {
   if (!element) throw new Error(`The customer account page is missing ${selector}.`);
@@ -48,7 +49,7 @@ if (root) {
   );
   const address = requireElement<HTMLTextAreaElement>(profileForm.querySelector<HTMLTextAreaElement>("[name=address]"), "[name=address]");
   const city = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=city]"), "[name=city]");
-  const state = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=state]"), "[name=state]");
+  const state = requireElement<HTMLSelectElement>(profileForm.querySelector<HTMLSelectElement>("[name=state]"), "[name=state]");
   const pincode = requireElement<HTMLInputElement>(profileForm.querySelector<HTMLInputElement>("[name=pincode]"), "[name=pincode]");
   const pincodeStatus = requireElement<HTMLElement>(profileForm.querySelector<HTMLElement>("[data-pincode-status]"), "[data-pincode-status]");
   initializePincodeLookup({ apiUrl, city, state, pincode, status: pincodeStatus });
@@ -146,7 +147,7 @@ if (root) {
     phoneInput.value = customerProfile.phone || latestOrder?.customerPhone || "";
     addressInput.value = customerProfile.address || "";
     city.value = customerProfile.city;
-    state.value = customerProfile.state;
+    state.value = normalizeState(customerProfile.state);
     pincode.value = customerProfile.pincode;
     profileForm.hidden = false;
     const profileTitle = profileForm.querySelector("h3");

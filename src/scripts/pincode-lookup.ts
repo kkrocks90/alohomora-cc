@@ -1,7 +1,9 @@
+import { normalizeState } from "../data/indian-states";
+
 interface PincodeLookupOptions {
   apiUrl: string;
   city: HTMLInputElement;
-  state: HTMLInputElement;
+  state: HTMLInputElement | HTMLSelectElement;
   pincode: HTMLInputElement;
   status: HTMLElement;
 }
@@ -34,7 +36,7 @@ export function initializePincodeLookup(options: PincodeLookupOptions) {
         throw new Error("PIN code lookup returned unexpected details.");
       }
       options.city.value = payload.city;
-      options.state.value = payload.state;
+      options.state.value = normalizeState(payload.state);
       show(`Delivering to ${payload.city}, ${payload.state}.`);
     } catch (error) {
       if (request !== latestRequest) return;

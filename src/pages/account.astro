@@ -1,5 +1,6 @@
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
+import StateSelect from "../components/StateSelect.astro";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
@@ -68,7 +69,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <label for="profile-city">City</label>
           <input id="profile-city" name="city" autocomplete="address-level2" maxlength="40" required />
           <label for="profile-state">State</label>
-          <input id="profile-state" name="state" autocomplete="address-level1" maxlength="40" required />
+          <StateSelect id="profile-state" />
           <label for="profile-pincode">PIN code</label>
           <input id="profile-pincode" name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required />
           <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>

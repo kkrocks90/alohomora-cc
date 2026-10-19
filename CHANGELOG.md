@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.6.0] - 2026-10-20
+
+### Changed
+- State is now a dropdown of all Indian states and union territories on checkout, profile and admin forms. PIN code lookup selects the matching state automatically, and older saved free-text states are matched where possible.
+
 ## [1.5.0] - 2026-10-20
 
 ### Changed

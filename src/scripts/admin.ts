@@ -1,5 +1,6 @@
 import { ADMIN_SESSION_KEY } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
+import { normalizeState } from "../data/indian-states";
 
 interface AdminCustomer {
   customerId: string;
@@ -232,7 +233,7 @@ if (root) {
   const customerSelectHint = requireElement<HTMLElement>(root, "#admin-order-customer-hint");
   const addressInput = requireElement<HTMLTextAreaElement>(root, "#admin-order-address");
   const orderCityInput = requireElement<HTMLInputElement>(root, "#admin-order-city");
-  const orderStateInput = requireElement<HTMLInputElement>(root, "#admin-order-state");
+  const orderStateInput = requireElement<HTMLSelectElement>(root, "#admin-order-state");
   const orderPincodeInput = requireElement<HTMLInputElement>(root, "#admin-order-pincode");
   const orderLines = requireElement<HTMLElement>(root, "#admin-order-lines");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
@@ -259,7 +260,7 @@ if (root) {
     const state = form.elements.namedItem("state");
     const pincode = form.elements.namedItem("pincode");
     const status = requireElement<HTMLElement>(form, "[data-pincode-status]");
-    if (!(city instanceof HTMLInputElement) || !(state instanceof HTMLInputElement) ||
+    if (!(city instanceof HTMLInputElement) || !(state instanceof HTMLSelectElement) ||
         !(pincode instanceof HTMLInputElement)) {
       throw new Error("The admin address form is incomplete.");
     }
@@ -438,7 +439,7 @@ if (root) {
       !(emailInput instanceof HTMLInputElement) ||
       !(addressField instanceof HTMLTextAreaElement) ||
       !(cityField instanceof HTMLInputElement) ||
-      !(stateField instanceof HTMLInputElement) ||
+      !(stateField instanceof HTMLSelectElement) ||
       !(pincodeField instanceof HTMLInputElement)
     ) throw new Error("The customer form is missing a required field.");
     nameInput.value = customer.name;
@@ -447,7 +448,7 @@ if (root) {
     emailInput.readOnly = true;
     addressField.value = customer.address;
     cityField.value = customer.city;
-    stateField.value = customer.state;
+    stateField.value = normalizeState(customer.state);
     pincodeField.value = customer.pincode;
     customerFormTitle.textContent = "Edit customer details";
     customerFormHint.textContent = "Update the customer name, mobile number, or default address. Email stays unchanged because it identifies the customer’s sign-in and order history.";
@@ -1051,7 +1052,7 @@ if (root) {
     if (customer) {
       addressInput.value = customer.address;
       orderCityInput.value = customer.city;
-      orderStateInput.value = customer.state;
+      orderStateInput.value = normalizeState(customer.state);
       orderPincodeInput.value = customer.pincode;
     }
   });

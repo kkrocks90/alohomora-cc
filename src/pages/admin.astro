@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
+import StateSelect from "../components/StateSelect.astro";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
@@ -188,7 +189,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
             <label class="admin-address-field">Default address<textarea name="address" autocomplete="street-address" rows="2" maxlength="250" required></textarea></label>
             <label>City<input name="city" autocomplete="address-level2" maxlength="40" required /></label>
-            <label>State<input name="state" autocomplete="address-level1" maxlength="40" required /></label>
+            <label>State<StateSelect /></label>
             <label>PIN code<input name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
             <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
             <div class="admin-customer-form-actions">
@@ -229,7 +230,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </select></label>
             <label>Delivery address<textarea name="address" id="admin-order-address" rows="2" maxlength="250" required></textarea></label>
             <label>City<input name="city" id="admin-order-city" autocomplete="address-level2" maxlength="40" required /></label>
-            <label>State<input name="state" id="admin-order-state" autocomplete="address-level1" maxlength="40" required /></label>
+            <label>State<StateSelect id="admin-order-state" /></label>
             <label>PIN code<input name="pincode" id="admin-order-pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
             <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
             <div class="admin-order-inline-fields">

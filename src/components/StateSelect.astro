@@ -1,0 +1,15 @@
+---
+import { INDIAN_STATES } from "../data/indian-states";
+
+interface Props {
+  id?: string;
+  name?: string;
+}
+
+const { id, name = "state" } = Astro.props;
+---
+
+<select id={id} name={name} autocomplete="address-level1" required>
+  <option value="" disabled selected>Select state</option>
+  {INDIAN_STATES.map((state) => <option value={state}>{state}</option>)}
+</select>
