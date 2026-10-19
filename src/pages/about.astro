@@ -1,0 +1,58 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<SiteLayout
+  title="About us — Chocolate Circle"
+  description="Meet Chocolate Circle, a small-batch handmade chocolate shop based in Chennai."
+>
+  <main class="policy-page about-page">
+    <header class="policy-heading">
+      <p class="eyebrow">A little about us</p>
+      <h1>Made by hand.<br /><em>Shared with love.</em></h1>
+    </header>
+
+    <article class="policy-content">
+      <p>
+        Chocolate Circle is a small-batch handmade chocolate shop from Chennai, operated by
+        Alohomora Chocolate Circle. We make thoughtful chocolate treats for everyday moments,
+        celebrations, and the people you love.
+      </p>
+
+      <h2>Small batches, personal touches</h2>
+      <p>
+        We make our chocolates by hand in small batches rather than mass-producing them. Choose
+        from the treats on our shelf, explore available flavours, and add a personal wrapper
+        touch where offered. Each order gets care from preparation through packing.
+      </p>
+
+      <h2>Made with your occasion in mind</h2>
+      <p>
+        Planning for a birthday, celebration, or a just-because gift? Please allow at least 3 to
+        4 days for preparation. If you add an event date, we’ll discuss delivery for two days
+        before the event or on the event date, depending on your location and the delivery
+        arrangement.
+      </p>
+
+      <h2>From Chennai to your doorstep</h2>
+      <p>
+        We’re based in Chennai and can arrange delivery across India where a courier can serve
+        your address. Delivery options and the fee are discussed with you after you place an
+        order, before dispatch.
+      </p>
+
+      <p>
+        We’d love to help with an order or a question. Reach us at
+        <a href="mailto:alohomora.chocolatecircle@gmail.com">alohomora.chocolatecircle@gmail.com</a>
+        or on <a href="https://wa.me/919500868468">WhatsApp at +91 95008 68468</a>.
+      </p>
+      <p>
+        <a class="button button-primary" href={`${base}store/`}>
+          Find your chocolate <span aria-hidden="true">↗</span>
+        </a>
+      </p>
+    </article>
+  </main>
+</SiteLayout>
