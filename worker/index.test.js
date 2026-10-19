@@ -373,6 +373,7 @@ test("only the signed-in order owner can verify payment and receive the order re
                 if (/SELECT payment_id FROM orders/i.test(sql)) {
                   return savedOrders.get(values[0]) ?? null;
                 }
+                if (/INSERT INTO customers/i.test(sql)) return { customer_id: "cus_customer" };
                 return null;
               },
               run: async () => {

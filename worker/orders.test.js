@@ -4,29 +4,52 @@ import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
 
 function createDatabase() {
   const rows = new Map();
+  const customers = new Map();
   return {
     rows,
+    customers,
     prepare(query) {
       return {
         bind(...values) {
           return {
             run: async () => {
-              if (!query.startsWith("INSERT INTO orders")) {
-                throw new Error("Unexpected database write.");
+              if (query.startsWith("INSERT INTO orders")) {
+                const [orderId, paymentId, customerName] = values;
+                if (rows.has(orderId)) return;
+                rows.set(orderId, {
+                  payment_id: paymentId,
+                  customer_name: customerName,
+                  event_date: values[6],
+                });
+                return;
               }
-              const [orderId, paymentId, customerName] = values;
-              if (rows.has(orderId)) return;
-              rows.set(orderId, {
-                payment_id: paymentId,
-                customer_name: customerName,
-                event_date: values[6],
-              });
+              if (query.startsWith("UPDATE orders SET customer_id")) {
+                rows.get(values[1]).customer_id = values[0];
+                return;
+              }
+              throw new Error("Unexpected database write.");
             },
             first: async () => {
-              if (query !== "SELECT payment_id FROM orders WHERE order_id = ?") {
-                throw new Error("Unexpected database query.");
+              if (query === "SELECT payment_id FROM orders WHERE order_id = ?") {
+                return rows.get(values[0]) ?? null;
               }
-              return rows.get(values[0]) ?? null;
+              if (query.startsWith("INSERT INTO customers")) {
+                const [customerId, customer_name, customer_phone, customer_email, default_address, created_at, updated_at] =
+                  values;
+                const existing = customers.get(customer_email);
+                const customer = existing ?? { customer_id: customerId };
+                Object.assign(customer, {
+                  customer_name,
+                  customer_phone,
+                  customer_email,
+                  default_address,
+                  created_at,
+                  updated_at,
+                });
+                customers.set(customer_email, customer);
+                return { customer_id: customer.customer_id };
+              }
+              throw new Error("Unexpected database query.");
             },
           };
         },
@@ -189,10 +212,14 @@ test("stores a verified paid order once", async () => {
   await savePaidOrder(database, paidOrder);
 
   assert.equal(database.rows.size, 1);
+  assert.equal(database.customers.size, 1);
+  assert.equal(database.customers.get(paidOrder.customerEmail).customer_name, paidOrder.customerName);
+  assert.equal(database.rows.get(paidOrder.orderId).customer_id, database.customers.get(paidOrder.customerEmail).customer_id);
   assert.deepEqual(database.rows.get(paidOrder.orderId), {
     payment_id: paidOrder.paymentId,
     customer_name: paidOrder.customerName,
     event_date: paidOrder.eventDate,
+    customer_id: database.customers.get(paidOrder.customerEmail).customer_id,
   });
 });
 
@@ -201,6 +228,24 @@ test("makes payment-verification retries idempotent", async () => {
   await savePaidOrder(database, paidOrder);
   await savePaidOrder(database, paidOrder);
   assert.equal(database.rows.size, 1);
+});
+
+test("refreshes an existing customer record by email when saving a paid order", async () => {
+  const database = createDatabase();
+  database.customers.set(paidOrder.customerEmail, {
+    customer_id: "cus_saved_customer",
+    customer_name: "Old Name",
+    customer_phone: "+911111111111",
+    customer_email: paidOrder.customerEmail,
+    default_address: "Old Address",
+  });
+
+  await savePaidOrder(database, paidOrder);
+
+  assert.equal(database.customers.size, 1);
+  assert.equal(database.customers.get(paidOrder.customerEmail).customer_id, "cus_saved_customer");
+  assert.equal(database.customers.get(paidOrder.customerEmail).customer_name, paidOrder.customerName);
+  assert.equal(database.customers.get(paidOrder.customerEmail).default_address, paidOrder.deliveryAddress);
 });
 
 test("does not accept a different payment for an existing order", async () => {

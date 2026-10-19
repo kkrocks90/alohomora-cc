@@ -201,4 +201,40 @@ export async function savePaidOrder(database, order) {
   if (!saved || saved.payment_id !== order.paymentId) {
     throw new Error("The payment order is already associated with a different recorded payment.");
   }
+
+  const email = order.customerEmail.trim().toLowerCase();
+  if (email) {
+    const customerId = `cus_${crypto.randomUUID()}`;
+    const now = new Date().toISOString();
+    const customer = await database
+      .prepare(
+        `INSERT INTO customers (
+          customer_id, customer_name, customer_phone, customer_email,
+          default_address, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> ''
+        DO UPDATE SET
+          customer_name = excluded.customer_name,
+          customer_phone = excluded.customer_phone,
+          customer_email = lower(trim(excluded.customer_email)),
+          default_address = excluded.default_address,
+          updated_at = excluded.updated_at
+        RETURNING customer_id`,
+      )
+      .bind(
+        customerId,
+        order.customerName,
+        order.customerPhone,
+        email,
+        order.deliveryAddress,
+        now,
+        now,
+      )
+      .first();
+    if (!customer?.customer_id) throw new Error("Could not save the order customer.");
+    await database
+      .prepare("UPDATE orders SET customer_id = ? WHERE order_id = ?")
+      .bind(customer.customer_id, order.orderId)
+      .run();
+  }
 }

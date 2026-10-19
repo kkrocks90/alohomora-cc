@@ -21,6 +21,29 @@ function makeDatabase(email) {
         async first() {
           if (/SELECT email FROM customer_sessions/i.test(sql)) return { email: database.email };
           if (/FROM customers WHERE customer_id/i.test(sql)) return database.customers.get(this.values[0]) ?? null;
+          if (/INSERT INTO customers/i.test(sql)) {
+            const [customerId, customer_name, customer_phone, customer_email, default_address, created_at, updated_at] =
+              this.values;
+            const existing = [...database.customers.values()].find((customer) =>
+              customer_email && customer.customer_email.toLowerCase() === customer_email.toLowerCase());
+            const saved = existing ?? {
+              customer_id: customerId,
+              customer_name,
+              customer_phone,
+              customer_email,
+              default_address,
+              created_at,
+            };
+            Object.assign(saved, {
+              customer_name,
+              customer_phone,
+              customer_email,
+              default_address,
+              updated_at,
+            });
+            database.customers.set(saved.customer_id, saved);
+            return { customer_id: saved.customer_id };
+          }
           return null;
         },
         async all() {
@@ -129,6 +152,18 @@ test("admin can save a customer and create an unpaid order at catalog price", as
   const { customer } = await customerResponse.json();
   assert.equal(database.customers.size, 1);
 
+  const duplicateCustomerResponse = await worker.fetch(makeRequest("/admin/customers/create", {
+    body: {
+      name: "Customer Example Updated",
+      phone: "+911234567890",
+      email: " CUSTOMER@example.com ",
+      address: "123 Updated Street",
+    },
+  }), env);
+  assert.equal(duplicateCustomerResponse.status, 201);
+  assert.equal((await duplicateCustomerResponse.json()).customer.customerId, customer.customerId);
+  assert.equal(database.customers.size, 1);
+
   const orderResponse = await worker.fetch(makeRequest("/admin/orders/create", {
     body: {
       customerId: customer.customerId,
@@ -187,6 +222,24 @@ test("admin manual order validates product flavour availability and status value
     },
   }), env);
   assert.equal(invalidFlavour.status, 400);
+
+  database.customers.set("cus_email_only", {
+    customer_id: "cus_email_only",
+    customer_name: "",
+    customer_phone: "",
+    customer_email: "new@example.com",
+    default_address: "",
+  });
+  const incompleteCustomer = await worker.fetch(makeRequest("/admin/orders/create", {
+    body: {
+      customerId: "cus_email_only",
+      address: "1 Chocolate Street",
+      deliveryMethod: "Porter (manual booking)",
+      items: [{ id: "product-1001", quantity: 1, flavour: "Dark Chocolate", wrapper: "" }],
+    },
+  }), env);
+  assert.equal(incompleteCustomer.status, 400);
+  assert.match((await incompleteCustomer.json()).error, /add their name and phone/i);
 
   const invalidStatus = await worker.fetch(makeRequest("/admin/orders/update-status", {
     body: { orderId: "missing", orderStatus: "paid" },

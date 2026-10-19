@@ -13,7 +13,6 @@ export const ORDER_STATUSES = [
 
 const DELIVERY_METHODS = ["Porter (manual booking)", "Courier (manual booking)"];
 const productById = new Map(products.map((product) => [product.id, product]));
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^\+?[0-9\s()-]{7,20}$/;
 
 function result(status, body) {
@@ -69,7 +68,7 @@ export async function getAdminData(request, env) {
           `SELECT customer_id, customer_name, customer_phone, customer_email,
                   default_address, created_at, updated_at
            FROM customers
-           ORDER BY customer_name COLLATE NOCASE
+           ORDER BY CASE WHEN customer_name = '' THEN customer_email ELSE customer_name END COLLATE NOCASE
            LIMIT 500`,
         )
         .all(),
@@ -124,26 +123,37 @@ export async function createAdminCustomer(request, env) {
     if (access.error) return access.error;
     const name = requiredText(body?.name, 80, "customer name");
     const phone = requiredText(body?.phone, 20, "phone number");
-    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+    const email = body?.email === "" || body?.email === undefined
+      ? ""
+      : normalizeCustomerEmail(body.email);
     const address = requiredText(body?.address, 250, "customer address");
     if (!phonePattern.test(phone)) return result(400, { error: "Enter a valid customer phone number." });
-    if (email.length > 120 || (email !== "" && !emailPattern.test(email))) {
+    if (body?.email && !email) {
       return result(400, { error: "Enter a valid customer email address." });
     }
 
     const customerId = `cus_${crypto.randomUUID()}`;
     const now = new Date().toISOString();
-    await env.ORDERS_DB
+    const savedCustomer = await env.ORDERS_DB
       .prepare(
         `INSERT INTO customers (
           customer_id, customer_name, customer_phone, customer_email,
           default_address, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> ''
+        DO UPDATE SET
+          customer_name = excluded.customer_name,
+          customer_phone = excluded.customer_phone,
+          customer_email = lower(trim(excluded.customer_email)),
+          default_address = excluded.default_address,
+          updated_at = excluded.updated_at
+        RETURNING customer_id`,
       )
       .bind(customerId, name, phone, email, address, now, now)
-      .run();
+      .first();
+    if (!savedCustomer?.customer_id) throw new Error("Could not save the customer.");
     return result(201, {
-      customer: { customerId, name, phone, email, address, createdAt: now, updatedAt: now },
+      customer: { customerId: savedCustomer.customer_id, name, phone, email, address, updatedAt: now },
     });
   } catch (error) {
     console.error("Could not create an admin customer.", error);
@@ -170,6 +180,11 @@ export async function createManualOrder(request, env) {
       .bind(customerId)
       .first();
     if (!customer) return result(404, { error: "Choose a saved customer." });
+    if (!customer.customer_name || !customer.customer_phone) {
+      return result(400, {
+        error: "This customer has only signed in so far. Add their name and phone in the customer form before creating a manual order.",
+      });
+    }
 
     const deliveryAddress = requiredText(body?.address || customer.default_address, 250, "delivery address");
     const deliveryMethod = body?.deliveryMethod;

@@ -203,6 +203,20 @@ export async function verifyLoginCode(request, env) {
       return result(401, { error: "That sign-in code is invalid or expired. Request a new code and try again." });
     }
 
+    if (email !== normalizeCustomerEmail(env.ADMIN_EMAIL)) {
+      const nowText = new Date(now).toISOString();
+      await env.ORDERS_DB
+        .prepare(
+          `INSERT INTO customers (
+            customer_id, customer_name, customer_phone, customer_email,
+            default_address, created_at, updated_at
+          ) VALUES (?, '', '', ?, '', ?, ?)
+          ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> '' DO NOTHING`,
+        )
+        .bind(`cus_${crypto.randomUUID()}`, email, nowText, nowText)
+        .run();
+    }
+
     const token = randomHex(32);
     const expiresAt = now + SESSION_LIFETIME_MS;
     await env.ORDERS_DB

@@ -89,6 +89,7 @@ test("one-time email code grants access to paid orders and logout revokes the se
   const database = {
     challenge: null,
     sessions: new Map(),
+    customers: new Map(),
     prepare(sql) {
       return {
         values: [],
@@ -145,6 +146,21 @@ test("one-time email code grants access to paid orders and logout revokes the se
             database.sessions.set(tokenHash, { email, expiresAt });
             return { meta: { changes: 1 } };
           }
+          if (/INSERT INTO customers/i.test(sql)) {
+            const [customerId, email, createdAt, updatedAt] = this.values;
+            if (![...database.customers.values()].some((customer) => customer.email === email)) {
+              database.customers.set(customerId, {
+                customerId,
+                name: "",
+                phone: "",
+                email,
+                address: "",
+                createdAt,
+                updatedAt,
+              });
+            }
+            return { meta: { changes: 1 } };
+          }
           if (/DELETE FROM customer_sessions/i.test(sql)) {
             return { meta: { changes: database.sessions.delete(this.values[0]) ? 1 : 0 } };
           }
@@ -152,19 +168,34 @@ test("one-time email code grants access to paid orders and logout revokes the se
         },
         async all() {
           return {
-            results: [{
-              order_id: "order_test123",
-              payment_status: "paid",
-              items_json: JSON.stringify([{ id: "midnight-dark", name: "Midnight Dark", quantity: 1 }]),
-              amount_paise: 50000,
-              currency: "INR",
-              delivery_method: "Porter (manual booking)",
-              created_at: "2026-10-14T00:00:00.000Z",
-              customer_name: "Customer Example",
-              customer_phone: "+911234567890",
-              delivery_address: "123 Sample Street",
-              event_date: "2026-12-25",
-            }],
+            results: [
+              {
+                order_id: "order_test123",
+                payment_status: "paid",
+                items_json: JSON.stringify([{ id: "midnight-dark", name: "Midnight Dark", quantity: 1 }]),
+                amount_paise: 50000,
+                currency: "INR",
+                delivery_method: "Porter (manual booking)",
+                created_at: "2026-10-14T00:00:00.000Z",
+                customer_name: "Customer Example",
+                customer_phone: "+911234567890",
+                delivery_address: "123 Sample Street",
+                event_date: "2026-12-25",
+              },
+              {
+                order_id: "manual_test456",
+                payment_status: "unpaid",
+                items_json: JSON.stringify([{ id: "midnight-dark", name: "Midnight Dark", quantity: 1 }]),
+                amount_paise: 50000,
+                currency: "INR",
+                delivery_method: "Courier (manual booking)",
+                created_at: "2026-10-15T00:00:00.000Z",
+                customer_name: "Customer Example",
+                customer_phone: "+911234567890",
+                delivery_address: "456 Sample Street",
+                event_date: "",
+              },
+            ],
           };
         },
       };
@@ -203,6 +234,8 @@ test("one-time email code grants access to paid orders and logout revokes the se
   );
   assert.equal(verified.status, 200);
   assert.match(verified.body.token, /^[0-9a-f]{64}$/);
+  assert.equal(database.customers.size, 1);
+  assert.equal([...database.customers.values()][0].email, "customer@example.com");
 
   const orders = await getCustomerOrders(
     makeRequest("/auth/orders", undefined, verified.body.token),
@@ -214,6 +247,8 @@ test("one-time email code grants access to paid orders and logout revokes the se
   assert.equal(orders.body.orders[0].customerPhone, "+911234567890");
   assert.equal(orders.body.orders[0].deliveryAddress, "123 Sample Street");
   assert.equal(orders.body.orders[0].eventDate, "2026-12-25");
+  assert.equal(orders.body.orders[1].orderId, "manual_test456");
+  assert.equal(orders.body.orders[1].status, "unpaid");
 
   const replay = await verifyLoginCode(
     makeRequest("/auth/verify-code", { email: "customer@example.com", code }),

@@ -226,12 +226,16 @@ if (root) {
       return;
     }
     for (const customer of adminData.customers) {
-      const option = new Option(`${customer.name} · ${customer.phone}`, customer.customerId);
+      const label = customer.name || customer.email;
+      const option = new Option(
+        [label, customer.phone].filter(Boolean).join(" · "),
+        customer.customerId,
+      );
       customerSelect.append(option);
       const card = document.createElement("article");
       card.className = "admin-customer-card";
       const name = document.createElement("strong");
-      name.textContent = customer.name;
+      name.textContent = customer.name || customer.email;
       const details = document.createElement("span");
       details.textContent = [customer.phone, customer.email, customer.address].filter(Boolean).join(" · ");
       card.append(name, details);
