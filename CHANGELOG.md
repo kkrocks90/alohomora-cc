@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.9.1] - 2026-10-20
+
+### Fixed
+- Removed the small sideways scroll on mobile pages, caused by the off-canvas cart drawer extending past the screen.
+
 ## [1.9.0] - 2026-10-20
 
 ### Changed

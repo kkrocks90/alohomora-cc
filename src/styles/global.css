@@ -4999,3 +4999,12 @@ h2 em {
     text-align: left;
   }
 }
+
+/* Off-canvas drawers must never create a sideways scroll on phones */
+@media (max-width: 620px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+}
