@@ -7,7 +7,7 @@ CREATE TABLE order_id_map (
 );
 
 INSERT INTO order_id_map (old_id, new_id)
-SELECT order_id, 'CC-' || strftime('%y%m%d', created_at) || '-' || upper(substr(hex(randomblob(4)), 1, 5))
+SELECT order_id, 'CC-' || substr(created_at, 3, 2) || substr(created_at, 6, 2) || substr(created_at, 9, 2) || '-' || upper(substr(hex(randomblob(4)), 1, 5))
 FROM orders
 WHERE order_id LIKE 'order\_%' ESCAPE '\';
 
