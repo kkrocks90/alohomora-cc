@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.0.1] - 2026-10-19
+
+### Fixed
+- Admin sign-in: the **Send OTP** button did nothing because the admin page script failed on load while setting up the new address map fields.
+
 ## [1.0.0] - 2026-10-19
 
 Initial release.

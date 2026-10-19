@@ -259,9 +259,9 @@ if (root) {
     const city = form.elements.namedItem("city");
     const state = form.elements.namedItem("state");
     const pincode = form.elements.namedItem("pincode");
-    const map = requireElement<HTMLElement>(form.querySelector<HTMLElement>("[data-address-map]"), "[data-address-map]");
-    const findButton = requireElement<HTMLButtonElement>(form.querySelector<HTMLButtonElement>("[data-find-address]"), "[data-find-address]");
-    const mapStatus = requireElement<HTMLElement>(form.querySelector<HTMLElement>("[data-address-map-status]"), "[data-address-map-status]");
+    const map = requireElement<HTMLElement>(form, "[data-address-map]");
+    const findButton = requireElement<HTMLButtonElement>(form, "[data-find-address]");
+    const mapStatus = requireElement<HTMLElement>(form, "[data-address-map-status]");
     if (!(address instanceof HTMLTextAreaElement) || !(city instanceof HTMLInputElement) ||
         !(state instanceof HTMLInputElement) || !(pincode instanceof HTMLInputElement)) {
       throw new Error("The admin address form is incomplete.");
