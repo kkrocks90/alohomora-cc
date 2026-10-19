@@ -4,96 +4,92 @@ import PolicyPage from "../components/PolicyPage.astro";
 
 <PolicyPage
   title="Privacy Policy"
-  description="Learn what information Chocolate Circle collects for chocolate orders and how it is used."
+  description="Learn what information Alohomora Chocolate Circle collects for Chocolate Circle orders and how it is used."
   kicker="Your information, handled thoughtfully"
 >
   <p>
-    This draft explains how the sample shop's checkout is designed. Confirm the details and
-    replace every bracketed prompt before publishing; have the final notice reviewed for the
-    privacy laws that apply to your business and customers.
+    <strong>Effective date: 19 October 2026.</strong> This notice describes the information used
+    to operate Chocolate Circle, take orders, arrange delivery, and provide customer accounts.
   </p>
 
   <h2>1. Who is responsible for your information</h2>
   <p>
-    The shop operator is <strong>[ADD FULL LEGAL BUSINESS OR OWNER NAME]</strong>, trading as
-    Chocolate Circle. Privacy contact: <strong>[ADD PRIVACY OR CUSTOMER SUPPORT EMAIL]</strong>,
-    <strong>[ADD BUSINESS ADDRESS]</strong>.
+    The shop is operated by <strong>Alohomora Chocolate Circle</strong>, trading as Chocolate
+    Circle. The business address and dispatch location are M3, Pushpammal St, RG Nagar,
+    Krishnaveni Nagar, Medavakkam, Vengavasal, Tamil Nadu 600073. The food business FSSAI
+    registration number provided by the operator is <strong>22420076002595</strong>. The shop is
+    not registered for GST. For privacy questions or requests, contact
+    <a href="mailto:alohomora.chocolatecircle@gmail.com">alohomora.chocolatecircle@gmail.com</a>
+    or WhatsApp <a href="https://wa.me/919500868468">+91 95008 68468</a>.
   </p>
 
-  <h2>2. Information used for an order</h2>
+  <h2>2. Information we collect</h2>
   <p>
-    When you check out, the website asks for your name, phone number, email address, and delivery
-    address. To calculate an approximate distance, the checkout also
-    sends the delivery pin’s latitude and longitude to the shop’s Cloudflare Worker. The Worker
-    calculates the straight-line distance and uses it to suggest Porter (15 km or less) or
-    courier (over 15 km) for the shop to book manually. The shop’s site does not send the
-    coordinates to an external geocoding or distance API or include them in Razorpay order notes.
-    If you choose your device’s location, your browser or device’s location services may process
-    location information under their own terms. Provide the delivery pin, rather than a different
-    current location, so the estimate is useful.
+    When you sign in, we use your email address to send a one-time sign-in code and associate
+    your customer profile and orders. A new customer can save a name, mobile number, and default
+    delivery address. You may edit those details for an individual order; the event date is
+    collected for that order only. We also keep order items, prices, payment and order references,
+    payment/order status, delivery method, and the delivery address used for each order. Manual
+    orders entered by the shop are associated with your profile when they use your email address.
   </p>
   <p>
-    The checkout sends your contact and delivery details and the selected product and manual
-    delivery-method details to the shop's Cloudflare Worker. The Worker creates a Razorpay order
-    and includes the supplied contact and delivery address in that payment provider's order notes
-    so the shop can fulfil the order. After Razorpay confirms payment, the Worker saves your name,
-    phone, email, delivery address, product details, paid amount, order and payment IDs,
-    delivery-method estimate, distance,     selected flavours and wrapper designs, and policy acknowledgement in a Cloudflare D1 database
-    controlled by the shop. Only authorized shop account users should have access to its records.
-    The delivery coordinates are used to calculate distance but are not stored in this database.
-    Provide only information needed to contact you and deliver your purchase.
-  </p>
-  <p>
-    The shopping bag is saved in your browser's local storage so it can remain available when
-    you return. This starter site does not set up advertising analytics. Customers can request a
-    one-time email code to view paid orders associated with that address. The shop's database
-    stores only a hash of each sign-in code and session token; codes expire after 10 minutes,
-    sign-in attempts are limited, and customer sessions expire after 30 days. Sign-in codes are
-    delivered by Resend. Review the production hosting, application logs, and any services you
-    add before publishing; update this notice if your actual practices differ.
+    At checkout, you provide a delivery pin’s latitude and longitude so the Worker can calculate
+    approximate straight-line distance from the shop and suggest Porter at or within 15 km, or a
+    courier beyond 15 km. The coordinates are used for this calculation and are not saved to the
+    shop’s order database or included in Razorpay order notes. If you use your device’s location,
+    your browser and device location services may process it under their own terms.
   </p>
 
-  <h2>3. Payments and service providers</h2>
+  <h2>3. How we use and share information</h2>
   <p>
-    Razorpay processes payment through its own checkout. This website does not collect or store
-    your full card, bank, or payment credentials. Cloudflare runs the checkout Worker, and
-    GitHub Pages hosts the static website. Resend delivers customer sign-in codes to email
-    addresses associated with paid orders. These providers may process information under their
-    own terms and privacy notices. Add or update this list if the shop starts using
-    analytics, customer-support, shipping, or other services that receive personal information.
+    We use customer and order information to create and manage your profile, process product
+    payments, contact you about your order, confirm the delivery fee and arrangements, deliver
+    your purchase, maintain business records, and respond to questions or complaints. The shop
+    may contact you using the email address or phone number you provide, including by WhatsApp
+    where appropriate.
+  </p>
+  <p>
+    Razorpay processes product payments and receives order information needed to create and
+    verify a payment. Resend delivers sign-in codes. Cloudflare runs the order Worker and stores
+    customer and order records in D1. GitHub Pages hosts the static website. Delivery providers
+    receive the contact and address details needed to fulfil a delivery after arrangements are
+    confirmed. WhatsApp may process messages when you contact or are contacted through WhatsApp.
+    These providers process information under their own terms and privacy notices. The site does
+    not collect or store full card or bank credentials and does not currently use advertising
+    analytics or subscribe customers to marketing messages.
   </p>
 
-  <h2>4. How the shop uses information</h2>
+  <h2>4. Storage and retention</h2>
   <p>
-    The intended use is to create and confirm payment orders, maintain the shop's paid-order and
-    sales reports, contact you about an order, arrange its delivery, and respond to a question or
-    issue. Add the shop's accurate retention schedule, accounting or legal recordkeeping
-    purposes, and any other use before publishing:
-    <strong>[ADD ACTUAL RETENTION PERIODS AND ANY OTHER PURPOSES]</strong>. This starter site
-    does not subscribe customers to marketing messages.
+    Customer profiles and order records are stored in the shop’s Cloudflare D1 database. Sign-in
+    codes and session tokens are stored as hashes; codes expire after 10 minutes and sign-in
+    sessions after 30 days. The shopping bag is stored in your browser’s local storage. The shop
+    currently has no fixed automatic deletion schedule for customer and order records; records
+    are retained for shop operations and applicable Indian legal and recordkeeping requirements.
   </p>
 
-  <h2>5. Your privacy choices and requests</h2>
+  <h2>5. Your requests</h2>
   <p>
-    To ask about, correct, or request deletion of information, contact
-    <strong>[ADD PRIVACY OR CUSTOMER SUPPORT EMAIL]</strong>. Add the rights available to
-    customers, response process, and any applicable privacy authority contact after reviewing
-    local requirements: <strong>[ADD APPLICABLE PRIVACY RIGHTS AND REQUEST PROCESS]</strong>.
-    Some payment or accounting records may need to be retained when required by law.
+    You may contact us to request access to or correction of your profile, or to ask for deletion
+    of information. We will consider and respond to requests under applicable law. We may need
+    to retain some order, payment, or accounting records where required by law or needed to
+    resolve a transaction or dispute. Send requests to
+    <a href="mailto:alohomora.chocolatecircle@gmail.com">alohomora.chocolatecircle@gmail.com</a>
+    or WhatsApp <a href="https://wa.me/919500868468">+91 95008 68468</a>.
   </p>
 
   <h2>6. Security and children</h2>
   <p>
-    Checkout uses a server-side Worker to keep Razorpay secret credentials out of the website's
-    public code. No internet transmission or storage is entirely risk-free. Add the shop's
-    contact and response steps for a suspected privacy incident:
-    <strong>[ADD PRIVACY INCIDENT CONTACT OR PROCESS]</strong>.
+    Payment credentials are handled by Razorpay rather than stored by this website. The shop
+    uses account access controls for its order database, but no internet transmission or storage
+    method can be guaranteed completely secure. If you have a concern about information
+    associated with your account or a suspected privacy incident, contact us promptly using the
+    details above.
   </p>
 
-  <h2>7. Updates and contact</h2>
+  <h2>7. Updates</h2>
   <p>
-    We will update this page if the shop's practices change. Effective date:
-    <strong>[ADD EFFECTIVE DATE]</strong>. Privacy questions:
-    <strong>[ADD PRIVACY OR CUSTOMER SUPPORT EMAIL AND POSTAL ADDRESS]</strong>.
+    We may update this notice when our services or practices change. The current version and its
+    effective date will be posted on this page.
   </p>
 </PolicyPage>
