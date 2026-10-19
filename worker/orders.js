@@ -159,6 +159,8 @@ export async function savePaidOrder(database, order) {
         order_id,
         payment_id,
         payment_status,
+        payment_method,
+        order_status,
         customer_name,
         customer_phone,
         customer_email,
@@ -171,7 +173,7 @@ export async function savePaidOrder(database, order) {
         distance_km,
         policies_accepted,
         created_at
-      ) VALUES (?, ?, 'paid', ?, ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
+      ) VALUES (?, ?, 'paid', 'razorpay', 'received', ?, ?, ?, ?, ?, ?, 'INR', ?, ?, ?, ?)
       ON CONFLICT(order_id) DO NOTHING`,
     )
     .bind(

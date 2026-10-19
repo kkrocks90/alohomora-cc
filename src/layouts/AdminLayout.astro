@@ -1,0 +1,38 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Chocolate Circle Admin",
+  description = "Private Chocolate Circle order management.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#faf7f1" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="admin-header">
+      <a class="wordmark" href={`${import.meta.env.BASE_URL}admin/`}>
+        <span class="wordmark-mark" aria-hidden="true">c</span>
+        <span>chocolate <i>circle</i></span>
+      </a>
+      <span class="admin-header-label">Order management</span>
+    </header>
+    <slot />
+    <script>
+      import "../scripts/admin";
+    </script>
+  </body>
+</html>

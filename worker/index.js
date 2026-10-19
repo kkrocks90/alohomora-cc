@@ -1,5 +1,11 @@
 import products from "../src/data/products.json" with { type: "json" };
 import {
+  createAdminCustomer,
+  createManualOrder,
+  getAdminData,
+  updateAdminOrderStatus,
+} from "./admin.js";
+import {
   getDistanceKm,
   getFulfillmentMethod,
   getStoreLocation,
@@ -459,6 +465,22 @@ export default {
     }
     if (path === "/auth/logout") {
       const result = await logoutCustomer(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/data") {
+      const result = await getAdminData(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/customers/create") {
+      const result = await createAdminCustomer(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/orders/create") {
+      const result = await createManualOrder(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/orders/update-status") {
+      const result = await updateAdminOrderStatus(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     return errorResponse("Not found.", 404, configuredOrigin);

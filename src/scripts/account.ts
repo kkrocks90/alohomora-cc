@@ -13,6 +13,7 @@ if (root) {
   }
 
   const apiUrl = root.dataset.checkoutApi?.replace(/\/+$/, "") ?? "";
+  const baseUrl = root.dataset.baseUrl ?? "/";
   const emailForm = requireElement(root.querySelector<HTMLFormElement>("#account-email-form"), "#account-email-form");
   const codeForm = requireElement(root.querySelector<HTMLFormElement>("#account-code-form"), "#account-code-form");
   const emailInput = requireElement(root.querySelector<HTMLInputElement>("#account-email"), "#account-email");
@@ -55,6 +56,7 @@ if (root) {
     createdAt?: string;
     deliveryMethod?: string;
     eventDate?: string;
+    orderStatus?: string;
     customerName?: string;
     customerPhone?: string;
     deliveryAddress?: string;
@@ -153,7 +155,16 @@ if (root) {
       reference.textContent = order.orderId ? `Order ${order.orderId}` : "Your order";
       const paid = document.createElement("span");
       paid.className = "order-paid";
-      paid.textContent = order.status === "paid" ? "Paid" : "Processing";
+      const orderStatusLabels: Record<string, string> = {
+        received: "Received",
+        confirmed: "Confirmed",
+        preparing: "Preparing",
+        ready: "Ready",
+        out_for_delivery: "Out for delivery",
+        delivered: "Delivered",
+        cancelled: "Cancelled",
+      };
+      paid.textContent = `${order.status === "paid" ? "Paid" : "Unpaid"} · ${orderStatusLabels[order.orderStatus ?? ""] ?? "Processing"}`;
       heading.append(reference, paid);
 
       const details = document.createElement("p");
@@ -186,6 +197,10 @@ if (root) {
     setBusy(true);
     try {
       const result = await post("/auth/orders", undefined, token);
+      if (result.isAdmin === true) {
+        window.location.assign(`${baseUrl}admin/`);
+        return;
+      }
       const orders = Array.isArray(result.orders)
         ? result.orders.filter((value): value is CustomerOrder => Boolean(value && typeof value === "object"))
         : [];

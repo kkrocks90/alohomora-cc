@@ -1,0 +1,113 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+---
+
+<AdminLayout
+  title="Order management — Chocolate Circle"
+  description="Private Chocolate Circle customer and order management."
+>
+  <main class="admin-page" id="admin-app" data-checkout-api={checkoutApiUrl}>
+    <section class="admin-login-panel" id="admin-login-panel" aria-labelledby="admin-title">
+      <p class="eyebrow">Chocolate Circle · private</p>
+      <h1 id="admin-title">Order <em>management.</em></h1>
+      <p class="admin-intro">Sign in with the shop admin email to manage customers, orders, and invoices.</p>
+      <form class="account-form" id="admin-email-form">
+        <label for="admin-email">Admin email address</label>
+        <input id="admin-email" name="email" type="email" autocomplete="email" maxlength="120" required />
+        <button class="button button-primary" type="submit">Send sign-in code <span aria-hidden="true">↗</span></button>
+      </form>
+      <form class="account-form" id="admin-code-form" hidden>
+        <label for="admin-code">Six-digit code</label>
+        <input
+          id="admin-code"
+          name="code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          required
+        />
+        <button class="button button-primary" type="submit">Open admin dashboard <span aria-hidden="true">↗</span></button>
+        <button class="account-text-button" id="admin-change-email" type="button">Use a different email</button>
+      </form>
+      <p class="account-status" id="admin-login-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="admin-dashboard" id="admin-dashboard" hidden>
+      <div class="admin-dashboard-heading">
+        <div>
+          <p class="eyebrow">Chocolate Circle</p>
+          <h1>Orders &amp; <em>customers.</em></h1>
+          <p class="admin-signed-in" id="admin-signed-in"></p>
+        </div>
+        <div class="admin-heading-actions">
+          <button class="button button-secondary" id="admin-refresh" type="button">Refresh</button>
+          <button class="account-text-button" id="admin-sign-out" type="button">Sign out</button>
+        </div>
+      </div>
+      <p class="admin-status" id="admin-status" role="status" aria-live="polite"></p>
+
+      <section class="admin-panel" aria-labelledby="admin-customers-title">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">Customer book</p>
+            <h2 id="admin-customers-title">Add a customer</h2>
+          </div>
+        </div>
+        <form class="admin-customer-form" id="admin-customer-form">
+          <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
+          <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
+          <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
+          <label class="admin-address-field">Default address<textarea name="address" autocomplete="street-address" rows="2" maxlength="250" required></textarea></label>
+          <button class="button button-primary" type="submit">Save customer</button>
+        </form>
+        <div class="admin-customer-list" id="admin-customer-list"></div>
+      </section>
+
+      <section class="admin-panel" aria-labelledby="admin-create-order-title">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">In-person, phone, or custom orders</p>
+            <h2 id="admin-create-order-title">Create manual order</h2>
+          </div>
+        </div>
+        <form class="admin-order-form" id="admin-order-form">
+          <label>Customer<select name="customerId" id="admin-order-customer" required>
+            <option value="">Choose a saved customer</option>
+          </select></label>
+          <label>Delivery address<textarea name="address" id="admin-order-address" rows="2" maxlength="250" required></textarea></label>
+          <div class="admin-order-inline-fields">
+            <label>Delivery method<select name="deliveryMethod" required>
+              <option value="Porter (manual booking)">Porter (manual booking)</option>
+              <option value="Courier (manual booking)">Courier (manual booking)</option>
+            </select></label>
+            <label>Event date (optional)<input name="eventDate" type="date" /></label>
+          </div>
+          <fieldset class="admin-order-items">
+            <legend>Order items</legend>
+            <div id="admin-order-lines"></div>
+            <button class="button button-secondary" id="admin-add-line" type="button">Add another item <span aria-hidden="true">+</span></button>
+          </fieldset>
+          <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
+          <p class="admin-payment-note">Manual orders are recorded as unpaid. No payment is initiated or collected here.</p>
+          <button class="button button-primary" type="submit">Create unpaid order</button>
+        </form>
+      </section>
+
+      <section class="admin-panel" aria-labelledby="admin-orders-title">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">Latest activity</p>
+            <h2 id="admin-orders-title">Order book</h2>
+          </div>
+        </div>
+        <div class="admin-order-list" id="admin-order-list"></div>
+      </section>
+    </section>
+
+    <section class="admin-invoice-print" id="admin-invoice-print" aria-label="Printable order invoice" hidden></section>
+  </main>
+</AdminLayout>

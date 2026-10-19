@@ -7,6 +7,7 @@ ALLOWED_ORIGIN = "https://chocolatecircle.in"
 STORE_LATITUDE = "12.9234"
 STORE_LONGITUDE = "80.1873"
 LOGIN_FROM_EMAIL = "Chocolate Circle <login@auth.chocolatecircle.in>"
+ADMIN_EMAIL = "alohomora.chocolatecircle@gmail.com"
 
 [[d1_databases]]
 binding = "ORDERS_DB"

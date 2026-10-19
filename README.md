@@ -29,6 +29,12 @@ Paid orders are saved to a Cloudflare D1 database through the existing checkout 
 
 Customers must sign in with a one-time email code before the checkout form is shown; the Worker also requires a valid signed-in session to create or verify payments. Checkout optionally accepts an event date, which is saved with paid orders and shown in order details. Customers can visit **My orders** to see up to 50 of their recent paid orders. First-time customers can sign in before they have an order, and their history will be empty until a paid order is saved. Codes expire after 10 minutes, are limited to five attempts, and can be requested once per minute per email; sessions expire after 30 days and are stored as hashes. The site is static, so the checkout page itself cannot be private; payment and order APIs enforce the sign-in requirement server-side.
 
+## Admin order management
+
+The private admin workspace is available at `/admin/`. Admin sign-in uses the same email-code flow, and the Worker authorizes management APIs only for `ADMIN_EMAIL` in `worker/wrangler.toml` (currently `alohomora.chocolatecircle@gmail.com`). A successful admin sign-in from the profile page opens the admin workspace. The dashboard lists up to 500 recent orders and saved customers, supports order-status updates, customer creation, and manual unpaid orders, and provides a print-to-PDF invoice/receipt. Manual order totals are calculated against the product catalog by the Worker; no payment is initiated. Printed documents are order invoices/receipts, not GST tax invoices, and do not include delivery charges.
+
+Before deploying admin changes, apply all pending D1 migrations with `npx wrangler d1 migrations apply cocoa-kind-orders --remote --config worker/wrangler.toml`, then deploy the Worker with `npm run worker:deploy`. Keep `ADMIN_EMAIL` restricted to the owner’s mailbox.
+
 Cloudflare Workers Free currently includes D1 allowances of 5 million rows read per day, 100,000 rows written per day, and 5 GB of total storage; see [Cloudflare D1 pricing and limits](https://developers.cloudflare.com/d1/platform/pricing/) before relying on a free-plan limit. Check database usage in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Metrics**. Restrict access to the Cloudflare account to trusted shop operators. Establish and follow an appropriate order-data retention period; delete records you no longer need, consistent with legal recordkeeping requirements.
 
 To create the free order database before deploying the Worker:

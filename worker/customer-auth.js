@@ -237,7 +237,7 @@ export async function getCustomerOrders(request, env) {
     if (!email) return result(401, { error: "Please sign in to view your orders." });
     const { results } = await env.ORDERS_DB
       .prepare(
-        `SELECT order_id, payment_status, items_json, amount_paise, currency,
+        `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise, currency,
                 delivery_method, created_at, customer_name, customer_phone,
                 delivery_address, event_date
          FROM orders
@@ -249,9 +249,12 @@ export async function getCustomerOrders(request, env) {
       .all();
     return result(200, {
       email,
+      isAdmin: normalizeCustomerEmail(email) === normalizeCustomerEmail(env.ADMIN_EMAIL),
       orders: results.map((order) => ({
         orderId: order.order_id,
         status: order.payment_status,
+        orderStatus: order.order_status,
+        paymentMethod: order.payment_method,
         items: JSON.parse(order.items_json),
         amountPaise: order.amount_paise,
         currency: order.currency,
