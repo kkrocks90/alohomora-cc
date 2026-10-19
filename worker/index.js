@@ -18,6 +18,7 @@ import {
   logoutCustomer,
   normalizeCustomerEmail,
   requestLoginCode,
+  updateCustomerProfile,
   verifyLoginCode,
 } from "./customer-auth.js";
 
@@ -461,6 +462,10 @@ export default {
     }
     if (path === "/auth/orders") {
       const result = await getCustomerOrders(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/auth/profile/update") {
+      const result = await updateCustomerProfile(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/auth/logout") {

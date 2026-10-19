@@ -66,6 +66,9 @@ const emailInput = requireElement<HTMLInputElement>("#checkout-email");
 const codeInput = requireElement<HTMLInputElement>("#checkout-code");
 const loginStatus = requireElement<HTMLElement>("#checkout-login-status");
 const checkoutForm = requireElement<HTMLFormElement>("#checkout-form");
+const profileSetup = requireElement<HTMLElement>("#checkout-profile-setup");
+const profileForm = requireElement<HTMLFormElement>("#checkout-profile-form");
+const profileStatus = requireElement<HTMLElement>("#checkout-profile-status");
 const eventDateInput = requireElement<HTMLInputElement>("#checkout-form input[name=eventDate]");
 const checkoutStatus = requireElement<HTMLElement>("#checkout-status");
 const checkoutButton = requireElement<HTMLButtonElement>("#checkout-button");
@@ -83,6 +86,7 @@ const currency = new Intl.NumberFormat("en-IN", {
 let cart: CartItem[] = loadCart();
 let customerEmail = "";
 let sessionToken = "";
+let profileComplete = false;
 
 const today = new Date();
 eventDateInput.min = [
@@ -140,8 +144,14 @@ async function requestApi(path: string, body?: unknown, token = sessionToken) {
 function showLogin() {
   loginPanel.hidden = false;
   checkoutContent.hidden = true;
+  profileSetup.hidden = true;
   emailForm.hidden = false;
   codeForm.hidden = true;
+}
+
+function setProfileStatus(message: string, error = false) {
+  profileStatus.textContent = message;
+  profileStatus.dataset.state = error ? "error" : "success";
 }
 
 function renderOrder() {
@@ -151,7 +161,8 @@ function renderOrder() {
   orderTotal.textContent = currency.format(total);
   emptyPanel.hidden = cart.length > 0;
   loginPanel.hidden = cart.length === 0 || Boolean(customerEmail);
-  checkoutContent.hidden = cart.length === 0 || !customerEmail;
+  profileSetup.hidden = cart.length === 0 || !customerEmail || profileComplete;
+  checkoutContent.hidden = cart.length === 0 || !customerEmail || !profileComplete;
 
   for (const item of cart) {
     const product = productById.get(item.id)!;
@@ -179,8 +190,39 @@ async function loadSession(token: string) {
   const result = await requestApi("/auth/orders", undefined, token);
   if (typeof result.email !== "string") throw new Error("Sign-in returned an invalid email address.");
   customerEmail = result.email;
+  const profile = isRecord(result.profile) ? result.profile : {};
+  const name = typeof profile.name === "string" ? profile.name : "";
+  const phone = typeof profile.phone === "string" ? profile.phone : "";
+  const address = typeof profile.address === "string" ? profile.address : "";
+  profileComplete = Boolean(name.trim() && phone.trim() && address.trim());
+  const setupName = profileForm.elements.namedItem("name");
+  const setupPhone = profileForm.elements.namedItem("phone");
+  const setupAddress = profileForm.elements.namedItem("address");
+  const checkoutName = checkoutForm.elements.namedItem("name");
+  const checkoutPhone = checkoutForm.elements.namedItem("phone");
+  const checkoutAddress = checkoutForm.elements.namedItem("address");
+  if (
+    setupName instanceof HTMLInputElement &&
+    setupPhone instanceof HTMLInputElement &&
+    setupAddress instanceof HTMLTextAreaElement &&
+    checkoutName instanceof HTMLInputElement &&
+    checkoutPhone instanceof HTMLInputElement &&
+    checkoutAddress instanceof HTMLTextAreaElement
+  ) {
+    setupName.value = name;
+    setupPhone.value = phone;
+    setupAddress.value = address;
+    checkoutName.value = name;
+    checkoutPhone.value = phone;
+    checkoutAddress.value = address;
+  }
   signedInEmail.textContent = `Signed in as ${customerEmail}`;
   setLoginStatus("");
+  if (!profileComplete) {
+    setProfileStatus("Save your details once, then we’ll prefill them at checkout.");
+  } else {
+    setProfileStatus("");
+  }
   renderOrder();
 }
 
@@ -233,6 +275,28 @@ requireElement<HTMLButtonElement>("#checkout-change-email").addEventListener("cl
   emailInput.focus();
 });
 
+profileForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!profileForm.reportValidity()) return;
+  const formData = new FormData(profileForm);
+  const button = profileForm.querySelector<HTMLButtonElement>("button[type=submit]");
+  if (button) button.disabled = true;
+  setProfileStatus("Saving your details…");
+  try {
+    await requestApi("/auth/profile/update", {
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      address: formData.get("address"),
+    });
+    await loadSession(sessionToken);
+    setCheckoutStatus("Your saved details are ready. You can edit them for this order.");
+  } catch (error) {
+    setProfileStatus(error instanceof Error ? error.message : "Could not save your details.", true);
+  } finally {
+    if (button) button.disabled = false;
+  }
+});
+
 signOutButton.addEventListener("click", async () => {
   let signOutMessage = "You’re signed out.";
   let signOutError = false;
@@ -246,6 +310,7 @@ signOutButton.addEventListener("click", async () => {
   window.dispatchEvent(new Event("customer-session-change"));
   sessionToken = "";
   customerEmail = "";
+  profileComplete = false;
   showLogin();
   setLoginStatus(signOutMessage, signOutError);
 });

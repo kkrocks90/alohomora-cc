@@ -242,6 +242,57 @@ export async function authenticatedEmail(request, env) {
   return session?.email ?? null;
 }
 
+export async function updateCustomerProfile(request, env) {
+  if (!isConfigured(env)) {
+    return result(503, { error: "Customer sign-in is not configured yet. Please contact the shop." });
+  }
+  let body;
+  try {
+    body = await readJson(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const email = await authenticatedEmail(request, env);
+    if (!email) return result(401, { error: "Please sign in to update your profile." });
+    if (email === normalizeCustomerEmail(env.ADMIN_EMAIL)) {
+      return result(403, { error: "Admin accounts do not have customer profiles." });
+    }
+    const name = typeof body?.name === "string" ? body.name.trim() : "";
+    const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
+    const address = typeof body?.address === "string" ? body.address.trim() : "";
+    if (!name || name.length > 80) return result(400, { error: "Enter your name (up to 80 characters)." });
+    if (!/^\+?[0-9\s()-]{7,20}$/.test(phone)) return result(400, { error: "Enter a valid mobile number." });
+    if (!address || address.length > 250) {
+      return result(400, { error: "Enter your default delivery address (up to 250 characters)." });
+    }
+
+    const now = new Date().toISOString();
+    const customer = await env.ORDERS_DB
+      .prepare(
+        `INSERT INTO customers (
+          customer_id, customer_name, customer_phone, customer_email,
+          default_address, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> ''
+        DO UPDATE SET
+          customer_name = excluded.customer_name,
+          customer_phone = excluded.customer_phone,
+          customer_email = lower(trim(excluded.customer_email)),
+          default_address = excluded.default_address,
+          updated_at = excluded.updated_at
+        RETURNING customer_id`,
+      )
+      .bind(`cus_${crypto.randomUUID()}`, name, phone, email, address, now, now)
+      .first();
+    if (!customer?.customer_id) throw new Error("Could not save your customer profile.");
+    return result(200, { profile: { name, phone, email, address } });
+  } catch (error) {
+    console.error("Could not update a customer profile.", error);
+    return result(503, { error: "Your profile could not be saved right now. Please try again." });
+  }
+}
+
 export async function getCustomerOrders(request, env) {
   if (!isConfigured(env)) {
     return result(503, { error: "Customer sign-in is not configured yet. Please contact the shop." });
@@ -249,7 +300,8 @@ export async function getCustomerOrders(request, env) {
   try {
     const email = await authenticatedEmail(request, env);
     if (!email) return result(401, { error: "Please sign in to view your orders." });
-    const { results } = await env.ORDERS_DB
+    const [ordersResult, customer] = await Promise.all([
+      env.ORDERS_DB
       .prepare(
         `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise, currency,
                 delivery_method, created_at, customer_name, customer_phone,
@@ -260,11 +312,24 @@ export async function getCustomerOrders(request, env) {
          LIMIT 50`,
       )
       .bind(email)
-      .all();
+      .all(),
+      env.ORDERS_DB
+        .prepare(
+          `SELECT customer_name, customer_phone, customer_email, default_address
+           FROM customers WHERE customer_email = ? COLLATE NOCASE`,
+        )
+        .bind(email)
+        .first(),
+    ]);
     return result(200, {
       email,
       isAdmin: normalizeCustomerEmail(email) === normalizeCustomerEmail(env.ADMIN_EMAIL),
-      orders: results.map((order) => ({
+      profile: {
+        name: customer?.customer_name ?? "",
+        phone: customer?.customer_phone ?? "",
+        address: customer?.default_address ?? "",
+      },
+      orders: ordersResult.results.map((order) => ({
         orderId: order.order_id,
         status: order.payment_status,
         orderStatus: order.order_status,

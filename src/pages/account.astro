@@ -52,6 +52,17 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <button class="account-text-button" id="account-sign-out" type="button">Sign out</button>
         </div>
         <dl class="profile-details" id="profile-details"></dl>
+        <form class="account-form profile-signup-form" id="profile-signup-form" hidden>
+          <h3>Save your details and default address</h3>
+          <p>We’ll prefill these details at checkout. You can still change them for each order.</p>
+          <label for="profile-name">Name</label>
+          <input id="profile-name" name="name" autocomplete="name" maxlength="80" required />
+          <label for="profile-phone">Mobile number</label>
+          <input id="profile-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" required />
+          <label for="profile-default-address">Default delivery address</label>
+          <textarea id="profile-default-address" name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
+          <button class="button button-primary" type="submit">Save my details <span aria-hidden="true">↗</span></button>
+        </form>
         <div class="profile-addresses">
           <h3>Addresses from your orders</h3>
           <div class="profile-address-list" id="profile-address-list"></div>

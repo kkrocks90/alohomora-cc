@@ -6,6 +6,7 @@ import {
   logoutCustomer,
   normalizeCustomerEmail,
   requestLoginCode,
+  updateCustomerProfile,
   verifyLoginCode,
 } from "./customer-auth.js";
 
@@ -20,6 +21,52 @@ test("normalizes valid customer email and rejects malformed addresses", () => {
   assert.equal(normalizeCustomerEmail("  Customer@Example.com "), "customer@example.com");
   assert.equal(normalizeCustomerEmail("not-an-email"), null);
   assert.equal(normalizeCustomerEmail(""), null);
+});
+
+test("signed-in customers can save profile details tied to their verified email", async () => {
+  const database = {
+    prepare(sql) {
+      return {
+        bind(...values) {
+          return {
+            first: async () => {
+              if (/SELECT email FROM customer_sessions/i.test(sql)) {
+                return { email: "customer@example.com" };
+              }
+              if (/INSERT INTO customers/i.test(sql)) {
+                assert.equal(values[3], "customer@example.com");
+                assert.equal(values[1], "Customer Example");
+                assert.equal(values[2], "+911234567890");
+                assert.equal(values[4], "123 Sample Street");
+                return { customer_id: values[0] };
+              }
+              return null;
+            },
+          };
+        },
+      };
+    },
+  };
+  const response = await updateCustomerProfile(
+    new Request("https://checkout.example.com/auth/profile/update", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${"a".repeat(64)}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: " Customer Example ",
+        phone: " +911234567890 ",
+        address: " 123 Sample Street ",
+      }),
+    }),
+    { ...configuredEnv, ORDERS_DB: database },
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body.profile, {
+    name: "Customer Example",
+    phone: "+911234567890",
+    email: "customer@example.com",
+    address: "123 Sample Street",
+  });
 });
 
 test("first-time customers can request a code without revealing account existence", async (context) => {

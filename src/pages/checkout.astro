@@ -60,6 +60,22 @@ const base = import.meta.env.BASE_URL;
       <p class="account-status" id="checkout-login-status" role="status" aria-live="polite"></p>
     </section>
 
+    <section class="checkout-profile-setup checkout-panel" id="checkout-profile-setup" hidden aria-labelledby="checkout-profile-title">
+      <p class="eyebrow">A quick introduction</p>
+      <h2 id="checkout-profile-title">Create your customer profile</h2>
+      <p>Save your name, mobile number, and default delivery address. You can edit these details for every checkout.</p>
+      <form class="account-form" id="checkout-profile-form">
+        <label for="checkout-profile-name">Name</label>
+        <input id="checkout-profile-name" name="name" autocomplete="name" maxlength="80" required />
+        <label for="checkout-profile-phone">Mobile number</label>
+        <input id="checkout-profile-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" required />
+        <label for="checkout-profile-address">Default delivery address</label>
+        <textarea id="checkout-profile-address" name="address" autocomplete="street-address" rows="3" maxlength="250" required></textarea>
+        <button class="button button-primary" type="submit">Save details and continue <span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="account-status" id="checkout-profile-status" role="status" aria-live="polite"></p>
+    </section>
+
     <section class="checkout-content" id="checkout-content" hidden aria-labelledby="checkout-title">
       <div class="checkout-main">
         <div class="checkout-panel checkout-customer-panel">

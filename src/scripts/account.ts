@@ -21,6 +21,7 @@ if (root) {
   const status = requireElement(root.querySelector<HTMLElement>("#account-status"), "#account-status");
   const profileSection = requireElement(root.querySelector<HTMLElement>("#account-profile"), "#account-profile");
   const profileDetails = requireElement(root.querySelector<HTMLElement>("#profile-details"), "#profile-details");
+  const profileForm = requireElement(root.querySelector<HTMLFormElement>("#profile-signup-form"), "#profile-signup-form");
   const profileAddressList = requireElement(root.querySelector<HTMLElement>("#profile-address-list"), "#profile-address-list");
   const ordersSection = requireElement(root.querySelector<HTMLElement>("#account-orders"), "#account-orders");
   const orderList = requireElement(root.querySelector<HTMLElement>("#order-list"), "#order-list");
@@ -62,6 +63,12 @@ if (root) {
     deliveryAddress?: string;
   }
 
+  interface CustomerProfile {
+    name: string;
+    phone: string;
+    address: string;
+  }
+
   async function post(path: string, body?: unknown, token?: string) {
     if (!apiUrl) throw new Error("Customer sign-in is not configured yet. Please contact the shop.");
     const response = await fetch(`${apiUrl}${path}`, {
@@ -82,13 +89,13 @@ if (root) {
     return result;
   }
 
-  function showProfile(orders: CustomerOrder[], accountEmail: string) {
+  function showProfile(orders: CustomerOrder[], accountEmail: string, customerProfile: CustomerProfile) {
     profileDetails.replaceChildren();
     const latestOrder = orders[0];
     const details = [
       ["Email address", accountEmail],
-      ["Name", latestOrder?.customerName ?? ""],
-      ["Phone number", latestOrder?.customerPhone ?? ""],
+      ["Name", customerProfile.name || latestOrder?.customerName || ""],
+      ["Phone number", customerProfile.phone || latestOrder?.customerPhone || ""],
     ];
     for (const [label, value] of details) {
       const term = document.createElement("dt");
@@ -97,6 +104,23 @@ if (root) {
       description.textContent = value || "Not available from previous orders";
       profileDetails.append(term, description);
     }
+    const nameInput = profileForm.elements.namedItem("name");
+    const phoneInput = profileForm.elements.namedItem("phone");
+    const addressInput = profileForm.elements.namedItem("address");
+    if (!(nameInput instanceof HTMLInputElement) ||
+        !(phoneInput instanceof HTMLInputElement) ||
+        !(addressInput instanceof HTMLTextAreaElement)) {
+      throw new Error("The customer profile form is incomplete.");
+    }
+    nameInput.value = customerProfile.name || latestOrder?.customerName || "";
+    phoneInput.value = customerProfile.phone || latestOrder?.customerPhone || "";
+    addressInput.value = customerProfile.address || "";
+    profileForm.hidden = false;
+    const profileTitle = profileForm.querySelector("h3");
+    const saveButton = profileForm.querySelector<HTMLButtonElement>("button[type=submit]");
+    const complete = Boolean(customerProfile.name && customerProfile.phone && customerProfile.address);
+    if (profileTitle) profileTitle.textContent = complete ? "Your details and default address" : "Complete your customer profile";
+    if (saveButton) saveButton.textContent = complete ? "Update my details" : "Save my details";
 
     profileAddressList.replaceChildren();
     const uniqueAddresses = new Map<string, CustomerOrder>();
@@ -109,7 +133,7 @@ if (root) {
     if (uniqueAddresses.size === 0) {
       const empty = document.createElement("p");
       empty.className = "account-empty";
-      empty.textContent = "Addresses from your paid orders will appear here.";
+      empty.textContent = "Addresses from your orders will appear here.";
       profileAddressList.append(empty);
     } else {
       for (const [address, order] of uniqueAddresses) {
@@ -205,7 +229,15 @@ if (root) {
         ? result.orders.filter((value): value is CustomerOrder => Boolean(value && typeof value === "object"))
         : [];
       const accountEmail = typeof result.email === "string" ? result.email : email;
-      showProfile(orders, accountEmail);
+      const rawProfile = result.profile && typeof result.profile === "object"
+        ? result.profile as Record<string, unknown>
+        : {};
+      const customerProfile = {
+        name: typeof rawProfile.name === "string" ? rawProfile.name : "",
+        phone: typeof rawProfile.phone === "string" ? rawProfile.phone : "",
+        address: typeof rawProfile.address === "string" ? rawProfile.address : "",
+      };
+      showProfile(orders, accountEmail, customerProfile);
       showOrderHistory(orders);
       emailForm.hidden = true;
       codeForm.hidden = true;
@@ -254,6 +286,27 @@ if (root) {
       await loadOrders(token);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not verify the code.", true);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  profileForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!profileForm.reportValidity()) return;
+    const formData = new FormData(profileForm);
+    setBusy(true);
+    setStatus("Saving your details…");
+    try {
+      await post("/auth/profile/update", {
+        name: formData.get("name"),
+        phone: formData.get("phone"),
+        address: formData.get("address"),
+      }, sessionStorage.getItem(sessionKey) ?? "");
+      await loadOrders(sessionStorage.getItem(sessionKey) ?? "");
+      setStatus("Your details and default delivery address are saved.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not save your details.", true);
     } finally {
       setBusy(false);
     }
