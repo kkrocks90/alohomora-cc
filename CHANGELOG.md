@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.17.0] - 2026-10-20
+
+### Added
+- New product: Chocolate Frogs (Set of 6), Rs 1500, listed under both Kids B'Day Special and Elite Gifting. Chocolate flavour only, no wrapper customisation.
+- Products can now appear in more than one category via an optional `extraTags` field; the store filter and category promo codes respect it.
+
 ## [1.16.3] - 2026-10-20
 
 ### Added

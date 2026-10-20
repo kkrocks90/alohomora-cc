@@ -603,5 +603,21 @@
             "Strawberry",
             "White Chocolate"
         ]
+    },
+    {
+        "id": "product-1051",
+        "name": "Chocolate Frogs (Set of 6)",
+        "description": "A set of 6 handmade chocolate frogs in collectible wizard-style boxes. A magical treat for birthdays and gifting.",
+        "price": 1500,
+        "image": "product-1051.jpg",
+        "tag": "Kids B'Day Special",
+        "extraTags": [
+            "Elite Gifting"
+        ],
+        "packSize": "Set of 6",
+        "flavours": [
+            "Chocolate"
+        ],
+        "customizable": false
     }
 ]

@@ -14,7 +14,7 @@ const productImages = import.meta.glob<{ default: ImageMetadata }>(
 const imagesByName = Object.fromEntries(
   Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
 );
-const tags = [...new Set([...products.map((product) => product.tag), ...extraCategories])].sort((a, b) => a.localeCompare(b));
+const tags = [...new Set([...products.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories])].sort((a, b) => a.localeCompare(b));
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
 

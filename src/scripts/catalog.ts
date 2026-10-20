@@ -60,7 +60,7 @@ if (catalog) {
       .filter((product) => {
         const searchText = product.dataset.productSearch ?? product.dataset.productName ?? "";
         const tag = product.dataset.productTag ?? "";
-        return searchText.includes(query) && (!selectedTag || tag === selectedTag);
+        return searchText.includes(query) && (!selectedTag || tag.split("|").includes(selectedTag));
       })
       .sort((first, second) => {
         const firstPrice = Number(first.dataset.productPrice);

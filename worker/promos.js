@@ -2,7 +2,7 @@ import products from "../src/data/products.json" with { type: "json" };
 import extraCategories from "../src/data/categories.json" with { type: "json" };
 
 const productById = new Map(products.map((product) => [product.id, product]));
-const categories = [...new Set([...products.map((product) => product.tag), ...extraCategories])];
+const categories = [...new Set([...products.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories])];
 const RESERVATION_MINUTES = 30;
 
 function validDate(value) {
@@ -40,7 +40,7 @@ export async function quotePromo(database, codeValue, email, items, now = new Da
         .reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
     } else if (promo.target_type === "category") {
       eligibleSubtotalPaise = items
-        .filter((item) => item.product.tag === promo.target_value)
+        .filter((item) => [item.product.tag, ...(item.product.extraTags ?? [])].includes(promo.target_value))
         .reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
     } else if (promo.target_type !== "all") {
       throw new Error("That promo code has invalid targeting.");

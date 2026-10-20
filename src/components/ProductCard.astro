@@ -8,6 +8,7 @@ interface Product {
   price: number;
   packSize: string;
   tag: string;
+  extraTags?: string[];
   flavours: string[];
   featured?: boolean;
   customizable?: boolean;
@@ -27,7 +28,7 @@ const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
   class="product-card"
   data-product-name={product.name.toLowerCase()}
   data-product-search={`${product.name} ${product.description} ${product.tag}`.toLowerCase()}
-  data-product-tag={product.tag}
+  data-product-tag={[product.tag, ...(product.extraTags ?? [])].join("|")}
   data-product-price={product.price}
   data-product-featured={product.featured ? "true" : "false"}
   style={`--card-index: ${index}`}
