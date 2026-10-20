@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.19.2]
+
+### Fixed
+- Custom fields (e.g. Customisation) now span the full width of the product options and checkout forms on mobile instead of sitting in a half-width column.
+
 ## [1.19.1]
 
 ### Fixed

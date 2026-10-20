@@ -6196,3 +6196,57 @@ main .store-heading > p {
 @media (max-width: 620px) {
   .admin-field-form { grid-template-columns: 1fr; }
 }
+
+/* Custom fields inside the product options grid */
+.product-options .custom-fields {
+  grid-column: 1 / -1;
+}
+
+.product-options .custom-field > label.custom-field-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  color: #46332a;
+}
+
+.product-options .custom-field textarea,
+.product-options .custom-field input[type="text"],
+.product-options .custom-field input[type="number"],
+.product-options .custom-field input[type="date"],
+.product-options .custom-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #ded2c5;
+  border-radius: 10px;
+  background: #fffdf9;
+  color: #46332a;
+  font: inherit;
+  font-size: 16px;
+}
+
+.product-options .custom-field textarea {
+  min-height: 92px;
+}
+
+.product-options .custom-field-choice {
+  display: flex;
+  grid-template-columns: none;
+  font-size: 14px;
+}
+
+.product-options .custom-field-required {
+  color: #a25f4c;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.checkout-form .custom-fields {
+  grid-column: 1 / -1;
+}
+
+.checkout-form .custom-field input[type="checkbox"],
+.checkout-form .custom-field input[type="radio"] {
+  min-height: 0;
+}
