@@ -106,7 +106,7 @@ function renderOrder(order: OrderDetails) {
     const details = document.createElement("div");
     appendText(details, "strong", `${item.name} × ${item.quantity}`);
     if (item.flavour) appendText(details, "span", `Flavour: ${item.flavour}`);
-    appendText(details, "span", `Wrapper: ${item.wrapper}`);
+    if (item.wrapper) appendText(details, "span", `Wrapper: ${item.wrapper}`);
     appendText(line, "span", currency.format(item.unitPriceRupees * item.quantity));
     line.prepend(details);
     itemList.append(line);

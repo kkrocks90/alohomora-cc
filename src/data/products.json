@@ -539,5 +539,16 @@
             "Strawberry",
             "White Chocolate"
         ]
+    },
+    {
+        "id": "product-1047",
+        "name": "Assorted Heart Chocolates (Pack of 1)",
+        "description": "A heart-shaped gift box of assorted handmade chocolates, with the selection chosen by us.",
+        "price": 1350,
+        "image": "product-1047.jpg",
+        "tag": "Elite Gifting",
+        "packSize": "Pack of 1",
+        "flavours": [],
+        "customizable": false
     }
 ]

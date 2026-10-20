@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.16.0] - 2026-10-20
+
+### Added
+- New product: Assorted Heart Chocolates (Pack of 1), Rs 1350, in Elite Gifting. No flavour choice.
+- Products can be marked `customizable: false`: no wrapper description is asked for on the product page, cart or checkout, and the Worker accepts an empty wrapper for them.
+
 ## [1.15.1] - 2026-10-20
 
 ### Fixed

@@ -217,6 +217,49 @@ test("rejects checkout PIN codes that are not six-digit Indian postal codes", as
   assert.match((await response.json()).error, /six-digit Indian PIN code/i);
 });
 
+test("products without customisation accept an empty wrapper and reject a custom one", async (context) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, init) => {
+    const payload = JSON.parse(String(init?.body));
+    return Response.json({ id: "order_test123", amount: payload.amount, currency: "INR" });
+  };
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  const send = (wrapper) => worker.fetch(
+    new Request("https://checkout.example.com/orders", {
+      method: "POST",
+      headers: { Origin: "https://shop.example.com", "Content-Type": "application/json", ...sessionHeaders },
+      body: JSON.stringify({
+        items: [{ id: "product-1047", quantity: 1, flavour: "", wrapper }],
+        customer: {
+          name: "Customer Example",
+          phone: "+911234567890",
+          email: "customer@example.com",
+          address: "123 Sample Street",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: "600001",
+          policyConsent: true,
+        },
+        deliveryLocation: { latitude: 0, longitude: 0 },
+      }),
+    }),
+    {
+      ALLOWED_ORIGIN: "https://shop.example.com",
+      STORE_LATITUDE: "0",
+      STORE_LONGITUDE: "0",
+      ORDERS_DB: authenticatedOrdersDb,
+      RAZORPAY_KEY_ID: "test_key",
+      RAZORPAY_KEY_SECRET: "test_secret",
+    },
+  );
+  assert.equal((await send("")).status, 201);
+  const rejected = await send("Pink flowers");
+  assert.equal(rejected.status, 400);
+  assert.match((await rejected.json()).error, /flavour.*wrapper/i);
+});
+
 test("requires flavour and wrapper selections before creating a payment order", async () => {
   const response = await worker.fetch(
     new Request("https://checkout.example.com/orders", {

@@ -95,8 +95,9 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
         (product.flavours.length > 0 && !product.flavours.includes(flavour)) ||
         (product.flavours.length === 0 && flavour !== "") ||
         typeof wrapper !== "string" ||
-        wrapper.trim().length < 3 ||
-        wrapper.trim().length > 120)
+        (product.customizable === false
+          ? wrapper !== ""
+          : wrapper.trim().length < 3 || wrapper.trim().length > 120))
     ) {
       throw new Error("The paid order contains an invalid product, quantity, flavour, or wrapper.");
     }

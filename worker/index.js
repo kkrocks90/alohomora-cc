@@ -132,12 +132,15 @@ function validateOrder(body, storeLocation) {
     if (!item || typeof item !== "object" || typeof item.id !== "string" ||
         !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > MAX_QUANTITY ||
         typeof item.flavour !== "string" ||
-        typeof item.wrapper !== "string" || item.wrapper.trim().length < 3 ||
-        item.wrapper.trim().length > 120) {
+        typeof item.wrapper !== "string") {
       throw new Error("Each product needs a valid quantity, any required flavour choice, and a wrapper description (3 to 120 characters).");
     }
     const product = productById.get(item.id);
     if (!product) throw new Error("A product in your bag is no longer available.");
+    const wrapperLength = item.wrapper.trim().length;
+    if (product.customizable === false ? item.wrapper !== "" : wrapperLength < 3 || wrapperLength > 120) {
+      throw new Error("Each product needs a valid quantity, any required flavour choice, and a wrapper description (3 to 120 characters).");
+    }
     if (
       (product.flavours.length > 0 && !product.flavours.includes(item.flavour)) ||
       (product.flavours.length === 0 && item.flavour !== "")

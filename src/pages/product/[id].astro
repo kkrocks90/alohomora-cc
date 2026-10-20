@@ -55,11 +55,12 @@ const productLd = [
     ],
   },
 ];
+const customizable = product.customizable !== false;
 ---
 
 <SiteLayout
   title={`${product.name} — Chocolate Circle`}
-  description={`${product.description} ₹${product.price}, ${product.packSize}. Handmade with a personalised wrapper.`}
+  description={`${product.description} ₹${product.price}, ${product.packSize}.${customizable ? " Handmade with a personalised wrapper." : " Handmade in small batches."}`}
   socialImage={shareImage.src}
   socialImageAlt={`${product.name} by Chocolate Circle`}
   ogType="product"
@@ -95,7 +96,9 @@ const productLd = [
           <span>{product.packSize}</span>
         </div>
         <p class="product-option-note">
-          Choose your quantity{product.flavours.length > 0 && ", flavour"}, then describe the wrapper you’d like.
+          {customizable
+            ? <>Choose your quantity{product.flavours.length > 0 && ", flavour"}, then describe the wrapper you’d like.</>
+            : <>Choose your quantity. The chocolate selection is decided by us.</>}
         </p>
         <form class="product-options" id="product-options-form">
           <label>
@@ -115,7 +118,7 @@ const productLd = [
               </select>
             </label>
           )}
-          <label>
+          {customizable && (<label>
             Describe your wrapper design <span>Required</span>
             <textarea
               name="wrapper"
@@ -125,7 +128,7 @@ const productLd = [
               placeholder="For example: pink flowers with a birthday message"
               required
             ></textarea>
-          </label>
+          </label>)}
           <button
             class="button button-primary product-add-button"
             type="button"
@@ -135,10 +138,10 @@ const productLd = [
             Add to bag <span aria-hidden="true">+</span>
           </button>
         </form>
-        <p class="product-detail-footnote">Please describe the colours, theme, or message you’d like (up to 120 characters). We’ll confirm what’s possible.</p>
+        {customizable && <p class="product-detail-footnote">Please describe the colours, theme, or message you’d like (up to 120 characters). We’ll confirm what’s possible.</p>}
         <ul class="product-trust" aria-label="Why customers love us">
           <li><span aria-hidden="true">🍫</span> Handmade in small batches</li>
-          <li><span aria-hidden="true">🎁</span> Personalised wrapper</li>
+          <li><span aria-hidden="true">🎁</span> {customizable ? "Personalised wrapper" : "Gift-ready box"}</li>
           <li><span aria-hidden="true">🚚</span> Delivery across India</li>
           <li><span aria-hidden="true">🔒</span> Secure Razorpay payment</li>
         </ul>

@@ -10,6 +10,7 @@ export interface Product {
   packSize: string;
   flavours: string[];
   featured?: boolean;
+  customizable?: boolean;
 }
 
 export interface CartItem {
@@ -70,8 +71,9 @@ export function loadCart(): CartItem[] {
         ? productById.get(item.id)!.flavours.includes(item.flavour)
         : item.flavour === "") &&
       typeof item.wrapper === "string" &&
-      item.wrapper.trim().length >= 3 &&
-      item.wrapper.trim().length <= 120,
+      (productById.get(item.id)!.customizable === false
+        ? item.wrapper === ""
+        : item.wrapper.trim().length >= 3 && item.wrapper.trim().length <= 120),
     ),
   );
 }

@@ -239,7 +239,7 @@ function renderOrder() {
     options.textContent = [
       item.quantity > 1 ? `Quantity: ${item.quantity}` : "",
       item.flavour ? `Flavour: ${item.flavour}` : "",
-      `Wrapper: ${item.wrapper}`,
+      item.wrapper ? `Wrapper: ${item.wrapper}` : "",
     ].filter(Boolean).join(" · ");
     details.append(name, options);
     const price = document.createElement("span");

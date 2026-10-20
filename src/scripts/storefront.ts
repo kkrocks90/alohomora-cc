@@ -60,9 +60,12 @@ function renderCart() {
       flavour.textContent = `Flavour: ${item.flavour}`;
       copy.append(flavour);
     }
-    const wrapper = document.createElement("span");
-    wrapper.textContent = `Wrapper: ${item.wrapper}`;
-    copy.append(wrapper, price);
+    if (item.wrapper) {
+      const wrapper = document.createElement("span");
+      wrapper.textContent = `Wrapper: ${item.wrapper}`;
+      copy.append(wrapper);
+    }
+    copy.append(price);
 
     const controls = document.createElement("div");
     controls.className = "cart-quantity";
@@ -140,7 +143,9 @@ document.addEventListener("click", (event) => {
     const hasValidFlavour = product.flavours.length > 0
       ? product.flavours.includes(flavour)
       : flavour === "";
-    if (!hasValidFlavour || wrapper.length < 3 || wrapper.length > 120) {
+    const customizable = product.customizable !== false;
+    const hasValidWrapper = customizable ? wrapper.length >= 3 && wrapper.length <= 120 : wrapper === "";
+    if (!hasValidFlavour || !hasValidWrapper) {
       throw new Error("Choose an available flavour and describe your wrapper design in 3 to 120 characters.");
     }
 
@@ -158,7 +163,7 @@ document.addEventListener("click", (event) => {
   const id = quantityButton?.dataset.productId;
   const flavour = quantityButton?.dataset.productFlavour;
   const wrapper = quantityButton?.dataset.productWrapper;
-  if (!quantityButton || !id || typeof flavour !== "string" || !wrapper || !productById.has(id)) return;
+  if (!quantityButton || !id || typeof flavour !== "string" || typeof wrapper !== "string" || !productById.has(id)) return;
   const item = cart.find((entry) => getCartItemKey(entry) === getCartItemKey({ id, flavour, wrapper }));
   if (!item) return;
   item.quantity = quantityButton.dataset.cartAction === "increase"
