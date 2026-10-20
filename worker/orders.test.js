@@ -163,7 +163,7 @@ test("does not accept paid order notes with tampered price or delivery method", 
   assert.throws(
     () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
       delivery_method: "Porter (manual booking)",
-      distance_km: "15.01",
+      distance_km: "30.01",
     }), paidOrder.amountPaise),
     /invalid delivery method/,
   );

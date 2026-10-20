@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.11.0] - 2026-10-20
+
+### Changed
+- Porter delivery radius increased from 15 km to 30 km. Beyond 30 km, courier is suggested. Terms, shipping and privacy policies updated.
+
 ## [1.10.1] - 2026-10-20
 
 ### Changed

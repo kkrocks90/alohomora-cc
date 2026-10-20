@@ -29,15 +29,15 @@ test("validates delivery coordinate ranges", () => {
   assert.equal(isValidDeliveryLocation(null), false);
 });
 
-test("calculates a distance of fifteen kilometres at the equator", () => {
-  const longitudeAt15Km = (PORTER_RADIUS_KM / 6371.0088) * (180 / Math.PI);
+test("calculates a distance of thirty kilometres at the equator", () => {
+  const longitudeAtRadius = (PORTER_RADIUS_KM / 6371.0088) * (180 / Math.PI);
   assert.ok(
-    Math.abs(getDistanceKm({ latitude: 0, longitude: 0 }, { latitude: 0, longitude: longitudeAt15Km }) -
+    Math.abs(getDistanceKm({ latitude: 0, longitude: 0 }, { latitude: 0, longitude: longitudeAtRadius }) -
       PORTER_RADIUS_KM) < 1e-9,
   );
 });
 
-test("selects Porter at 15 km and a courier only beyond 15 km", () => {
-  assert.equal(getFulfillmentMethod(15), "Porter (manual booking)");
-  assert.equal(getFulfillmentMethod(15.00001), "Courier (manual booking)");
+test("selects Porter at 30 km and a courier only beyond 30 km", () => {
+  assert.equal(getFulfillmentMethod(30), "Porter (manual booking)");
+  assert.equal(getFulfillmentMethod(30.00001), "Courier (manual booking)");
 });

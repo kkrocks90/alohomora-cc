@@ -1,4 +1,4 @@
-export const PORTER_RADIUS_KM = 15;
+export const PORTER_RADIUS_KM = 30;
 
 const EARTH_RADIUS_KM = 6371.0088;
 
