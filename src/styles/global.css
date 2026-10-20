@@ -6007,3 +6007,33 @@ main .store-heading > p {
 .product-options label > select {
   margin-top: 8px;
 }
+/* Session loader: avoids flashing the sign-in form while a saved session loads */
+.session-loader {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 50vh;
+  color: #5f4e44;
+  font-weight: 600;
+}
+.is-session-loading > .session-loader {
+  display: flex;
+}
+.is-session-loading > :not(.session-loader):not(script) {
+  display: none !important;
+}
+.session-loader-spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #e6d6c8;
+  border-top-color: #a25f4c;
+  border-radius: 50%;
+  animation: session-spin 0.8s linear infinite;
+}
+@keyframes session-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .session-loader-spinner { animation-duration: 2.4s; }
+}

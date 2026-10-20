@@ -1143,6 +1143,10 @@ if (root) {
       showSignedOut(error instanceof AdminApiError && error.status === 403
         ? "This signed-in account does not have admin access."
         : error instanceof Error ? error.message : "Could not load the admin dashboard.");
+    }).finally(() => {
+      root.classList.remove("is-session-loading");
     });
+  } else {
+    root.classList.remove("is-session-loading");
   }
 }

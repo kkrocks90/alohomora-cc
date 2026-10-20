@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.14.2] - 2026-10-20
+
+### Fixed
+- The profile and admin pages no longer flash the sign-in form while a saved session loads; a spinner is shown instead.
+
 ## [1.14.1] - 2026-10-20
 
 ### Fixed

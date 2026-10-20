@@ -7,6 +7,17 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 
 <SiteLayout title="My profile — Chocolate Circle" description="Sign in securely to view your Chocolate Circle profile, delivery addresses, and orders." noIndex>
   <main class="account-page" id="customer-account" data-checkout-api={checkoutApiUrl} data-base-url={import.meta.env.BASE_URL}>
+    <script is:inline>
+      (function () {
+        var ok = function (v) { return /^[0-9a-f]{64}$/.test(v || ""); };
+        try {
+          if (ok(localStorage.getItem("cocoa-kind-customer-session")) || ok(sessionStorage.getItem("cocoa-kind-customer-session"))) {
+            document.currentScript.parentElement.classList.add("is-session-loading");
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <div class="session-loader" role="status" aria-live="polite"><span class="session-loader-spinner" aria-hidden="true"></span><span>Loading your profile…</span></div>
     <section class="account-panel" aria-labelledby="account-title">
       <p class="eyebrow">Your little chocolate corner</p>
       <h1 id="account-title">My profile</h1>

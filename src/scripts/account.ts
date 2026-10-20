@@ -267,6 +267,7 @@ if (root) {
     ordersSection.hidden = false;
   }
 
+  let redirectingToAdmin = false;
   async function loadOrders(token: string, rememberMe?: boolean) {
     setBusy(true);
     try {
@@ -275,6 +276,7 @@ if (root) {
         clearCustomerSessionToken();
         sessionStorage.setItem(ADMIN_SESSION_KEY, token);
         window.dispatchEvent(new Event("customer-session-change"));
+        redirectingToAdmin = true;
         window.location.assign(`${baseUrl}admin/`);
         return;
       }
@@ -402,6 +404,10 @@ if (root) {
     void loadOrders(existingToken).catch((error: unknown) => {
       emailForm.hidden = false;
       setStatus(error instanceof Error ? error.message : "Could not load your orders.", true);
+    }).finally(() => {
+      if (!redirectingToAdmin) root.classList.remove("is-session-loading");
     });
+  } else {
+    root.classList.remove("is-session-loading");
   }
 }

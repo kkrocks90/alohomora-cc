@@ -11,6 +11,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
   noIndex
 >
   <main class="admin-page" id="admin-app" data-checkout-api={checkoutApiUrl}>
+    <script is:inline>
+      (function () {
+        try {
+          if (sessionStorage.getItem("cocoa-kind-admin-session")) {
+            document.currentScript.parentElement.classList.add("is-session-loading");
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <div class="session-loader" role="status" aria-live="polite"><span class="session-loader-spinner" aria-hidden="true"></span><span>Opening dashboard…</span></div>
     <section class="admin-login-panel" id="admin-login-panel" aria-labelledby="admin-title">
       <p class="eyebrow">Chocolate Circle · private</p>
       <h1 id="admin-title">Order <em>management.</em></h1>
