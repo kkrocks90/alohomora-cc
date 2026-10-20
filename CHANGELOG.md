@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.19.1]
+
+### Fixed
+- Admin dashboard login now accepts legacy order payloads that do not include custom-field snapshots, so OTP sign-in no longer fails with "invalid admin data" on older/test orders.
+- Missing item/order custom snapshots are normalized to empty lists on the client, preventing runtime errors while keeping invoice and order views working.
+
 ## [1.19.0]
 
 ### Changed

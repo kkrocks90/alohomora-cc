@@ -88,6 +88,13 @@ interface AdminData {
   customFields: CustomField[];
 }
 
+function isAnswerList(value: unknown): value is { label: string; value: string }[] {
+  return Array.isArray(value) && value.every((entry) =>
+    !!entry && typeof entry === "object" &&
+    typeof (entry as Record<string, unknown>).label === "string" &&
+    typeof (entry as Record<string, unknown>).value === "string");
+}
+
 function formatDeliveryAddress(order: Pick<AdminOrder, "deliveryAddress" | "city" | "state" | "pincode">) {
   return [order.deliveryAddress, order.city, order.state, order.pincode].filter(Boolean).join(", ");
 }
@@ -123,7 +130,8 @@ function isAdminOrderItem(value: unknown): value is AdminOrderItem {
     typeof item.quantity === "number" &&
     typeof item.unitPriceRupees === "number" &&
     typeof item.flavour === "string" &&
-    typeof item.wrapper === "string";
+    typeof item.wrapper === "string" &&
+    (item.custom === undefined || isAnswerList(item.custom));
 }
 
 function isAdminOrder(value: unknown): value is AdminOrder {
@@ -151,7 +159,8 @@ function isAdminOrder(value: unknown): value is AdminOrder {
     typeof order.currency === "string" &&
     typeof order.deliveryMethod === "string" &&
     typeof order.eventDate === "string" &&
-    typeof order.createdAt === "string";
+    typeof order.createdAt === "string" &&
+    (order.customFields === undefined || isAnswerList(order.customFields));
 }
 
 function isAdminPromo(value: unknown): value is AdminPromo {
@@ -189,8 +198,24 @@ function isAdminData(value: unknown): value is AdminData {
     data.categories.every((category) => typeof category === "string") &&
     Array.isArray(data.promos) &&
     data.promos.every(isAdminPromo) &&
-    Array.isArray(data.customFields) &&
-    data.customFields.every(isCustomField);
+    (data.customFields === undefined ||
+      (Array.isArray(data.customFields) && data.customFields.every(isCustomField)));
+}
+
+function normalizeAdminData(data: AdminData): AdminData {
+  const root = data as AdminData & { customFields?: CustomField[] };
+  return {
+    ...data,
+    customFields: Array.isArray(root.customFields) ? root.customFields : [],
+    orders: data.orders.map((order) => ({
+      ...order,
+      customFields: Array.isArray(order.customFields) ? order.customFields : [],
+      items: order.items.map((item) => ({
+        ...item,
+        custom: Array.isArray(item.custom) ? item.custom : [],
+      })),
+    })),
+  };
 }
 
 function requireElement<T extends Element>(parent: ParentNode, selector: string): T {
@@ -841,7 +866,7 @@ if (root) {
   async function loadDashboard(token = sessionStorage.getItem(sessionKey) ?? "") {
     const result = await post("/admin/data", undefined, token);
     if (!isAdminData(result)) throw new Error("The order service returned invalid admin data.");
-    adminData = result;
+    adminData = normalizeAdminData(result);
     loginPanel.hidden = true;
     dashboard.hidden = false;
     signedIn.textContent = `Signed in as ${adminData.email}`;
