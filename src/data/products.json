@@ -1,617 +1,543 @@
 [
     {
-        "id":  "product-1001",
-        "name":  "Choco Cubes (Pack of 40)",
-        "description":  "A ready-to-share pack of 40.",
-        "price":  800,
-        "image":  "product-1001.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 40",
-        "flavours":  [
-                         "Chocolate",
-                         "Dark Chocolate",
-                         "Crispies",
-                         "Almonds",
-                         "Nuts",
-                         "Butterscotch",
-                         "Strawberry",
-                         "White Chocolate"
-                     ],
-        "featured":  true
+        "id": "product-1001",
+        "name": "Choco Cubes (Pack of 40)",
+        "description": "A ready-to-share pack of 40.",
+        "price": 800,
+        "image": "product-1001.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 40",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ],
+        "featured": true
     },
     {
-        "id":  "product-1002",
-        "name":  "Treasure Tin - ₹120 Edition (Pack of 20)",
-        "description":  "A ready-to-share pack of 20.",
-        "price":  2400,
-        "image":  "product-1002.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 20",
-        "featured":  true,
-        "flavours":  [
-
-                     ]
+        "id": "product-1002",
+        "name": "Treasure Tin - ₹120 Edition (Pack of 20)",
+        "description": "A ready-to-share pack of 20.",
+        "price": 2400,
+        "image": "product-1002.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 20",
+        "featured": true,
+        "flavours": []
     },
     {
-        "id":  "product-1003",
-        "name":  "Steel Box - ₹210 Edition (Pack of 10)",
-        "description":  "A ready-to-share pack of 10.",
-        "price":  2100,
-        "image":  "product-1003.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 10",
-        "flavours":  [
-
-                     ]
+        "id": "product-1003",
+        "name": "Steel Box - ₹210 Edition (Pack of 10)",
+        "description": "A ready-to-share pack of 10.",
+        "price": 2100,
+        "image": "product-1003.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 10",
+        "flavours": []
     },
     {
-        "id":  "product-1004",
-        "name":  "Treasure Tin - ₹60 Edition (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1800,
-        "image":  "product-1004.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1004",
+        "name": "Treasure Tin - ₹60 Edition (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1800,
+        "image": "product-1004.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1005",
-        "name":  "Steel Box - ₹155 Edition (Pack of 15)",
-        "description":  "A ready-to-share pack of 15.",
-        "price":  2325,
-        "image":  "product-1005.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 15",
-        "flavours":  [
-
-                     ]
+        "id": "product-1005",
+        "name": "Steel Box - ₹155 Edition (Pack of 15)",
+        "description": "A ready-to-share pack of 15.",
+        "price": 2325,
+        "image": "product-1005.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 15",
+        "flavours": []
     },
     {
-        "id":  "product-1006",
-        "name":  "Golden Tray Chocolates (Pack of 25)",
-        "description":  "A ready-to-share pack of 25.",
-        "price":  2250,
-        "image":  "product-1006.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 25",
-        "flavours":  [
-
-                     ]
+        "id": "product-1006",
+        "name": "Golden Tray Chocolates (Pack of 25)",
+        "description": "A ready-to-share pack of 25.",
+        "price": 2250,
+        "image": "product-1006.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 25",
+        "flavours": []
     },
     {
-        "id":  "product-1007",
-        "name":  "Choco Glass Box (Pack of 25)",
-        "description":  "A ready-to-share pack of 25.",
-        "price":  2250,
-        "image":  "product-1007.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 25",
-        "flavours":  [
-
-                     ]
+        "id": "product-1007",
+        "name": "Choco Glass Box (Pack of 25)",
+        "description": "A ready-to-share pack of 25.",
+        "price": 2250,
+        "image": "product-1007.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 25",
+        "flavours": []
     },
     {
-        "id":  "product-1008",
-        "name":  "Cone Marshmallows (Pack of 10)",
-        "description":  "A ready-to-share pack of 10.",
-        "price":  750,
-        "image":  "product-1008.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 10",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1008",
+        "name": "Cone Marshmallows (Pack of 10)",
+        "description": "A ready-to-share pack of 10.",
+        "price": 750,
+        "image": "product-1008.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 10",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1009",
-        "name":  "Cone Jujubes (Pack of 10)",
-        "description":  "A ready-to-share pack of 10.",
-        "price":  750,
-        "image":  "product-1009.jpg",
-        "tag":  "Candies \u0026 sweets",
-        "packSize":  "Pack of 10",
-        "flavours":  [
-
-                     ]
+        "id": "product-1009",
+        "name": "Cone Jujubes (Pack of 10)",
+        "description": "A ready-to-share pack of 10.",
+        "price": 750,
+        "image": "product-1009.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 10",
+        "flavours": []
     },
     {
-        "id":  "product-1010",
-        "name":  "Cone Chocolate (Pack of 10)",
-        "description":  "A ready-to-share pack of 10.",
-        "price":  1000,
-        "image":  "product-1010.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 10",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1010",
+        "name": "Cone Chocolate (Pack of 10)",
+        "description": "A ready-to-share pack of 10.",
+        "price": 1000,
+        "image": "product-1010.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 10",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1011",
-        "name":  "Silver Circle Box (Pack of 40)",
-        "description":  "A ready-to-share pack of 40.",
-        "price":  1600,
-        "image":  "product-1011.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 40",
-        "flavours":  [
-
-                     ]
+        "id": "product-1011",
+        "name": "Silver Circle Box (Pack of 40)",
+        "description": "A ready-to-share pack of 40.",
+        "price": 1600,
+        "image": "product-1011.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 40",
+        "flavours": []
     },
     {
-        "id":  "product-1012",
-        "name":  "Golden Circle Box (Pack of 40)",
-        "description":  "A ready-to-share pack of 40.",
-        "price":  1520,
-        "image":  "product-1012.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 40",
-        "flavours":  [
-
-                     ]
+        "id": "product-1012",
+        "name": "Golden Circle Box (Pack of 40)",
+        "description": "A ready-to-share pack of 40.",
+        "price": 1520,
+        "image": "product-1012.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 40",
+        "flavours": []
     },
     {
-        "id":  "product-1013",
-        "name":  "Golden Circle Box (w Netted wrap and Card) (Pack of 40)",
-        "description":  "A ready-to-share pack of 40.",
-        "price":  1800,
-        "image":  "product-1013.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 40",
-        "flavours":  [
-
-                     ]
+        "id": "product-1013",
+        "name": "Golden Circle Box (w Netted wrap and Card) (Pack of 40)",
+        "description": "A ready-to-share pack of 40.",
+        "price": 1800,
+        "image": "product-1013.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 40",
+        "flavours": []
     },
     {
-        "id":  "product-1016",
-        "name":  "Dry Grapes (In a bottle) (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1100,
-        "image":  "product-1016.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1017",
+        "name": "Festive Basket (Steel) (Pack of 15)",
+        "description": "A ready-to-share pack of 15.",
+        "price": 2250,
+        "image": "product-1017.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 15",
+        "flavours": []
     },
     {
-        "id":  "product-1017",
-        "name":  "Festive Basket (Steel) (Pack of 15)",
-        "description":  "A ready-to-share pack of 15.",
-        "price":  2250,
-        "image":  "product-1017.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 15",
-        "flavours":  [
-
-                     ]
+        "id": "product-1018",
+        "name": "Golden Cube Box (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1800,
+        "image": "product-1018.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1018",
-        "name":  "Golden Cube Box (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1800,
-        "image":  "product-1018.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1019",
+        "name": "Steel Box - Plain (Pack of 25)",
+        "description": "A ready-to-share pack of 25.",
+        "price": 2725,
+        "image": "product-1019.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 25",
+        "flavours": []
     },
     {
-        "id":  "product-1019",
-        "name":  "Steel Box - Plain (Pack of 25)",
-        "description":  "A ready-to-share pack of 25.",
-        "price":  2725,
-        "image":  "product-1019.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 25",
-        "flavours":  [
-
-                     ]
+        "id": "product-1020",
+        "name": "18 Slot Hamper",
+        "description": "A hamper with 18 slots, ready for gifting.",
+        "price": 1500,
+        "image": "product-1020.jpg",
+        "tag": "Hampers",
+        "packSize": "18 slots",
+        "featured": true,
+        "flavours": []
     },
     {
-        "id":  "product-1020",
-        "name":  "18 Slot Hamper",
-        "description":  "A hamper with 18 slots, ready for gifting.",
-        "price":  1500,
-        "image":  "product-1020.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "18 slots",
-        "featured":  true,
-        "flavours":  [
-
-                     ]
+        "id": "product-1021",
+        "name": "12 Slot Hamper",
+        "description": "A hamper with 12 slots, ready for gifting.",
+        "price": 1300,
+        "image": "product-1021.jpg",
+        "tag": "Hampers",
+        "packSize": "12 slots",
+        "flavours": []
     },
     {
-        "id":  "product-1021",
-        "name":  "12 Slot Hamper",
-        "description":  "A hamper with 12 slots, ready for gifting.",
-        "price":  1300,
-        "image":  "product-1021.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "12 slots",
-        "flavours":  [
-
-                     ]
+        "id": "product-1022",
+        "name": "6 Slot Hamper",
+        "description": "A hamper with 6 slots, ready for gifting.",
+        "price": 950,
+        "image": "product-1022.jpg",
+        "tag": "Hampers",
+        "packSize": "6 slots",
+        "flavours": []
     },
     {
-        "id":  "product-1022",
-        "name":  "6 Slot Hamper",
-        "description":  "A hamper with 6 slots, ready for gifting.",
-        "price":  950,
-        "image":  "product-1022.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "6 slots",
-        "flavours":  [
-
-                     ]
+        "id": "product-1023",
+        "name": "5 Slot Hamper",
+        "description": "A hamper with 5 slots, ready for gifting.",
+        "price": 900,
+        "image": "product-1023.jpg",
+        "tag": "Hampers",
+        "packSize": "5 slots",
+        "flavours": []
     },
     {
-        "id":  "product-1023",
-        "name":  "5 Slot Hamper",
-        "description":  "A hamper with 5 slots, ready for gifting.",
-        "price":  900,
-        "image":  "product-1023.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "5 slots",
-        "flavours":  [
-
-                     ]
+        "id": "product-1024",
+        "name": "4 Slot Hamper",
+        "description": "A hamper with 4 slots, ready for gifting.",
+        "price": 800,
+        "image": "product-1024.jpg",
+        "tag": "Hampers",
+        "packSize": "4 slots",
+        "flavours": []
     },
     {
-        "id":  "product-1024",
-        "name":  "4 Slot Hamper",
-        "description":  "A hamper with 4 slots, ready for gifting.",
-        "price":  800,
-        "image":  "product-1024.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "4 slots",
-        "flavours":  [
-
-                     ]
+        "id": "product-1025",
+        "name": "Stationary Chocolate (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1500,
+        "image": "product-1025.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 30",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1025",
-        "name":  "Stationary Chocolate (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1500,
-        "image":  "product-1025.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1026",
+        "name": "Choco Dabba (Pack of 80)",
+        "description": "A ready-to-share pack of 80.",
+        "price": 1125,
+        "image": "product-1026.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 80",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1026",
-        "name":  "Choco Dabba (Pack of 80)",
-        "description":  "A ready-to-share pack of 80.",
-        "price":  1125,
-        "image":  "product-1026.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 80",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1027",
+        "name": "Chocolate Pouch (Pack of 50)",
+        "description": "A ready-to-share pack of 50.",
+        "price": 1360,
+        "image": "product-1027.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 50",
+        "flavours": []
     },
     {
-        "id":  "product-1027",
-        "name":  "Chocolate Pouch (Pack of 50)",
-        "description":  "A ready-to-share pack of 50.",
-        "price":  1360,
-        "image":  "product-1027.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 50",
-        "flavours":  [
-
-                     ]
+        "id": "product-1028",
+        "name": "Choco Cards (w Pen \u0026 Pencil) (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1350,
+        "image": "product-1028.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1028",
-        "name":  "Choco Cards (w Pen \u0026 Pencil) (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1350,
-        "image":  "product-1028.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1029",
+        "name": "Choco Cans (Pack of 20)",
+        "description": "A ready-to-share pack of 20.",
+        "price": 1300,
+        "image": "product-1029.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 20",
+        "flavours": []
     },
     {
-        "id":  "product-1029",
-        "name":  "Choco Cans (Pack of 20)",
-        "description":  "A ready-to-share pack of 20.",
-        "price":  1300,
-        "image":  "product-1029.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 20",
-        "flavours":  [
-
-                     ]
+        "id": "product-1030",
+        "name": "Folded Card Chocolate (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1350,
+        "image": "product-1030.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1030",
-        "name":  "Folded Card Chocolate (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1350,
-        "image":  "product-1030.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1031",
+        "name": "Tin Chocolates (Pack of 20)",
+        "description": "A ready-to-share pack of 20.",
+        "price": 1600,
+        "image": "product-1031.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 20",
+        "flavours": []
     },
     {
-        "id":  "product-1031",
-        "name":  "Tin Chocolates (Pack of 20)",
-        "description":  "A ready-to-share pack of 20.",
-        "price":  1600,
-        "image":  "product-1031.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 20",
-        "flavours":  [
-
-                     ]
+        "id": "product-1032",
+        "name": "Pouch Bag with Chocolates (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1280,
+        "image": "product-1032.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1032",
-        "name":  "Pouch Bag with Chocolates (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1280,
-        "image":  "product-1032.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1033",
+        "name": "Mini Cards w Disc Chocolate (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 950,
+        "image": "product-1033.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1033",
-        "name":  "Mini Cards w Disc Chocolate (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  950,
-        "image":  "product-1033.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1034",
+        "name": "Mini Cards Square (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 950,
+        "image": "product-1034.jpg",
+        "tag": "Kids B'Day Special",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1034",
-        "name":  "Mini Cards Square (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  950,
-        "image":  "product-1034.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1035",
+        "name": "Choco Tangles (Pack of 50)",
+        "description": "A ready-to-share pack of 50.",
+        "price": 760,
+        "image": "product-1035.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 50",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1035",
-        "name":  "Choco Tangles (Pack of 50)",
-        "description":  "A ready-to-share pack of 50.",
-        "price":  760,
-        "image":  "product-1035.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 50",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1036",
+        "name": "Choco Bars (Pack of 10)",
+        "description": "A ready-to-share pack of 10.",
+        "price": 680,
+        "image": "product-1036.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 10",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1036",
-        "name":  "Choco Bars (Pack of 10)",
-        "description":  "A ready-to-share pack of 10.",
-        "price":  680,
-        "image":  "product-1036.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 10",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1037",
+        "name": "Bangle Chocolate (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 950,
+        "image": "product-1037.jpg",
+        "tag": "Hampers",
+        "packSize": "Pack of 30",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1037",
-        "name":  "Bangle Chocolate (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  950,
-        "image":  "product-1037.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1038",
+        "name": "Stick Candy Junior (Pack of 50)",
+        "description": "A ready-to-share pack of 50.",
+        "price": 960,
+        "image": "product-1038.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 50",
+        "flavours": []
     },
     {
-        "id":  "product-1038",
-        "name":  "Stick Candy Junior (Pack of 50)",
-        "description":  "A ready-to-share pack of 50.",
-        "price":  960,
-        "image":  "product-1038.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 50",
-        "flavours":  [
-
-                     ]
+        "id": "product-1039",
+        "name": "Lollipops (with bow) (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 800,
+        "image": "product-1039.jpg",
+        "tag": "Candies \u0026 sweets",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1039",
-        "name":  "Lollipops (with bow) (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  800,
-        "image":  "product-1039.jpg",
-        "tag":  "Candies \u0026 sweets",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1040",
+        "name": "Peanut Candy (Kadalai Mittai) (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 1280,
+        "image": "product-1040.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1040",
-        "name":  "Peanut Candy (Kadalai Mittai) (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  1280,
-        "image":  "product-1040.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1041",
+        "name": "Choco Wafers (Pack of 50)",
+        "description": "A ready-to-share pack of 50.",
+        "price": 1520,
+        "image": "product-1041.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 50",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1041",
-        "name":  "Choco Wafers (Pack of 50)",
-        "description":  "A ready-to-share pack of 50.",
-        "price":  1520,
-        "image":  "product-1041.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 50",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1042",
+        "name": "Lollipops (Pack of 30)",
+        "description": "A ready-to-share pack of 30.",
+        "price": 720,
+        "image": "product-1042.jpg",
+        "tag": "Candies \u0026 sweets",
+        "packSize": "Pack of 30",
+        "flavours": []
     },
     {
-        "id":  "product-1042",
-        "name":  "Lollipops (Pack of 30)",
-        "description":  "A ready-to-share pack of 30.",
-        "price":  720,
-        "image":  "product-1042.jpg",
-        "tag":  "Candies \u0026 sweets",
-        "packSize":  "Pack of 30",
-        "flavours":  [
-
-                     ]
+        "id": "product-1043",
+        "name": "Choco Slabs (Pack of 20)",
+        "description": "A ready-to-share pack of 20.",
+        "price": 800,
+        "image": "product-1043.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 20",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1043",
-        "name":  "Choco Slabs (Pack of 20)",
-        "description":  "A ready-to-share pack of 20.",
-        "price":  800,
-        "image":  "product-1043.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 20",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1044",
+        "name": "Stick Candy (Pack of 50)",
+        "description": "A ready-to-share pack of 50.",
+        "price": 1040,
+        "image": "product-1044.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 50",
+        "flavours": []
     },
     {
-        "id":  "product-1044",
-        "name":  "Stick Candy (Pack of 50)",
-        "description":  "A ready-to-share pack of 50.",
-        "price":  1040,
-        "image":  "product-1044.jpg",
-        "tag":  "Gifts \u0026 hampers",
-        "packSize":  "Pack of 50",
-        "flavours":  [
-
-                     ]
+        "id": "product-1045",
+        "name": "Mini Bars (Pack of 40)",
+        "description": "A ready-to-share pack of 40.",
+        "price": 800,
+        "image": "product-1045.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 40",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     },
     {
-        "id":  "product-1045",
-        "name":  "Mini Bars (Pack of 40)",
-        "description":  "A ready-to-share pack of 40.",
-        "price":  800,
-        "image":  "product-1045.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 40",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
-    },
-    {
-        "id":  "product-1046",
-        "name":  "Choco Squares (Pack of 50)",
-        "description":  "A ready-to-share pack of 50.",
-        "price":  640,
-        "image":  "product-1046.jpg",
-        "tag":  "Chocolate treats",
-        "packSize":  "Pack of 50",
-        "flavours":  [
-                        "Chocolate",
-                        "Dark Chocolate",
-                        "Crispies",
-                        "Almonds",
-                        "Nuts",
-                        "Butterscotch",
-                        "Strawberry",
-                        "White Chocolate"
-                     ]
+        "id": "product-1046",
+        "name": "Choco Squares (Pack of 50)",
+        "description": "A ready-to-share pack of 50.",
+        "price": 640,
+        "image": "product-1046.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 50",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     }
 ]

@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.14.3] - 2026-10-20
+
+### Changed
+- Categories: renamed "Gifts & hampers" to "Hampers", removed "Tradition Specials", added "Bulk Specials".
+- Products: removed Dry Grapes (In a bottle); moved Stationary Chocolate, Cone options, Choco Dabba, Choco Cards, Folded Card Chocolate and both Mini Cards to Kids B'Day Special; Bangle Chocolate to Hampers; Stick Candy Junior, Stick Candy and Peanut Candy to Chocolate treats.
+- Promo-code category lists come from the same data, so the Worker needs a redeploy to pick up the new category names.
+
 ## [1.14.2] - 2026-10-20
 
 ### Fixed
