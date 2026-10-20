@@ -584,5 +584,24 @@
             "Nuts"
         ],
         "customizable": false
+    },
+    {
+        "id": "product-1050",
+        "name": "Chocolate Bouquet (Pack of 1)",
+        "description": "A handmade chocolate bouquet with ribbon-tied chocolates, wrapped in your choice of flavour and design.",
+        "price": 850,
+        "image": "product-1050.jpg",
+        "tag": "Elite Gifting",
+        "packSize": "Pack of 1",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ]
     }
 ]

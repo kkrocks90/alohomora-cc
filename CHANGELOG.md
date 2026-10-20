@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.16.3] - 2026-10-20
+
+### Added
+- New product: Chocolate Bouquet (Pack of 1), Rs 850, in Elite Gifting. All flavours, wrapper customisation available.
+
 ## [1.16.2] - 2026-10-20
 
 ### Added
