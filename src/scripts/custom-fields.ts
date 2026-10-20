@@ -8,6 +8,7 @@ export interface CustomField {
   options: string[];
   min: number | null;
   max: number | null;
+  futureOnly?: boolean;
   required: boolean;
   placeholder: string;
   helpText: string;
@@ -117,7 +118,8 @@ export function renderCustomFields(container: HTMLElement, fields: CustomField[]
       input.name = name;
       input.id = id;
       input.rows = 3;
-      input.maxLength = 500;
+      input.maxLength = field.max ?? 500;
+      if (field.min !== null) input.minLength = field.min;
       input.required = field.required;
       input.placeholder = field.placeholder;
       (heading as HTMLLabelElement).htmlFor = id;
@@ -159,10 +161,11 @@ export function renderCustomFields(container: HTMLElement, fields: CustomField[]
         input.inputMode = "decimal";
       } else if (field.type === "date") {
         input.type = "date";
-        input.min = new Date().toISOString().slice(0, 10);
+        if (field.futureOnly) input.min = new Date().toISOString().slice(0, 10);
       } else {
         input.type = "text";
-        input.maxLength = 200;
+        input.maxLength = field.max ?? 200;
+        if (field.min !== null) input.minLength = field.min;
       }
       (heading as HTMLLabelElement).htmlFor = id;
       wrapper.append(heading, input);

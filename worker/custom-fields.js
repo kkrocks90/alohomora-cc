@@ -45,13 +45,18 @@ export function validateFieldDefinition(body, categories) {
     if (options.length > MAX_OPTIONS) throw new Error(`Add no more than ${MAX_OPTIONS} options.`);
     config.options = options;
   }
-  if (type === "number") {
-    const min = optionalNumber(body.min, "minimum value");
-    const max = optionalNumber(body.max, "maximum value");
+  if (type === "number" || type === "text" || type === "textarea") {
+    const isNumber = type === "number";
+    const min = optionalNumber(body.min, isNumber ? "minimum value" : "minimum length");
+    const max = optionalNumber(body.max, isNumber ? "maximum value" : "maximum length");
+    if (!isNumber && [min, max].some((limit) => limit !== null && (!Number.isInteger(limit) || limit < 0))) {
+      throw new Error("Text length limits must be whole numbers.");
+    }
     if (min !== null && max !== null && min > max) throw new Error("The minimum value cannot be greater than the maximum.");
     if (min !== null) config.min = min;
     if (max !== null) config.max = max;
   }
+  if (type === "date" && body.futureOnly === true) config.futureOnly = true;
   const appliesTo = { mode: "all", values: [] };
   if (scope === "product") {
     const mode = body.appliesTo?.mode ?? "all";
@@ -94,6 +99,7 @@ export function rowToField(row) {
     options: Array.isArray(config.options) ? config.options : [],
     min: typeof config.min === "number" ? config.min : null,
     max: typeof config.max === "number" ? config.max : null,
+    futureOnly: config.futureOnly === true,
     required: row.required === 1,
     placeholder: row.placeholder ?? "",
     helpText: row.help_text ?? "",
@@ -157,6 +163,10 @@ function validateAnswer(field, value) {
       if (text.length > (field.type === "text" ? TEXT_LIMIT : TEXTAREA_LIMIT)) {
         throw new Error(`The answer for "${field.label}" is too long.`);
       }
+      if ((field.min !== null && text.length < field.min) || (field.max !== null && text.length > field.max)) {
+        const limits = [field.min !== null ? `at least ${field.min}` : "", field.max !== null ? `at most ${field.max}` : ""];
+        throw new Error(`The answer for "${field.label}" must be ${limits.filter(Boolean).join(" and ")} characters.`);
+      }
       return text;
     }
     case "number": {
@@ -171,6 +181,9 @@ function validateAnswer(field, value) {
       if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
           new Date(`${value}T00:00:00.000Z`).toISOString().slice(0, 10) !== value) {
         throw new Error(`Choose a valid date for "${field.label}".`);
+      }
+      if (field.futureOnly && value < new Date().toISOString().slice(0, 10)) {
+        throw new Error(`Please choose a date for "${field.label}" that is today or later.`);
       }
       return value;
     }

@@ -177,9 +177,9 @@ document.addEventListener("click", (event) => {
       ? product.flavours.includes(flavour)
       : flavour === "";
     const customizable = product.customizable !== false;
-    const hasValidWrapper = customizable ? wrapper.length >= 3 && wrapper.length <= 120 : wrapper === "";
+    const hasValidWrapper = wrapper === "";
     if (!hasValidFlavour || !hasValidWrapper) {
-      throw new Error("Choose an available flavour and describe your wrapper design in 3 to 120 characters.");
+      throw new Error("Please choose an available flavour.");
     }
 
     let custom;

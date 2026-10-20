@@ -46,6 +46,7 @@ export function initCustomFieldsAdmin({ root, post, setStatus, reload, getCatalo
   const optionsLabel = required<HTMLElement>(root, "#admin-field-options-label");
   const optionsInput = required<HTMLTextAreaElement>(root, "#admin-field-options");
   const range = required<HTMLElement>(root, "#admin-field-range");
+  const futureLabel = required<HTMLElement>(root, "#admin-field-future-label");
   const placeholderLabel = required<HTMLElement>(root, "#admin-field-placeholder-label");
   const targets = required<HTMLElement>(root, "#admin-field-targets");
   const appliesMode = required<HTMLSelectElement>(root, "#admin-field-applies-mode");
@@ -86,7 +87,10 @@ export function initCustomFieldsAdmin({ root, post, setStatus, reload, getCatalo
     const type = typeSelect.value as CustomFieldType;
     optionsLabel.hidden = !OPTION_TYPES.includes(type);
     optionsInput.required = OPTION_TYPES.includes(type);
-    range.hidden = type !== "number";
+    range.hidden = !["number", "text", "textarea"].includes(type);
+    futureLabel.hidden = type !== "date";
+    field("min").step = type === "number" ? "any" : "1";
+    field("max").step = type === "number" ? "any" : "1";
     placeholderLabel.hidden = !PLACEHOLDER_TYPES.includes(type);
     targets.hidden = scope.value !== "product";
   }
@@ -115,6 +119,7 @@ export function initCustomFieldsAdmin({ root, post, setStatus, reload, getCatalo
     field("placeholder").value = entry.placeholder;
     field("helpText").value = entry.helpText;
     field("required").checked = entry.required;
+    field("futureOnly").checked = entry.futureOnly === true;
     field("sortOrder").value = String(entry.sortOrder);
     appliesMode.value = entry.appliesTo.mode;
     syncForm();
@@ -213,8 +218,9 @@ export function initCustomFieldsAdmin({ root, post, setStatus, reload, getCatalo
       scope: scope.value,
       type,
       options: OPTION_TYPES.includes(type) ? optionsInput.value.split(/\r?\n/) : [],
-      min: type === "number" ? field("min").value : "",
-      max: type === "number" ? field("max").value : "",
+      min: ["number", "text", "textarea"].includes(type) ? field("min").value : "",
+      max: ["number", "text", "textarea"].includes(type) ? field("max").value : "",
+      futureOnly: type === "date" && field("futureOnly").checked,
       placeholder: PLACEHOLDER_TYPES.includes(type) ? field("placeholder").value.trim() : "",
       helpText: field("helpText").value.trim(),
       required: field("required").checked,

@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.19.0]
+
+### Changed
+- The checkout "Event date" and the product-page wrapper "Customisation" inputs are now admin-managed custom fields (seeded by migration `0010`), so they can be edited, reordered, retargeted or disabled from the admin Custom fields tab.
+- Custom text fields support minimum and maximum length; date fields can be limited to today or later.
+- Wrapper text is no longer required by the Worker. Existing orders keep their stored event date and wrapper text.
+
 ## [1.18.0]
 
 ### Added

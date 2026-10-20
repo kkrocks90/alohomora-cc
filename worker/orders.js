@@ -100,7 +100,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise, pend
         typeof wrapper !== "string" ||
         (product.customizable === false
           ? wrapper !== ""
-          : wrapper.trim().length < 3 || wrapper.trim().length > 120))
+          : wrapper.trim().length > 120))
     ) {
       throw new Error("The paid order contains an invalid product, quantity, flavour, or wrapper.");
     }

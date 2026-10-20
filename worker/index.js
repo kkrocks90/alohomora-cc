@@ -149,7 +149,7 @@ function validateOrder(body, storeLocation, customFields = []) {
     const product = productById.get(item.id);
     if (!product) throw new Error("A product in your bag is no longer available.");
     const wrapperLength = item.wrapper.trim().length;
-    if (product.customizable === false ? item.wrapper !== "" : wrapperLength < 3 || wrapperLength > 120) {
+    if (product.customizable === false ? item.wrapper !== "" : wrapperLength > 120) {
       throw new Error("Each product needs a valid quantity, any required flavour choice, and a wrapper description (3 to 120 characters).");
     }
     if (

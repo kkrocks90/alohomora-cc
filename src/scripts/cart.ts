@@ -77,7 +77,7 @@ export function loadCart(): CartItem[] {
       typeof item.wrapper === "string" &&
       (productById.get(item.id)!.customizable === false
         ? item.wrapper === ""
-        : item.wrapper.trim().length >= 3 && item.wrapper.trim().length <= 120),
+        : item.wrapper.trim().length <= 120),
     ),
   );
 }

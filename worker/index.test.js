@@ -697,6 +697,21 @@ test("only the signed-in order owner can verify payment and receive the order re
   }
 });
 
+test("text length limits and future-only dates are enforced", async () => {
+  const rows = [
+    fieldRow({ field_id: "field_len", type: "textarea", config_json: '{"min":3,"max":120}' }),
+    fieldRow({ field_id: "field_day", scope: "checkout", label: "Event date", type: "date", required: 0,
+      config_json: '{"futureOnly":true}', applies_to_json: '{"mode":"all","values":[]}' }),
+  ];
+  const saved = [];
+  const future = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10);
+  assert.equal((await postCustomOrder(rows, saved, { custom: { field_len: "ab" } })).status, 400);
+  assert.equal((await postCustomOrder(rows, saved, { custom: { field_len: "x".repeat(121) } })).status, 400);
+  assert.equal((await postCustomOrder(rows, saved, { custom: { field_len: "Happy birthday" }, checkout: { field_day: "2020-01-01" } })).status, 400);
+  const ok = await postCustomOrder(rows, saved, { custom: { field_len: "Happy birthday" }, checkout: { field_day: future } });
+  assert.equal(ok.status, 201);
+});
+
 function customFieldsDb(rows, saved) {
   return {
     prepare(sql) {

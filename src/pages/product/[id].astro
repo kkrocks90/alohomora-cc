@@ -97,7 +97,7 @@ const customizable = product.customizable !== false;
         </div>
         <p class="product-option-note">
           {customizable
-            ? <>Choose your quantity{product.flavours.length > 0 && ", flavour"}, then describe the wrapper you’d like.</>
+            ? <>Choose your quantity{product.flavours.length > 0 && ", flavour"} and any personalisation options.</>
             : <>Choose your quantity. The chocolate selection is decided by us.</>}
         </p>
         <form class="product-options" id="product-options-form">
@@ -118,17 +118,6 @@ const customizable = product.customizable !== false;
               </select>
             </label>
           )}
-          {customizable && (<label>
-            Describe your wrapper design <span>Required</span>
-            <textarea
-              name="wrapper"
-              rows="4"
-              minlength="3"
-              maxlength="120"
-              placeholder="For example: pink flowers with a birthday message"
-              required
-            ></textarea>
-          </label>)}
           <div class="custom-fields" id="product-custom-fields" hidden></div>
           <button
             class="button button-primary product-add-button"
@@ -139,7 +128,6 @@ const customizable = product.customizable !== false;
             Add to bag <span aria-hidden="true">+</span>
           </button>
         </form>
-        {customizable && <p class="product-detail-footnote">Please describe the colours, theme, or message you’d like (up to 120 characters). We’ll confirm what’s possible.</p>}
         <ul class="product-trust" aria-label="Why customers love us">
           <li><span aria-hidden="true">🍫</span> Handmade in small batches</li>
           <li><span aria-hidden="true">🎁</span> {customizable ? "Personalised wrapper" : "Gift-ready box"}</li>

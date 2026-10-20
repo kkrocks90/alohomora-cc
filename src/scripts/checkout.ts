@@ -92,7 +92,6 @@ const checkoutForm = requireElement<HTMLFormElement>("#checkout-form");
 const profileSetup = requireElement<HTMLElement>("#checkout-profile-setup");
 const profileForm = requireElement<HTMLFormElement>("#checkout-profile-form");
 const profileStatus = requireElement<HTMLElement>("#checkout-profile-status");
-const eventDateInput = requireElement<HTMLInputElement>("#checkout-form input[name=eventDate]");
 const checkoutStatus = requireElement<HTMLElement>("#checkout-status");
 const checkoutButton = requireElement<HTMLButtonElement>("#checkout-button");
 const signedInEmail = requireElement<HTMLElement>("#checkout-signed-in");
@@ -135,11 +134,6 @@ initializeFormPincodeLookup(profileForm);
 initializeFormPincodeLookup(checkoutForm);
 
 const today = new Date();
-eventDateInput.min = [
-  today.getFullYear(),
-  String(today.getMonth() + 1).padStart(2, "0"),
-  String(today.getDate()).padStart(2, "0"),
-].join("-");
 
 function setLoginStatus(message: string, error = false) {
   loginStatus.textContent = message;
@@ -562,7 +556,6 @@ checkoutForm.addEventListener("submit", async (event) => {
         city: String(formData.get("city") ?? ""),
         state: String(formData.get("state") ?? ""),
         pincode: String(formData.get("pincode") ?? ""),
-        eventDate: String(formData.get("eventDate") ?? ""),
         policyConsent: formData.get("policyConsent") === "on",
       },
     });

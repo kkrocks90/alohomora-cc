@@ -189,12 +189,6 @@ test("validates required flavours and wrapper descriptions and preserves product
   );
   assert.throws(
     () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
-      items: JSON.stringify([["product-1001", 2, 800, "Chocolate", "  "]]),
-    }), paidOrder.amountPaise),
-    /invalid product, quantity, flavour, or wrapper/,
-  );
-  assert.throws(
-    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({
       items: JSON.stringify([["product-1001", 2, 800, "Chocolate", "x".repeat(121)]]),
     }), paidOrder.amountPaise),
     /invalid product, quantity, flavour, or wrapper/,
