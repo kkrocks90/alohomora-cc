@@ -1,4 +1,5 @@
 import { clearCustomerSessionToken, getCustomerSessionToken } from "./cart";
+import { buildOrderProgress } from "./order-progress";
 
 interface OrderItem {
   name: string;
@@ -11,6 +12,7 @@ interface OrderItem {
 interface OrderDetails {
   orderId: string;
   status: string;
+  orderStatus?: string;
   items: OrderItem[];
   amountPaise: number;
   productSubtotalPaise: number;
@@ -93,6 +95,9 @@ function renderOrder(order: OrderDetails) {
     "thank-you-meta",
   );
 
+  const progress = buildOrderProgress(order.orderStatus ?? "received");
+  if (progress) orderContainer.append(progress);
+
   const itemList = document.createElement("ul");
   itemList.className = "thank-you-items";
   for (const item of order.items) {
@@ -141,6 +146,28 @@ function renderOrder(order: OrderDetails) {
   }
   appendText(delivery, "p", `Suggested fulfillment: ${order.deliveryMethod}. The shop will confirm arrangements with you.`);
   orderContainer.append(delivery);
+
+  const readyBy = new Date(date.valueOf() + 4 * 24 * 60 * 60 * 1000);
+  const estimate = document.createElement("div");
+  estimate.className = "thank-you-estimate";
+  appendText(estimate, "strong", "Estimated preparation");
+  appendText(
+    estimate,
+    "span",
+    Number.isNaN(readyBy.valueOf())
+      ? "Allow 3 to 4 days for preparation before delivery."
+      : `Ready by about ${readyBy.toLocaleDateString("en-IN", { dateStyle: "long" })}. We’ll confirm delivery with you.`,
+  );
+  orderContainer.append(estimate);
+
+  const share = document.createElement("a");
+  share.className = "button button-secondary thank-you-share";
+  const message = `I just ordered handmade chocolates from Chocolate Circle! ${window.location.origin}/store/`;
+  share.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  share.target = "_blank";
+  share.rel = "noopener";
+  share.textContent = "Share on WhatsApp";
+  orderContainer.append(share);
 }
 
 async function loadOrder() {

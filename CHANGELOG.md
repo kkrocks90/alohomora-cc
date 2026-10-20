@@ -5,6 +5,18 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.13.0] - 2026-10-20
+
+### Added
+- Product page: sticky image on desktop, trust badges, preparation-time note and a "You may also like" row.
+- Checkout: step indicator, rounded fields, and an assurance list (secure payment, lead time, WhatsApp help).
+- Thank-you page: confirmation badge, order progress tracker, estimated ready date and a WhatsApp share button.
+- Account: order history cards now show a progress tracker and a status pill.
+- Policy pages: an automatic "On this page" contents list.
+- Branded 404 page.
+- Store: the search and category bar now stays pinned on desktop too.
+- Admin: mobile-friendly scrolling tabs and stacked filters.
+
 ## [1.12.0] - 2026-10-20
 
 ### Changed

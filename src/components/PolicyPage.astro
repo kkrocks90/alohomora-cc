@@ -18,6 +18,7 @@ const base = import.meta.env.BASE_URL;
       <h1>{title}</h1>
       <p class="policy-updated">Effective date: <strong>22 October 2026</strong></p>
     </header>
+    <nav class="policy-toc" id="policy-toc" aria-label="On this page" hidden></nav>
     <article class="policy-content">
       <slot />
     </article>
@@ -27,4 +28,24 @@ const base = import.meta.env.BASE_URL;
       <a href={`${base}shipping-policy/`}>Shipping Policy</a>
     </nav>
   </main>
+  <script>
+    const toc = document.querySelector<HTMLElement>("#policy-toc");
+    const headings = document.querySelectorAll<HTMLElement>(".policy-content h2");
+    if (toc && headings.length > 2) {
+      const title = document.createElement("strong");
+      title.textContent = "On this page";
+      const list = document.createElement("ol");
+      headings.forEach((heading, index) => {
+        heading.id ||= `section-${index + 1}`;
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `#${heading.id}`;
+        link.textContent = (heading.textContent ?? "").replace(/^\d+\.\s*/, "");
+        item.append(link);
+        list.append(item);
+      });
+      toc.append(title, list);
+      toc.hidden = false;
+    }
+  </script>
 </SiteLayout>

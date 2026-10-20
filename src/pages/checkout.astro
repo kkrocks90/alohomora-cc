@@ -27,6 +27,12 @@ const base = import.meta.env.BASE_URL;
       <h1>Secure <em>checkout.</em></h1>
       <p>Sign in with your email first. Your bag stays saved while you check out.</p>
     </section>
+    <ol class="checkout-steps" aria-label="Checkout steps">
+      <li class="is-done"><span>1</span> Bag</li>
+      <li class="is-current"><span>2</span> Details</li>
+      <li><span>3</span> Payment</li>
+      <li><span>4</span> Confirmed</li>
+    </ol>
 
     <section class="checkout-login checkout-panel" id="checkout-login" aria-labelledby="checkout-login-title">
       <p class="eyebrow">Your email, your order</p>
@@ -177,6 +183,11 @@ const base = import.meta.env.BASE_URL;
           Delivery arrangements and any delivery charge will be confirmed separately and are not
           included in this payment.
         </p>
+        <ul class="checkout-trust" aria-label="Order assurances">
+          <li><span aria-hidden="true">🔒</span> Secure payment by Razorpay</li>
+          <li><span aria-hidden="true">🍫</span> Handmade fresh, ready in 3 to 4 days</li>
+          <li><span aria-hidden="true">💬</span> Questions? <a href="https://wa.me/919500868468">WhatsApp us</a></li>
+        </ul>
         <a class="text-link" href={`${base}store/`}>Continue shopping <span aria-hidden="true">→</span></a>
       </aside>
     </section>

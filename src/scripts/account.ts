@@ -5,6 +5,7 @@ import {
   saveCustomerSessionToken,
 } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
+import { buildOrderProgress } from "./order-progress";
 import { normalizeState } from "../data/indian-states";
 
 function requireElement<T extends Element>(element: T | null, selector: string): T {
@@ -257,7 +258,10 @@ if (root) {
         ].filter(Boolean).join(" · ");
         items.append(line);
       }
-      card.append(heading, details, items);
+      card.append(heading, details);
+      const progress = buildOrderProgress(order.orderStatus);
+      if (progress) card.append(progress);
+      card.append(items);
       orderList.append(card);
     }
     ordersSection.hidden = false;

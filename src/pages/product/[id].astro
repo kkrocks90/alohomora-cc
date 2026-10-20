@@ -1,6 +1,7 @@
 ---
 import { Image, type ImageMetadata } from "astro:assets";
 import SiteLayout from "../../layouts/SiteLayout.astro";
+import ProductCard from "../../components/ProductCard.astro";
 import products from "../../data/products.json";
 
 const productImages = import.meta.glob<{ default: ImageMetadata }>(
@@ -20,6 +21,10 @@ export function getStaticPaths() {
 const { product } = Astro.props;
 const image = imagesByName[product.image];
 if (!image) throw new Error(`Product image not found: ${product.image}`);
+const related = [
+  ...products.filter((other) => other.id !== product.id && other.tag === product.tag),
+  ...products.filter((other) => other.id !== product.id && other.tag !== product.tag),
+].slice(0, 4);
 const base = import.meta.env.BASE_URL;
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
@@ -96,8 +101,27 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           </button>
         </form>
         <p class="product-detail-footnote">Please describe the colours, theme, or message you’d like (up to 120 characters). We’ll confirm what’s possible.</p>
+        <ul class="product-trust" aria-label="Why customers love us">
+          <li><span aria-hidden="true">🍫</span> Handmade in small batches</li>
+          <li><span aria-hidden="true">🎁</span> Personalised wrapper</li>
+          <li><span aria-hidden="true">🚚</span> Delivery across India</li>
+          <li><span aria-hidden="true">🔒</span> Secure Razorpay payment</li>
+        </ul>
+        <p class="product-lead-time">Please allow 3 to 4 days for preparation. Planning an event? Add the date at checkout.</p>
       </div>
     </article>
+    {related.length > 0 && (
+      <section class="product-related" aria-labelledby="related-title">
+        <h2 id="related-title">You may also <em>like</em></h2>
+        <div class="product-grid product-related-grid">
+          {related.map((other, index) => {
+            const otherImage = imagesByName[other.image];
+            if (!otherImage) throw new Error(`Product image not found: ${other.image}`);
+            return <ProductCard product={other} image={otherImage} index={index + 4} />;
+          })}
+        </div>
+      </section>
+    )}
     <a class="product-back-link" href={`${base}store/`}>← Back to all treats</a>
   </main>
 </SiteLayout>
