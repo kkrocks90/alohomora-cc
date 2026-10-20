@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.14.1] - 2026-10-20
+
+### Fixed
+- Product names in the product page's "You may also like" row were oversized because the section-heading style leaked onto the card titles.
+
 ## [1.14.0] - 2026-10-21
 
 ### Added

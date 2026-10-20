@@ -5567,7 +5567,7 @@ h2 em {
   margin-top: 64px;
 }
 
-.product-related h2 {
+.product-related > h2 {
   margin: 0 0 22px;
   color: var(--cocoa-dark);
   font-family: var(--serif);
@@ -5576,7 +5576,7 @@ h2 em {
   letter-spacing: -0.035em;
 }
 
-.product-related h2 em {
+.product-related > h2 em {
   color: #9a6e5a;
 }
 
@@ -5937,7 +5937,7 @@ h2 em {
 .checkout-heading h1 em,
 .thank-you-panel h1 em,
 .not-found-card h1 em,
-.product-related h2 em {
+.product-related > h2 em {
   color: #7d5543;
 }
 
