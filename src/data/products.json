@@ -550,5 +550,25 @@
         "packSize": "Pack of 1",
         "flavours": [],
         "customizable": false
+    },
+    {
+        "id": "product-1048",
+        "name": "Heart Chocolates (Pack of 50)",
+        "description": "Foil-wrapped heart-shaped handmade chocolates, a pack of 50 in the flavour of your choice.",
+        "price": 500,
+        "image": "product-1048.jpg",
+        "tag": "Chocolate treats",
+        "packSize": "Pack of 50",
+        "flavours": [
+            "Chocolate",
+            "Dark Chocolate",
+            "Crispies",
+            "Almonds",
+            "Nuts",
+            "Butterscotch",
+            "Strawberry",
+            "White Chocolate"
+        ],
+        "customizable": false
     }
 ]

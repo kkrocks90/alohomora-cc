@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.16.1] - 2026-10-20
+
+### Added
+- New product: Heart Chocolates (Pack of 50), Rs 500, in Chocolate treats. All flavours available, no wrapper customisation.
+
 ## [1.16.0] - 2026-10-20
 
 ### Added
