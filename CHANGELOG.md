@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.10.0] - 2026-10-20
+
+### Changed
+- Desktop visual polish: larger hero with soft glow and shadowed artwork, pill buttons, dark promise bar, rounded category cards, bordered product cards with hover lift, icon-badged "Good to know" cards, and a rounded closing banner.
+
 ## [1.9.3] - 2026-10-20
 
 ### Changed
