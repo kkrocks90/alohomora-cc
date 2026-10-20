@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.10.1] - 2026-10-20
+
+### Changed
+- Mobile footer redesign: dark cocoa rounded panel, centred brand and tagline, pill "Shop all treats" link, side-by-side Instagram and WhatsApp buttons, and a two-column policy link list.
+
 ## [1.10.0] - 2026-10-20
 
 ### Changed

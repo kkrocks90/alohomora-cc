@@ -5268,3 +5268,93 @@ h2 em {
     width: 100%;
   }
 }
+
+/* Mobile footer */
+@media (max-width: 620px) {
+  .site-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 8px;
+    padding: 32px 20px 26px;
+    border-radius: 28px 28px 0 0;
+    background: #4a3026;
+    color: #f3dfc8;
+    text-align: center;
+  }
+
+  .site-footer .wordmark,
+  .site-footer .wordmark i {
+    color: #fff6eb;
+  }
+
+  .site-footer .wordmark-mark {
+    border-color: rgb(255 246 235 / 55%);
+    color: #fff6eb;
+  }
+
+  .site-footer > p {
+    margin: 0;
+    color: #e0b79c;
+    font-family: var(--serif);
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .site-footer > a:not(.wordmark) {
+    padding: 9px 18px;
+    border: 1px solid rgb(255 246 235 / 28%);
+    border-radius: 999px;
+    color: #fff6eb;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .footer-social-links {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .footer-social-links a {
+    display: flex;
+    flex: 1;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 246 235 / 12%);
+    color: #fff6eb;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .policy-links {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 12px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid rgb(255 246 235 / 16%);
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .policy-links a {
+    padding: 11px 2px;
+    border-bottom: 1px solid rgb(255 246 235 / 10%);
+    color: #e9d5c0;
+    text-decoration: none;
+  }
+
+  .site-footer > small {
+    margin-top: 4px;
+    color: #b99c86;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+}
