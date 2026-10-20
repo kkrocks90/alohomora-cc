@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.15.1] - 2026-10-20
+
+### Fixed
+- Downloaded or printed invoices were blank because the invoice container stayed hidden; it is now shown while printing.
+
 ## [1.15.0] - 2026-10-20
 
 ### Added

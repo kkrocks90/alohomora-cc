@@ -188,11 +188,13 @@ export function renderInvoice(container: HTMLElement, order: OrderView, customer
 // Opens the browser's print dialog, where "Save as PDF" downloads the invoice.
 export function printInvoice(container: HTMLElement, order: OrderView, customerEmail?: string) {
   renderInvoice(container, order, customerEmail);
+  container.hidden = false;
   const previousTitle = document.title;
   document.title = `Invoice-${order.orderId}`;
   const restore = () => {
     document.title = previousTitle;
     container.replaceChildren();
+    container.hidden = true;
     window.removeEventListener("afterprint", restore);
   };
   window.addEventListener("afterprint", restore);
