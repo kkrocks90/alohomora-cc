@@ -1,6 +1,7 @@
 import { ADMIN_SESSION_KEY, clearCustomerSessionToken, getCustomerSessionToken } from "./cart";
 import { buildOrderProgress } from "./order-progress";
 import {
+  answerLines,
   ORDER_STATUS_LABELS,
   type OrderView,
   formatAddress,
@@ -131,6 +132,7 @@ if (root) {
       details.append(el("strong", `${item.name} × ${item.quantity}`));
       if (item.flavour) details.append(el("span", `Flavour: ${item.flavour}`));
       if (item.wrapper) details.append(el("span", `Wrapper: ${item.wrapper}`));
+      for (const line of answerLines(item.custom)) details.append(el("span", line));
       line.append(details, el("span", formatMoney(item.unitPriceRupees * item.quantity * 100)));
       list.append(line);
     }
@@ -155,6 +157,7 @@ if (root) {
     rows.append(row("Address", formatAddress(order)));
     if (order.eventDate) rows.append(row("Event date", formatEventDate(order.eventDate, "long")));
     if (order.deliveryMethod) rows.append(row("Fulfilment", order.deliveryMethod));
+for (const answer of order.customFields) rows.append(row(answer.label, answer.value));
     delivery.append(rows);
     container!.append(delivery);
 

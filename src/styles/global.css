@@ -6157,3 +6157,42 @@ main .store-heading > p {
 .order-detail-panel::before {
   display: none;
 }
+
+/* Custom fields */
+.custom-fields { display: grid; gap: 14px; margin: 4px 0; }
+.custom-fields[hidden] { display: none; }
+.custom-field { display: grid; gap: 6px; }
+.custom-field-label { font-size: 13px; font-weight: 600; }
+.custom-field-required { margin-left: 4px; font-size: 11px; font-weight: 400; opacity: 0.7; }
+.custom-field input[type="text"],
+.custom-field input[type="number"],
+.custom-field input[type="date"],
+.custom-field select,
+.custom-field textarea { width: 100%; font: inherit; }
+.custom-field-choices { display: grid; gap: 8px; }
+.custom-field-choice { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.custom-field-choice input { width: auto; min-height: 0; }
+.custom-field-help { opacity: 0.7; font-size: 12px; }
+
+.admin-field-form .admin-field-check { display: flex; align-items: center; gap: 8px; }
+.admin-field-form .admin-field-check input { width: auto; min-height: 0; }
+.admin-field-form .admin-field-range,
+.admin-field-form .admin-field-targets,
+.admin-field-form .admin-form-actions,
+.admin-field-form #admin-field-options-label { grid-column: 1 / -1; }
+.admin-field-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.admin-field-targets { display: grid; gap: 10px; }
+.admin-field-targets[hidden],
+.admin-field-form fieldset[hidden],
+.admin-field-form .admin-field-range[hidden] { display: none; }
+.admin-field-form fieldset { max-height: 220px; margin: 0; padding: 10px 12px; overflow: auto; border: 1px solid #ded2c5; }
+.admin-field-applies-list { display: grid; gap: 6px; }
+.admin-field-choice { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.admin-field-choice input { width: auto; min-height: 0; }
+.admin-field-list { display: grid; gap: 9px; margin-top: 22px; }
+.admin-field-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-field-form .admin-form-actions { display: flex; gap: 10px; }
+
+@media (max-width: 620px) {
+  .admin-field-form { grid-template-columns: 1fr; }
+}

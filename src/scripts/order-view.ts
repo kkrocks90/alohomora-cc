@@ -1,9 +1,15 @@
+export interface OrderCustomAnswer {
+  label: string;
+  value: string;
+}
+
 export interface OrderViewItem {
   name: string;
   quantity: number;
   unitPriceRupees: number;
   flavour: string;
   wrapper: string;
+  custom: OrderCustomAnswer[];
 }
 
 export interface OrderView {
@@ -12,6 +18,7 @@ export interface OrderView {
   paymentStatus: "paid" | "unpaid";
   paymentMethod: string;
   items: OrderViewItem[];
+  customFields: OrderCustomAnswer[];
   amountPaise: number;
   productSubtotalPaise: number;
   discountPaise: number;
@@ -76,6 +83,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 const text = (value: unknown) => (typeof value === "string" ? value : "");
+const toAnswers = (value: unknown): OrderCustomAnswer[] =>
+  Array.isArray(value)
+    ? value.filter(isRecord).map((entry) => ({ label: text(entry.label), value: text(entry.value) })).filter((entry) => entry.label && entry.value)
+    : [];
+export const answerLines = (answers: OrderCustomAnswer[]) => answers.map((answer) => `${answer.label}: ${answer.value}`);
 const number = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
 
 // Accepts both the customer (/auth/orders) and admin (/admin/data) order shapes.
@@ -94,7 +106,9 @@ export function toOrderView(value: unknown): OrderView | null {
       unitPriceRupees: number(item.unitPriceRupees),
       flavour: text(item.flavour),
       wrapper: text(item.wrapper),
+      custom: toAnswers(item.custom),
     })),
+    customFields: toAnswers(value.customFields),
     amountPaise,
     productSubtotalPaise: typeof value.productSubtotalPaise === "number" ? value.productSubtotalPaise : amountPaise,
     discountPaise: number(value.discountPaise),
@@ -148,6 +162,7 @@ export function renderInvoice(container: HTMLElement, order: OrderView, customer
   appendText(orderBlock, "p", `Payment: ${payment.state} (${payment.method})`);
   if (order.eventDate) appendText(orderBlock, "p", `Event date: ${formatEventDate(order.eventDate)}`);
   if (order.deliveryMethod) appendText(orderBlock, "p", order.deliveryMethod);
+  for (const line of answerLines(order.customFields)) appendText(orderBlock, "p", line);
   meta.append(customerBlock, orderBlock);
   container.append(meta);
 
@@ -162,7 +177,7 @@ export function renderInvoice(container: HTMLElement, order: OrderView, customer
     const row = document.createElement("tr");
     const description = document.createElement("td");
     appendText(description, "strong", item.name);
-    appendText(description, "span", [item.flavour ? `Flavour: ${item.flavour}` : "", item.wrapper].filter(Boolean).join(" · "));
+    appendText(description, "span", [item.flavour ? `Flavour: ${item.flavour}` : "", item.wrapper, ...answerLines(item.custom)].filter(Boolean).join(" · "));
     row.append(description);
     appendText(row, "td", String(item.quantity));
     appendText(row, "td", formatMoney(item.unitPriceRupees * 100));
@@ -207,7 +222,7 @@ export function buildShareMessage(order: OrderView, storeUrl: string) {
     `Order ID: ${order.orderId}`,
     "",
     ...order.items.map((item) => {
-      const extras = [item.flavour, item.wrapper].filter(Boolean).join(", ");
+      const extras = [item.flavour, item.wrapper, ...answerLines(item.custom)].filter(Boolean).join(", ");
       return `• ${item.name} × ${item.quantity}${extras ? ` (${extras})` : ""}`;
     }),
     "",
@@ -217,6 +232,7 @@ export function buildShareMessage(order: OrderView, storeUrl: string) {
   ];
   if (order.eventDate) lines.push(`Event date: ${formatEventDate(order.eventDate, "long")}`);
   if (order.deliveryMethod) lines.push(`Delivery: ${order.deliveryMethod}`);
+  lines.push(...answerLines(order.customFields));
   lines.push("", `Handmade chocolates from Chocolate Circle: ${storeUrl}`);
   return lines.join("\n");
 }

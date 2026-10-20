@@ -103,6 +103,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="promos"
         >Promo codes</button>
+        <button
+          class="admin-tab"
+          id="admin-fields-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-fields-panel"
+          tabindex="-1"
+          data-admin-tab="fields"
+        >Custom fields</button>
       </div>
 
       <section
@@ -173,6 +183,59 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <button class="button button-primary" type="submit">Generate promo code</button>
           </form>
           <div class="admin-promo-list" id="admin-promo-list" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-fields-panel"
+        role="tabpanel"
+        aria-labelledby="admin-fields-tab"
+        data-admin-panel="fields"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-fields-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Extra questions</p>
+              <h2 id="admin-fields-title">Custom fields</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Add extra questions customers answer. <strong>Product fields</strong> appear on the product page and are saved for each item in the bag. <strong>Checkout fields</strong> are asked once per order. Answers appear on the order, invoice, and WhatsApp share.</p>
+          <form class="admin-promo-form admin-field-form" id="admin-field-form">
+            <label>Field label<input name="label" maxlength="80" required placeholder="Gift message" /></label>
+            <label>Where it appears<select name="scope" id="admin-field-scope" required>
+              <option value="product">Product detail page</option>
+              <option value="checkout">Checkout</option>
+            </select></label>
+            <label>Input type<select name="type" id="admin-field-type" required></select></label>
+            <label id="admin-field-options-label" hidden>Options (one per line)<textarea name="options" id="admin-field-options" rows="4" placeholder="Option one&#10;Option two"></textarea></label>
+            <div class="admin-field-range" id="admin-field-range" hidden>
+              <label>Minimum<input name="min" type="number" step="any" /></label>
+              <label>Maximum<input name="max" type="number" step="any" /></label>
+            </div>
+            <label id="admin-field-placeholder-label">Placeholder (optional)<input name="placeholder" maxlength="80" /></label>
+            <label>Help text (optional)<input name="helpText" maxlength="200" /></label>
+            <label class="admin-field-check"><input name="required" type="checkbox" /> Customers must answer this</label>
+            <label>Display order<input name="sortOrder" type="number" step="1" min="-1000" max="1000" value="0" /></label>
+            <div class="admin-field-targets" id="admin-field-targets">
+              <label>Applies to<select name="appliesMode" id="admin-field-applies-mode">
+                <option value="all">All products</option>
+                <option value="categories">Selected categories</option>
+                <option value="products">Selected products</option>
+              </select></label>
+              <fieldset id="admin-field-applies-values" hidden>
+                <legend id="admin-field-applies-legend">Choose</legend>
+                <div class="admin-field-applies-list" id="admin-field-applies-list"></div>
+              </fieldset>
+            </div>
+            <div class="admin-form-actions">
+              <button class="button button-primary" id="admin-field-submit" type="submit">Create field</button>
+              <button class="button button-secondary" id="admin-field-cancel" type="button" hidden>Cancel edit</button>
+            </div>
+          </form>
+          <div class="admin-field-list" id="admin-field-list" aria-live="polite"></div>
         </section>
       </section>
 

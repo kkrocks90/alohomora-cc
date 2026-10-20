@@ -2,6 +2,8 @@ import { ADMIN_SESSION_KEY } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
 import { normalizeState } from "../data/indian-states";
 import { printInvoice } from "./order-view";
+import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
+import type { CustomField } from "./custom-fields";
 
 interface AdminCustomer {
   customerId: string;
@@ -28,6 +30,7 @@ interface AdminOrderItem {
   unitPriceRupees: number;
   flavour: string;
   wrapper: string;
+  custom: { label: string; value: string }[];
 }
 
 interface AdminOrder {
@@ -46,6 +49,7 @@ interface AdminOrder {
   state: string;
   pincode: string;
   items: AdminOrderItem[];
+  customFields: { label: string; value: string }[];
   amountPaise: number;
   productSubtotalPaise: number;
   discountPaise: number;
@@ -81,6 +85,7 @@ interface AdminData {
   products: AdminProduct[];
   categories: string[];
   promos: AdminPromo[];
+  customFields: CustomField[];
 }
 
 function formatDeliveryAddress(order: Pick<AdminOrder, "deliveryAddress" | "city" | "state" | "pincode">) {
@@ -183,7 +188,9 @@ function isAdminData(value: unknown): value is AdminData {
     Array.isArray(data.categories) &&
     data.categories.every((category) => typeof category === "string") &&
     Array.isArray(data.promos) &&
-    data.promos.every(isAdminPromo);
+    data.promos.every(isAdminPromo) &&
+    Array.isArray(data.customFields) &&
+    data.customFields.every(isCustomField);
 }
 
 function requireElement<T extends Element>(parent: ParentNode, selector: string): T {
@@ -681,6 +688,7 @@ if (root) {
       appendText(details, "span", formatDeliveryAddress(order));
       appendText(details, "span", order.deliveryMethod);
       if (order.eventDate) appendText(details, "span", `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
+      for (const answer of order.customFields ?? []) appendText(details, "span", `${answer.label}: ${answer.value}`);
       const items = document.createElement("ul");
       items.className = "admin-order-items-list";
       order.items.forEach((item) => {
@@ -689,6 +697,7 @@ if (root) {
           `${item.name} × ${item.quantity}`,
           item.flavour,
           item.wrapper,
+          ...(item.custom ?? []).map((answer) => `${answer.label}: ${answer.value}`),
         ].filter(Boolean).join(" · ");
         items.append(line);
       });
@@ -838,12 +847,21 @@ if (root) {
     signedIn.textContent = `Signed in as ${adminData.email}`;
     renderCustomers();
     renderPromos();
+    customFieldsAdmin.render(adminData.customFields);
     syncPromoFormFields();
     orderLines.replaceChildren();
     renderOrderLine();
     renderOrders();
     updateOrderTotal();
   }
+
+  const customFieldsAdmin = initCustomFieldsAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    setStatus,
+    reload: () => loadDashboard(),
+    getCatalogue: () => ({ products: adminData?.products ?? [], categories: adminData?.categories ?? [] }),
+  });
 
   emailForm.addEventListener("submit", async (event) => {
     event.preventDefault();

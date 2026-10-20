@@ -1,6 +1,6 @@
 import { clearCustomerSessionToken, getCustomerSessionToken } from "./cart";
 import { buildOrderProgress } from "./order-progress";
-import { buildShareMessage, toOrderView } from "./order-view";
+import { answerLines, buildShareMessage, toOrderView } from "./order-view";
 
 interface OrderItem {
   name: string;
@@ -101,17 +101,20 @@ function renderOrder(order: OrderDetails) {
 
   const itemList = document.createElement("ul");
   itemList.className = "thank-you-items";
-  for (const item of order.items) {
+  const view = toOrderView(order);
+  for (const [index, item] of order.items.entries()) {
     const line = document.createElement("li");
     const details = document.createElement("div");
     appendText(details, "strong", `${item.name} × ${item.quantity}`);
     if (item.flavour) appendText(details, "span", `Flavour: ${item.flavour}`);
     if (item.wrapper) appendText(details, "span", `Wrapper: ${item.wrapper}`);
+    for (const answer of answerLines(view?.items[index]?.custom ?? [])) appendText(details, "span", answer);
     appendText(line, "span", currency.format(item.unitPriceRupees * item.quantity));
     line.prepend(details);
     itemList.append(line);
   }
   orderContainer.append(itemList);
+  for (const answer of answerLines(view?.customFields ?? [])) appendText(orderContainer, "p", answer, "thank-you-meta");
 
   if (order.discountPaise > 0) {
     const subtotal = document.createElement("div");

@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.18.0]
+
+### Added
+- Admin "Custom fields" tab: create, edit, enable/disable and delete fields at product-detail or checkout level (text, textarea, number, date, dropdown, radio, checkboxes, checkbox), with required flag, placeholder, help text and targeting by all products, categories or specific products.
+- Answers are validated server-side and shown in the cart, checkout, thank-you page, order detail, invoice, WhatsApp share and admin orders.
+- Migration `0009_custom_fields.sql` (apply before deploying the Worker).
+
 ## [1.17.0] - 2026-10-20
 
 ### Added

@@ -1,4 +1,12 @@
 import { CART_STORAGE_KEY, loadCart, productById, saveCart, type CartItem } from "./cart";
+import {
+  answersKey,
+  fetchCustomFields,
+  fieldAppliesToProduct,
+  readCustomAnswers,
+  renderCustomFields,
+  type CustomField,
+} from "./custom-fields";
 
 function requireElement<T extends HTMLElement>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -25,8 +33,26 @@ const currency = new Intl.NumberFormat("en-IN", {
 let cart: CartItem[] = loadCart();
 let previousFocus: HTMLElement | null = null;
 
-function getCartItemKey(item: Pick<CartItem, "id" | "flavour" | "wrapper">) {
-  return JSON.stringify([item.id, item.flavour, item.wrapper]);
+function getCartItemKey(item: Pick<CartItem, "id" | "flavour" | "wrapper" | "custom">) {
+  return JSON.stringify([item.id, item.flavour, item.wrapper, answersKey(item.custom)]);
+}
+
+let productFields: CustomField[] = [];
+const customFieldsContainer = document.querySelector<HTMLElement>("#product-custom-fields");
+const productAddButton = document.querySelector<HTMLButtonElement>("[data-add-to-cart]");
+const checkoutApi = document.querySelector<HTMLElement>("#storefront")?.dataset.checkoutApi ?? "";
+if (customFieldsContainer && productAddButton) {
+  const product = productById.get(productAddButton.dataset.addToCart ?? "");
+  productAddButton.disabled = true;
+  fetchCustomFields(checkoutApi)
+    .then((fields) => {
+      productFields = product ? fields.filter((field) => fieldAppliesToProduct(field, product)) : [];
+      renderCustomFields(customFieldsContainer, productFields);
+    })
+    .catch((error: unknown) => console.error("Could not load the extra product fields.", error))
+    .finally(() => {
+      productAddButton.disabled = false;
+    });
 }
 
 function renderCart() {
@@ -65,6 +91,11 @@ function renderCart() {
       wrapper.textContent = `Wrapper: ${item.wrapper}`;
       copy.append(wrapper);
     }
+    for (const answer of item.custom ?? []) {
+      const extra = document.createElement("span");
+      extra.textContent = `${answer.label}: ${answer.text}`;
+      copy.append(extra);
+    }
     copy.append(price);
 
     const controls = document.createElement("div");
@@ -77,6 +108,7 @@ function renderCart() {
     decrease.dataset.productId = item.id;
     decrease.dataset.productFlavour = item.flavour;
     decrease.dataset.productWrapper = item.wrapper;
+    decrease.dataset.productCustom = JSON.stringify(item.custom ?? []);
     const amount = document.createElement("span");
     amount.textContent = String(item.quantity);
     amount.setAttribute("aria-label", `${item.quantity} ${item.quantity === 1 ? "item" : "items"}`);
@@ -88,6 +120,7 @@ function renderCart() {
     increase.dataset.productId = item.id;
     increase.dataset.productFlavour = item.flavour;
     increase.dataset.productWrapper = item.wrapper;
+    increase.dataset.productCustom = JSON.stringify(item.custom ?? []);
     controls.append(decrease, amount, increase);
     row.append(copy, controls);
     cartItems.append(row);
@@ -149,7 +182,14 @@ document.addEventListener("click", (event) => {
       throw new Error("Choose an available flavour and describe your wrapper design in 3 to 120 characters.");
     }
 
-    const newItem = { id, quantity, flavour, wrapper };
+    let custom;
+    try {
+      custom = customFieldsContainer ? readCustomAnswers(customFieldsContainer, productFields) : [];
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Please complete the extra details.");
+      return;
+    }
+    const newItem: CartItem = { id, quantity, flavour, wrapper, ...(custom.length > 0 ? { custom } : {}) };
     const existingItem = cart.find((item) => getCartItemKey(item) === getCartItemKey(newItem));
     if (existingItem) existingItem.quantity = Math.min(existingItem.quantity + quantity, 20);
     else cart.push(newItem);
@@ -164,7 +204,13 @@ document.addEventListener("click", (event) => {
   const flavour = quantityButton?.dataset.productFlavour;
   const wrapper = quantityButton?.dataset.productWrapper;
   if (!quantityButton || !id || typeof flavour !== "string" || typeof wrapper !== "string" || !productById.has(id)) return;
-  const item = cart.find((entry) => getCartItemKey(entry) === getCartItemKey({ id, flavour, wrapper }));
+  let custom: CartItem["custom"];
+  try {
+    custom = JSON.parse(quantityButton.dataset.productCustom || "[]") as CartItem["custom"];
+  } catch {
+    return;
+  }
+  const item = cart.find((entry) => getCartItemKey(entry) === getCartItemKey({ id, flavour, wrapper, custom }));
   if (!item) return;
   item.quantity = quantityButton.dataset.cartAction === "increase"
     ? Math.min(item.quantity + 1, 20)

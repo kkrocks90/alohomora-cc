@@ -1,4 +1,5 @@
 import products from "../data/products.json";
+import { isCustomAnswer, type CustomAnswer } from "./custom-fields";
 
 export interface Product {
   id: string;
@@ -7,6 +8,7 @@ export interface Product {
   price: number;
   image: string;
   tag: string;
+  extraTags?: string[];
   packSize: string;
   flavours: string[];
   featured?: boolean;
@@ -18,6 +20,7 @@ export interface CartItem {
   quantity: number;
   flavour: string;
   wrapper: string;
+  custom?: CustomAnswer[];
 }
 
 export const CART_STORAGE_KEY = "cocoa-kind-cart-v1";
@@ -70,6 +73,7 @@ export function loadCart(): CartItem[] {
       (productById.get(item.id)!.flavours.length > 0
         ? productById.get(item.id)!.flavours.includes(item.flavour)
         : item.flavour === "") &&
+      (item.custom === undefined || (Array.isArray(item.custom) && item.custom.length <= 40 && item.custom.every(isCustomAnswer))) &&
       typeof item.wrapper === "string" &&
       (productById.get(item.id)!.customizable === false
         ? item.wrapper === ""

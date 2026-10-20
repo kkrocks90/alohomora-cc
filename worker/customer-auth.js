@@ -302,6 +302,15 @@ export async function updateCustomerProfile(request, env) {
   }
 }
 
+function parseCustomSnapshot(text) {
+  try {
+    const list = text ? JSON.parse(text) : [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
 export async function getCustomerOrders(request, env) {
   if (!isConfigured(env)) {
     return result(503, { error: "Customer sign-in is not configured yet. Please contact the shop." });
@@ -315,7 +324,7 @@ export async function getCustomerOrders(request, env) {
         `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise,
                 product_subtotal_paise, discount_paise, promo_code, currency,
                 delivery_method, created_at, customer_name, customer_phone,
-                delivery_address, city, state, pincode, event_date
+                delivery_address, city, state, pincode, event_date, custom_json
          FROM orders
          WHERE customer_email = ? COLLATE NOCASE
          ORDER BY created_at DESC
@@ -348,6 +357,7 @@ export async function getCustomerOrders(request, env) {
         orderStatus: order.order_status,
         paymentMethod: order.payment_method,
         items: JSON.parse(order.items_json),
+        customFields: parseCustomSnapshot(order.custom_json),
         amountPaise: order.amount_paise,
         productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
         discountPaise: order.discount_paise ?? 0,

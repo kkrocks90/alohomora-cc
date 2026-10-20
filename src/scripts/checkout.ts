@@ -9,6 +9,13 @@ import {
   type CartItem,
 } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
+import {
+  answersToPayload,
+  fetchCustomFields,
+  readCustomAnswers,
+  renderCustomFields,
+  type CustomField,
+} from "./custom-fields";
 import { normalizeState } from "../data/indian-states";
 
 interface PaymentOrder {
@@ -240,6 +247,7 @@ function renderOrder() {
       item.quantity > 1 ? `Quantity: ${item.quantity}` : "",
       item.flavour ? `Flavour: ${item.flavour}` : "",
       item.wrapper ? `Wrapper: ${item.wrapper}` : "",
+      ...(item.custom ?? []).map((answer) => `${answer.label}: ${answer.text}`),
     ].filter(Boolean).join(" · ");
     details.append(name, options);
     const price = document.createElement("span");
@@ -524,13 +532,27 @@ checkoutForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  let checkoutAnswers;
+  try {
+    checkoutAnswers = readCustomAnswers(checkoutCustomContainer, checkoutFields);
+  } catch (error) {
+    setCheckoutStatus(error instanceof Error ? error.message : "Please complete the extra details.", true);
+    return;
+  }
   const formData = new FormData(checkoutForm);
   checkoutButton.disabled = true;
   setCheckoutStatus("Preparing your secure checkout…");
   let activeReservationId = "";
   try {
     const orderResult = await requestApi("/orders", {
-      items: cart.map(({ id, quantity, flavour, wrapper }) => ({ id, quantity, flavour, wrapper })),
+      items: cart.map(({ id, quantity, flavour, wrapper, custom }) => ({
+        id,
+        quantity,
+        flavour,
+        wrapper,
+        custom: answersToPayload(custom),
+      })),
+      customFields: answersToPayload(checkoutAnswers),
       promoCode: appliedPromo?.code ?? "",
       customer: {
         name: String(formData.get("name") ?? ""),
@@ -627,3 +649,12 @@ if (cart.length > 0) {
     showLogin();
   }
 }
+
+const checkoutCustomContainer = requireElement<HTMLElement>("#checkout-custom-fields");
+let checkoutFields: CustomField[] = [];
+fetchCustomFields(apiUrl)
+  .then((fields) => {
+    checkoutFields = fields.filter((field) => field.scope === "checkout");
+    renderCustomFields(checkoutCustomContainer, checkoutFields);
+  })
+  .catch((error: unknown) => console.error("Could not load the extra checkout fields.", error));

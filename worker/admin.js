@@ -1,6 +1,7 @@
 import products from "../src/data/products.json" with { type: "json" };
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { generateOrderId } from "./order-id.js";
+import { assertFieldCapacity, listCustomFields, validateFieldDefinition } from "./custom-fields.js";
 import { getPromoCategories, validatePromoDefinition, validatePromoLimits } from "./promos.js";
 
 export const ORDER_STATUSES = [
@@ -53,12 +54,12 @@ export async function getAdminData(request, env) {
   try {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
-    const [ordersResult, customersResult, promosResult] = await Promise.all([
+    const [ordersResult, customersResult, promosResult, customFields] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
                   customer_id, customer_name, customer_phone, customer_email,
-                  delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
+                  delivery_address, city, state, pincode, items_json, custom_json, amount_paise, product_subtotal_paise,
                   discount_paise, promo_code, currency, delivery_method, event_date, created_at
            FROM orders
            ORDER BY created_at DESC`,
@@ -84,6 +85,7 @@ export async function getAdminData(request, env) {
            ORDER BY p.created_at DESC`,
         )
         .all(),
+      listCustomFields(env.ORDERS_DB),
     ]);
     return result(200, {
       email: access.email,
@@ -103,6 +105,7 @@ export async function getAdminData(request, env) {
         state: order.state ?? "",
         pincode: order.pincode ?? "",
         items: JSON.parse(order.items_json),
+        customFields: parseSnapshot(order.custom_json),
         amountPaise: order.amount_paise,
         productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
         discountPaise: order.discount_paise ?? 0,
@@ -127,6 +130,7 @@ export async function getAdminData(request, env) {
       orderStatuses: ORDER_STATUSES,
       products: products.map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
       categories: getPromoCategories(),
+      customFields,
       promos: promosResult.results.map((promo) => ({
         promoId: promo.promo_id,
         name: promo.name,
@@ -147,6 +151,16 @@ export async function getAdminData(request, env) {
   } catch (error) {
     console.error("Could not load the admin dashboard.", error);
     return result(503, { error: "The admin dashboard is temporarily unavailable." });
+  }
+}
+
+function parseSnapshot(text) {
+  if (!text) return [];
+  try {
+    const list = JSON.parse(text);
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
   }
 }
 
@@ -240,6 +254,117 @@ export async function updateAdminPromo(request, env) {
     } catch (error) {
       console.error("Could not update an admin promo code.", error);
       return result(503, { error: "The promo code could not be updated right now. Please try again." });
+  }
+}
+
+export async function createAdminCustomField(request, env) {
+  let body;
+  try {
+    body = await readBody(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const access = await requireAdmin(request, env);
+    if (access.error) return access.error;
+    let definition;
+    try {
+      definition = validateFieldDefinition(body, getPromoCategories());
+      assertFieldCapacity(await listCustomFields(env.ORDERS_DB));
+    } catch (error) {
+      return result(400, { error: error.message });
+    }
+    const fieldId = `field_${crypto.randomUUID().slice(0, 12)}`;
+    await insertOrReplaceField(env.ORDERS_DB, fieldId, definition, true, new Date().toISOString());
+    const [field] = (await listCustomFields(env.ORDERS_DB)).filter((entry) => entry.id === fieldId);
+    return result(201, { field });
+  } catch (error) {
+    console.error("Could not create a custom field.", error);
+    return result(503, { error: "The custom field could not be created right now. Please try again." });
+  }
+}
+
+async function insertOrReplaceField(database, fieldId, definition, active, createdAt) {
+  await database.prepare(
+    `INSERT INTO custom_fields (
+      field_id, scope, label, type, config_json, required, placeholder, help_text,
+      applies_to_json, sort_order, active, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(field_id) DO UPDATE SET
+      scope = excluded.scope, label = excluded.label, type = excluded.type,
+      config_json = excluded.config_json, required = excluded.required,
+      placeholder = excluded.placeholder, help_text = excluded.help_text,
+      applies_to_json = excluded.applies_to_json, sort_order = excluded.sort_order,
+      active = excluded.active`,
+  ).bind(
+    fieldId,
+    definition.scope,
+    definition.label,
+    definition.type,
+    JSON.stringify(definition.config),
+    definition.required ? 1 : 0,
+    definition.placeholder,
+    definition.helpText,
+    JSON.stringify(definition.appliesTo),
+    definition.sortOrder,
+    active ? 1 : 0,
+    createdAt,
+  ).run();
+}
+
+export async function updateAdminCustomField(request, env) {
+  let body;
+  try {
+    body = await readBody(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const access = await requireAdmin(request, env);
+    if (access.error) return access.error;
+    const fieldId = requiredText(body?.fieldId, 80, "custom field");
+    if (typeof body?.active !== "boolean") return result(400, { error: "Choose whether this field is active." });
+    const existing = (await listCustomFields(env.ORDERS_DB)).find((entry) => entry.id === fieldId);
+    if (!existing) return result(404, { error: "That custom field could not be found." });
+    let definition = null;
+    if (body.definition !== undefined) {
+      try {
+        definition = validateFieldDefinition(body.definition, getPromoCategories());
+      } catch (error) {
+        return result(400, { error: error.message });
+      }
+    }
+    if (definition) {
+      await insertOrReplaceField(env.ORDERS_DB, fieldId, definition, body.active, existing.createdAt);
+    } else {
+      await env.ORDERS_DB.prepare("UPDATE custom_fields SET active = ? WHERE field_id = ?")
+        .bind(body.active ? 1 : 0, fieldId).run();
+    }
+    const [field] = (await listCustomFields(env.ORDERS_DB)).filter((entry) => entry.id === fieldId);
+    return result(200, { field });
+  } catch (error) {
+    console.error("Could not update a custom field.", error);
+    return result(503, { error: "The custom field could not be updated right now. Please try again." });
+  }
+}
+
+export async function deleteAdminCustomField(request, env) {
+  let body;
+  try {
+    body = await readBody(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const access = await requireAdmin(request, env);
+    if (access.error) return access.error;
+    const fieldId = requiredText(body?.fieldId, 80, "custom field");
+    const deleted = await env.ORDERS_DB.prepare("DELETE FROM custom_fields WHERE field_id = ?").bind(fieldId).run();
+    if (deleted.meta?.changes === 0) return result(404, { error: "That custom field could not be found." });
+    return result(200, { fieldId });
+  } catch (error) {
+    console.error("Could not delete a custom field.", error);
+    return result(503, { error: "The custom field could not be deleted right now. Please try again." });
   }
 }
 

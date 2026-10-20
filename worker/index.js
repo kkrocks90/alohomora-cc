@@ -2,8 +2,11 @@ import products from "../src/data/products.json" with { type: "json" };
 import {
   createAdminPromo,
   createAdminCustomer,
+  createAdminCustomField,
   createManualOrder,
+  deleteAdminCustomField,
   getAdminData,
+  updateAdminCustomField,
   updateAdminCustomer,
   updateAdminOrderStatus,
   updateAdminPromo,
@@ -15,6 +18,14 @@ import {
   isValidDeliveryLocation,
 } from "./delivery.js";
 import { parsePaidOrderNotes, savePaidOrder } from "./orders.js";
+import {
+  collectAnswers,
+  deletePendingCustom,
+  fieldAppliesToProduct,
+  listCustomFields,
+  loadPendingCustom,
+  savePendingCustom,
+} from "./custom-fields.js";
 import { generateOrderId, ORDER_ID_PATTERN } from "./order-id.js";
 import { isValidPincode, lookupPincode, PincodeLookupError } from "./pincode.js";
 import {
@@ -73,7 +84,7 @@ async function readBody(request) {
   }
 }
 
-function validateOrder(body, storeLocation) {
+function validateOrder(body, storeLocation, customFields = []) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     throw new Error("Order details are missing.");
   }
@@ -147,7 +158,8 @@ function validateOrder(body, storeLocation) {
     ) {
       throw new Error("Choose a valid flavour for each product that offers one.");
     }
-    const variantKey = JSON.stringify([item.id, item.flavour, item.wrapper]);
+    const custom = collectAnswers(customFields.filter((field) => fieldAppliesToProduct(field, product)), item.custom);
+    const variantKey = JSON.stringify([item.id, item.flavour, item.wrapper, custom.map(({ id, value }) => [id, value])]);
     if (seen.has(variantKey)) throw new Error("Your bag contains the same product options more than once.");
     seen.add(variantKey);
     return {
@@ -155,8 +167,10 @@ function validateOrder(body, storeLocation) {
       quantity: item.quantity,
       flavour: item.flavour,
       wrapper: item.wrapper.trim(),
+      custom,
     };
   });
+  const checkoutCustom = collectAnswers(customFields.filter((field) => field.scope === "checkout"), body.customFields);
 
   const amount = items.reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
   if (!Number.isSafeInteger(amount) || amount <= 0) throw new Error("Your order total is invalid.");
@@ -164,6 +178,7 @@ function validateOrder(body, storeLocation) {
   return {
     customer,
     items,
+    checkoutCustom,
     amount,
     subtotalPaise: amount,
     distanceKm,
@@ -277,7 +292,7 @@ async function handleCreateOrder(request, env, origin) {
     } else if (body && typeof body === "object") {
       delete body.deliveryLocation;
     }
-    order = validateOrder(body, storeLocation);
+    order = validateOrder(body, storeLocation, await listCustomFields(env.ORDERS_DB, { activeOnly: true }));
     if (body.promoCode !== undefined && body.promoCode !== null && body.promoCode !== "") {
       promoQuote = await quotePromo(env.ORDERS_DB, body.promoCode, customerEmail, order.items);
       order.amount = promoQuote.payablePaise;
@@ -314,14 +329,16 @@ async function handleCreateOrder(request, env, origin) {
         state: order.customer.state,
         pincode: order.customer.pincode,
         eventDate: order.customer.eventDate,
-        items: order.items.map(({ product, quantity, flavour, wrapper }) => ({
+        items: order.items.map(({ product, quantity, flavour, wrapper, custom }) => ({
           id: product.id,
           name: product.name,
           quantity,
           unitPriceRupees: product.price,
           flavour,
           wrapper,
+          ...(custom.length > 0 ? { custom } : {}),
         })),
+        customFields: order.checkoutCustom,
         amountPaise: 0,
         productSubtotalPaise: promoQuote.subtotalPaise,
         discountPaise: promoQuote.discountPaise,
@@ -431,6 +448,18 @@ async function handleCreateOrder(request, env, origin) {
   if (providerOrder.amount !== order.amount || providerOrder.currency !== "INR" || !providerOrder.id) {
     console.error("Razorpay returned an order with unexpected details.");
     return errorResponse("Secure checkout returned an invalid order. Please try again.", 502, origin);
+  }
+
+  if (order.checkoutCustom.length > 0 || order.items.some((item) => item.custom.length > 0)) {
+    try {
+      await savePendingCustom(env.ORDERS_DB, appOrderId, {
+        checkout: order.checkoutCustom,
+        items: order.items.map((item) => item.custom),
+      });
+    } catch (error) {
+      console.error("Could not save custom field answers for a new payment order.", error);
+      return errorResponse("Your extra order details could not be saved. Please try again shortly.", 503, origin);
+    }
   }
 
   let reservation = null;
@@ -588,6 +617,18 @@ async function handleVerifyPayment(request, env, origin) {
     return errorResponse("Payment has not been fully captured yet. Please contact the shop if money was debited.", 409, origin);
   }
 
+  const hasAppOrderId = typeof verifiedOrder.receipt === "string" && ORDER_ID_PATTERN.test(verifiedOrder.receipt);
+  let pendingCustom = null;
+  try {
+    pendingCustom = hasAppOrderId ? await loadPendingCustom(env.ORDERS_DB, verifiedOrder.receipt) : null;
+  } catch (error) {
+    console.error("Could not read custom field answers for a captured payment.", error);
+    return errorResponse(
+      "Your payment was received, but the order could not be saved. Please do not pay again; contact the shop with your Razorpay order ID.",
+      503,
+      origin,
+    );
+  }
   let paidOrder;
   try {
     paidOrder = parsePaidOrderNotes(
@@ -595,6 +636,7 @@ async function handleVerifyPayment(request, env, origin) {
       payment.id,
       verifiedOrder.notes,
       verifiedOrder.amount,
+      pendingCustom,
     );
   } catch (error) {
     console.error("The captured Razorpay order could not be reconciled with its order details.", error);
@@ -647,6 +689,8 @@ async function handleVerifyPayment(request, env, origin) {
     );
   }
 
+  if (pendingCustom) await deletePendingCustom(env.ORDERS_DB, verifiedOrder.receipt);
+
   return jsonResponse({
     verified: true,
     orderId: paidOrder.orderId,
@@ -686,6 +730,18 @@ export default {
       } catch (error) {
         console.error("Could not load a featured promo.", error);
         return errorResponse("The featured promo is temporarily unavailable.", 503, configuredOrigin);
+      }
+    }
+    if (request.method === "GET" && path === "/custom-fields") {
+      if (!env.ORDERS_DB) return jsonResponse({ fields: [] }, 200, configuredOrigin);
+      try {
+        const fields = await listCustomFields(env.ORDERS_DB, { activeOnly: true });
+        const response = jsonResponse({ fields }, 200, configuredOrigin);
+        response.headers.set("Cache-Control", "public, max-age=60, s-maxage=60");
+        return response;
+      } catch (error) {
+        console.error("Could not load custom fields.", error);
+        return errorResponse("The extra order fields are temporarily unavailable.", 503, configuredOrigin);
       }
     }
     const pincodeMatch = path.match(/^\/pincode\/(\d{6})$/);
@@ -736,6 +792,18 @@ export default {
     }
     if (path === "/admin/promos/update") {
       const result = await updateAdminPromo(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/custom-fields/create") {
+      const result = await createAdminCustomField(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/custom-fields/update") {
+      const result = await updateAdminCustomField(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/custom-fields/delete") {
+      const result = await deleteAdminCustomField(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/customers/create") {

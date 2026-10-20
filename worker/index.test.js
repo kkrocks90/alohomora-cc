@@ -28,6 +28,7 @@ const authenticatedOrdersDb = {
           first: async () => /SELECT email FROM customer_sessions/i.test(sql)
             ? { email: "customer@example.com" }
             : null,
+          all: async () => ({ results: [] }),
         };
       },
     };
@@ -694,4 +695,85 @@ test("only the signed-in order owner can verify payment and receive the order re
       assert.equal(database.savedOrders.size, 0);
     }
   }
+});
+
+function customFieldsDb(rows, saved) {
+  return {
+    prepare(sql) {
+      return {
+        bind(...args) {
+          return {
+            first: async () => /SELECT email FROM customer_sessions/i.test(sql) ? { email: "customer@example.com" } : null,
+            all: async () => ({ results: /FROM custom_fields/i.test(sql) ? rows : [] }),
+            run: async () => {
+              if (/INTO pending_order_custom/i.test(sql)) saved.push({ orderId: args[0], payload: JSON.parse(args[1]) });
+              return { meta: { changes: 1 } };
+            },
+          };
+        },
+      };
+    },
+  };
+}
+
+const fieldRow = (overrides) => ({
+  field_id: "field_a", scope: "product", label: "Message on card", type: "text", config_json: "{}",
+  required: 1, placeholder: "", help_text: "", applies_to_json: '{"mode":"products","values":["product-1002"]}',
+  sort_order: 0, active: 1, created_at: "2025-01-01T00:00:00.000Z", ...overrides,
+});
+
+async function postCustomOrder(rows, saved, { custom, checkout } = {}) {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, init) => {
+    const payload = JSON.parse(String(init?.body));
+    return Response.json({ id: "order_custom", amount: payload.amount, currency: "INR" });
+  };
+  try {
+    return await worker.fetch(
+      new Request("https://checkout.example.com/orders", {
+        method: "POST",
+        headers: { Origin: "https://shop.example.com", "Content-Type": "application/json", ...sessionHeaders },
+        body: JSON.stringify({
+          items: [{ id: "product-1002", quantity: 1, flavour: "", wrapper: "A red wrapper with a message", custom }],
+          customFields: checkout,
+          customer: {
+            name: "Customer Example", phone: "+911234567890", email: "customer@example.com",
+            address: "123 Sample Street", city: "Chennai", state: "Tamil Nadu", pincode: "600001", policyConsent: true,
+          },
+          deliveryLocation: { latitude: 0, longitude: 0 },
+        }),
+      }),
+      {
+        ALLOWED_ORIGIN: "https://shop.example.com", STORE_LATITUDE: "0", STORE_LONGITUDE: "0",
+        ORDERS_DB: customFieldsDb(rows, saved), RAZORPAY_KEY_ID: "k", RAZORPAY_KEY_SECRET: "s",
+      },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+}
+
+test("required product custom fields must be answered", async () => {
+  const response = await postCustomOrder([fieldRow({})], []);
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /Message on card/);
+});
+
+test("custom field answers are validated and stored for payment verification", async () => {
+  const saved = [];
+  const rows = [
+    fieldRow({}),
+    fieldRow({ field_id: "field_b", scope: "checkout", label: "Gift wrap", type: "dropdown", required: 0,
+      config_json: '{"options":["Yes","No"]}', applies_to_json: '{"mode":"all","values":[]}' }),
+    fieldRow({ field_id: "field_c", label: "Other product only", applies_to_json: '{"mode":"products","values":["product-1001"]}' }),
+  ];
+  const bad = await postCustomOrder(rows, saved, { custom: { field_a: "Happy birthday" }, checkout: { field_b: "Maybe" } });
+  assert.equal(bad.status, 400);
+  const ok = await postCustomOrder(rows, saved, { custom: { field_a: "Happy birthday" }, checkout: { field_b: "Yes" } });
+  assert.equal(ok.status, 201);
+  assert.equal(saved.length, 1);
+  assert.deepEqual(saved[0].payload, {
+    checkout: [{ id: "field_b", label: "Gift wrap", value: "Yes" }],
+    items: [[{ id: "field_a", label: "Message on card", value: "Happy birthday" }]],
+  });
 });

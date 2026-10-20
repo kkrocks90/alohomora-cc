@@ -13,7 +13,7 @@ function requireNoteText(notes, field, maximum) {
   return value.trim();
 }
 
-export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
+export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise, pendingCustom = null) {
   if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) {
     throw new Error("The verified payment amount is invalid.");
   }
@@ -71,7 +71,10 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
   }
 
   const seen = new Set();
-  const items = requestedItems.map((item) => {
+  if (pendingCustom && pendingCustom.items.length !== requestedItems.length) {
+    throw new Error("The paid order extra details do not match its products.");
+  }
+  const items = requestedItems.map((item, index) => {
     if (
       !Array.isArray(item) ||
       (item.length !== 3 && item.length !== 5) ||
@@ -103,7 +106,8 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     }
     const storedFlavour = legacyOptions ? "Not selected (legacy order)" : flavour;
     const storedWrapper = legacyOptions ? "Not selected (legacy order)" : wrapper.trim();
-    const variantKey = JSON.stringify([item[0], storedFlavour, storedWrapper]);
+    const custom = pendingCustom?.items[index] ?? [];
+    const variantKey = JSON.stringify([item[0], storedFlavour, storedWrapper, custom.map(({ id, value }) => [id, value])]);
     if (seen.has(variantKey)) throw new Error("The paid order contains duplicate product options.");
     seen.add(variantKey);
     return {
@@ -113,6 +117,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
       unitPriceRupees: item[2],
       flavour: storedFlavour,
       wrapper: storedWrapper,
+      ...(custom.length > 0 ? { custom } : {}),
     };
   });
 
@@ -211,6 +216,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise) {
     deliveryMethod,
     distanceKm,
     policiesAccepted,
+    customFields: pendingCustom?.checkout ?? [],
   };
 }
 
@@ -300,6 +306,13 @@ export async function savePaidOrder(database, order) {
     }
   } else {
     await database.prepare(insertSql).bind(...insertValues).run();
+  }
+
+  if (order.customFields?.length > 0) {
+    await database
+      .prepare("UPDATE orders SET custom_json = ? WHERE order_id = ? AND custom_json = ''")
+      .bind(JSON.stringify(order.customFields), order.orderId)
+      .run();
   }
 
   const saved = await database
