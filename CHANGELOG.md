@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.12.0] - 2026-10-20
+
+### Changed
+- Desktop header: animated underline on nav links, pill-style Login, and a filled cocoa "My bag" button with a soft shadow.
+- Mobile side menu: rounded panel, icon-badged links, and a footer with tagline plus WhatsApp and Instagram buttons.
+
 ## [1.11.0] - 2026-10-20
 
 ### Changed
