@@ -95,6 +95,7 @@ function openCart() {
   previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   cartDrawer.classList.add("is-open");
   cartDrawer.setAttribute("aria-hidden", "false");
+  cartDrawer.inert = false;
   backdrop.hidden = false;
   openCartButton.setAttribute("aria-expanded", "true");
   document.body.style.overflow = "hidden";
@@ -104,6 +105,7 @@ function openCart() {
 function closeCart() {
   cartDrawer.classList.remove("is-open");
   cartDrawer.setAttribute("aria-hidden", "true");
+  cartDrawer.inert = true;
   backdrop.hidden = true;
   openCartButton.setAttribute("aria-expanded", "false");
   document.body.style.overflow = "";

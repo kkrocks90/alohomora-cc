@@ -863,7 +863,7 @@ h2 em {
   gap: 8px;
 }
 
-.product-name-row h3 {
+.product-name-row :is(h2, h3) {
   margin: 0;
   color: #4a3027;
   font-family: var(--serif);
@@ -872,7 +872,7 @@ h2 em {
   letter-spacing: -0.03em;
 }
 
-.product-name-row h3 a:hover {
+.product-name-row :is(h2, h3) a:hover {
   color: #a25f4c;
 }
 
@@ -3442,7 +3442,7 @@ h2 em {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .product-name-row h3 {
+  .product-name-row :is(h2, h3) {
     font-size: 19px;
   }
 
@@ -3943,7 +3943,7 @@ h2 em {
     display: block;
   }
 
-  .product-name-row h3 {
+  .product-name-row :is(h2, h3) {
     font-size: 17px;
     line-height: 1.15;
   }
@@ -5038,7 +5038,7 @@ h2 em {
     padding: 10px 10px 12px;
   }
 
-  .featured-slider .product-copy h3 {
+  .featured-slider .product-copy :is(h2, h3) {
     font-size: 14px;
     line-height: 1.25;
   }
@@ -5925,4 +5925,85 @@ h2 em {
 
 .checkout-page:has(.checkout-empty:not([hidden])) .checkout-steps {
   display: none;
+}
+
+/* ---- Accessibility: contrast ---- */
+:root {
+  --muted: #6b5a4f;
+}
+
+.eyebrow,
+.wordmark i,
+.checkout-heading h1 em,
+.thank-you-panel h1 em,
+.not-found-card h1 em,
+.product-related h2 em {
+  color: #7d5543;
+}
+
+.product-weight,
+.product-card-price span,
+.store-count,
+.catalog-note,
+.product-detail-footnote,
+.product-lead-time,
+.product-detail-price span,
+.product-breadcrumb,
+.checkout-signed-in,
+.thank-you-meta,
+.location-privacy,
+.policy-updated {
+  color: #6b5a4f;
+}
+
+.hero-description,
+.store-heading > p,
+.checkout-heading > p:last-child,
+.checkout-panel > p:not(.eyebrow),
+.product-detail-description,
+.delivery-note {
+  color: #5f4e44;
+}
+
+.order-progress li {
+  color: #7a6759;
+}
+
+.product-card-title {
+  margin: 0;
+}
+.story-copy p,
+.kindness-card p,
+.store-heading p,
+.product-copy p,
+.tab-bar span,
+#tab-bar span,
+.account-link span {
+  color: #5f4e44;
+}
+main #our-story .story-copy p,
+main .store-heading > p {
+  color: #5f4e44;
+}
+
+.policy-content a.button-primary {
+  color: #fffdf9;
+  text-decoration: none;
+}
+
+.product-options label > select,
+.product-options label > textarea {
+  margin-top: 4px;
+}
+.store-page .store-heading > p:last-child,
+.store-page .store-heading p {
+  color: #5f4e44 !important;
+}
+
+.product-options {
+  gap: 20px;
+}
+
+.product-options label > select {
+  margin-top: 8px;
 }

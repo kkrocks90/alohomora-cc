@@ -1,5 +1,5 @@
 ---
-import { Image, type ImageMetadata } from "astro:assets";
+import { Image, getImage, type ImageMetadata } from "astro:assets";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import products from "../../data/products.json";
@@ -27,9 +27,44 @@ const related = [
 ].slice(0, 4);
 const base = import.meta.env.BASE_URL;
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const shareImage = await getImage({ src: image, width: 1200, height: 630, fit: "cover", format: "jpeg", quality: 82 });
+const productLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: new URL(shareImage.src, Astro.site).href,
+    category: product.tag,
+    brand: { "@type": "Brand", name: "Chocolate Circle" },
+    offers: {
+      "@type": "Offer",
+      url: new URL(Astro.url.pathname, Astro.site).href,
+      priceCurrency: "INR",
+      price: String(product.price),
+      availability: "https://schema.org/InStock",
+      seller: { "@type": "Organization", name: "Chocolate Circle" },
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Shop", item: new URL("/store/", Astro.site).href },
+      { "@type": "ListItem", position: 2, name: product.name },
+    ],
+  },
+];
 ---
 
-<SiteLayout title={`${product.name} — Chocolate Circle`} description={product.description}>
+<SiteLayout
+  title={`${product.name} — Chocolate Circle`}
+  description={`${product.description} ₹${product.price}, ${product.packSize}. Handmade with a personalised wrapper.`}
+  socialImage={shareImage.src}
+  socialImageAlt={`${product.name} by Chocolate Circle`}
+  ogType="product"
+  jsonLd={productLd}
+>
   <main class="product-detail-page" id="storefront" data-checkout-api={checkoutApiUrl}>
     <nav class="product-breadcrumb" aria-label="Breadcrumb">
       <a href={`${base}store/`}>Shop all treats</a>
@@ -95,7 +130,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             class="button button-primary product-add-button"
             type="button"
             data-add-to-cart={product.id}
-            aria-label={`Add ${product.name}${product.flavours.length > 0 ? " with selected flavour" : ""} and wrapper to your bag`}
+            aria-label={`Add to bag: ${product.name}`}
           >
             Add to bag <span aria-hidden="true">+</span>
           </button>

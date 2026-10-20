@@ -5,6 +5,16 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.14.0] - 2026-10-21
+
+### Added
+- Per-product Open Graph share images (1200x630), `og:type=product`, and richer descriptions with price and pack size.
+- Product, BreadcrumbList and Store/Organization JSON-LD structured data.
+- `lastmod` in the sitemap.
+
+### Fixed
+- Accessibility (Lighthouse 100 on key pages): cart drawer and mobile menu are `inert` when closed, product card heading order, redundant labels, colour contrast, and select spacing.
+
 ## [1.13.0] - 2026-10-20
 
 ### Added

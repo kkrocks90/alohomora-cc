@@ -25,9 +25,22 @@ const categoryCards = [...new Set(products.map((product) => product.tag))]
     if (!image) throw new Error(`Product image not found: ${product.image}`);
     return { tag, image, count: products.filter((item) => item.tag === tag).length };
   });
+const orgLd = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  name: "Chocolate Circle",
+  url: "https://chocolatecircle.in/",
+  logo: "https://chocolatecircle.in/favicon.svg",
+  image: "https://chocolatecircle.in/social-share.jpg",
+  description: "Small-batch handmade chocolates, lovingly made and wrapped for sharing.",
+  email: "alohomora.chocolatecircle@gmail.com",
+  telephone: "+919500868468",
+  address: { "@type": "PostalAddress", addressLocality: "Chennai", addressRegion: "Tamil Nadu", postalCode: "600073", addressCountry: "IN" },
+  areaServed: "IN",
+};
 ---
 
-<SiteLayout>
+<SiteLayout jsonLd={[orgLd]}>
   <main id="storefront" data-checkout-api={checkoutApiUrl}>
     <a class="announcement-strip" href={`${import.meta.env.BASE_URL}store/`}>
       <span class="announcement-sparkle" aria-hidden="true">✳</span>
@@ -109,7 +122,6 @@ const categoryCards = [...new Set(products.map((product) => product.tag))]
           <a
             class="category-shortcut"
             href={`${import.meta.env.BASE_URL}store/?category=${encodeURIComponent(tag)}`}
-            aria-label={`Browse ${count} ${tag.toLowerCase()} products`}
           >
             <Image
               src={image}

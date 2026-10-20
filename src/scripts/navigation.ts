@@ -57,6 +57,7 @@ if (menuToggle) {
 
   function closeMenu() {
     menu.setAttribute("aria-hidden", "true");
+    menu.inert = true;
     backdrop.hidden = true;
     menuButton.setAttribute("aria-expanded", "false");
     document.body.style.overflow = "";
@@ -66,6 +67,7 @@ if (menuToggle) {
   function openMenu() {
     previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     menu.setAttribute("aria-hidden", "false");
+    menu.inert = false;
     backdrop.hidden = false;
     menuButton.setAttribute("aria-expanded", "true");
     document.body.style.overflow = "hidden";

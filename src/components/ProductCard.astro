@@ -31,7 +31,7 @@ const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
   data-product-featured={product.featured ? "true" : "false"}
   style={`--card-index: ${index}`}
 >
-  <a class="product-detail-link" href={productUrl} aria-label={`View ${product.name} details and options`}>
+  <a class="product-detail-link" href={productUrl} tabindex="-1" aria-hidden="true">
     <div class="product-image-wrap">
       <Image
         src={image}
@@ -50,7 +50,7 @@ const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
   </a>
   <div class="product-copy">
     <div class="product-name-row">
-      <h3><a href={productUrl}>{product.name}</a></h3>
+      <h2 class="product-card-title"><a href={productUrl}>{product.name}</a></h2>
       <span class="product-weight">{product.packSize}</span>
     </div>
     <p>{product.description}</p>

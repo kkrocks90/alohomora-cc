@@ -7,6 +7,8 @@ interface Props {
   socialImage?: string;
   socialImageAlt?: string;
   noIndex?: boolean;
+  ogType?: string;
+  jsonLd?: Record<string, unknown>[];
 }
 
 const {
@@ -15,6 +17,8 @@ const {
   socialImage = "/social-share.jpg",
   socialImageAlt = "Chocolate Circle handmade chocolates and small-batch treats",
   noIndex = false,
+  ogType = "website",
+  jsonLd = [],
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
@@ -30,7 +34,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     <link rel="canonical" href={canonicalUrl} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#faf7f1" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Chocolate Circle" />
     <meta property="og:locale" content="en_IN" />
     <meta property="og:title" content={title} />
@@ -47,10 +51,11 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     <meta name="twitter:image:alt" content={socialImageAlt} />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <title>{title}</title>
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replaceAll("<", "\\u003c")} />)}
   </head>
   <body>
     <header class="site-header">
-      <a class="wordmark" href={base} aria-label="Chocolate Circle home">
+      <a class="wordmark" href={base}>
         <span class="wordmark-mark" aria-hidden="true">c</span>
         <span>chocolate <i>circle</i></span>
       </a>
@@ -206,7 +211,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     </a>
 
     <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
-    <aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true">
+    <aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true" inert>
       <div class="drawer-header">
         <div>
           <p class="eyebrow">A treat for later</p>
