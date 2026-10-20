@@ -570,5 +570,19 @@
             "White Chocolate"
         ],
         "customizable": false
+    },
+    {
+        "id": "product-1049",
+        "name": "Heart Chocolate Box (Pack of 1)",
+        "description": "A heart-shaped gift box of handmade chocolates, in your choice of chocolate or nut.",
+        "price": 900,
+        "image": "product-1049.jpg",
+        "tag": "Elite Gifting",
+        "packSize": "Pack of 1",
+        "flavours": [
+            "Chocolate",
+            "Nuts"
+        ],
+        "customizable": false
     }
 ]

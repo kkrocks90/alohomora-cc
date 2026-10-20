@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.16.2] - 2026-10-20
+
+### Added
+- New product: Heart Chocolate Box (Pack of 1), Rs 900, in Elite Gifting. Chocolate or Nuts flavour, no wrapper customisation.
+
 ## [1.16.1] - 2026-10-20
 
 ### Added
