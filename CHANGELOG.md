@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.14.4] - 2026-10-20
+
+### Changed
+- Moved both Lollipops to Chocolate treats and removed the Candies & sweets category.
+
 ## [1.14.3] - 2026-10-20
 
 ### Changed
