@@ -5,6 +5,17 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.15.0] - 2026-10-20
+
+### Added
+- Order detail page (/order/?id=...) for customers and the admin: items, totals, delivery details, progress tracker, and a Download invoice button (use Save as PDF in the print window).
+- Admin can update an order's status from the detail page, which also shows payment references.
+- "View details" links from the profile order cards, the admin order list and the thank-you page.
+- The thank-you page's WhatsApp share now includes the order ID, items, total, event date and delivery method (no address or phone).
+
+### Changed
+- The admin invoice now uses the shared invoice renderer.
+
 ## [1.14.4] - 2026-10-20
 
 ### Changed

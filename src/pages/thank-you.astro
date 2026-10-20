@@ -10,7 +10,7 @@ const base = import.meta.env.BASE_URL;
   description="Your Chocolate Circle order confirmation and details."
   noIndex
 >
-  <main class="thank-you-page" id="thank-you-page" data-checkout-api={checkoutApiUrl}>
+  <main class="thank-you-page" id="thank-you-page" data-checkout-api={checkoutApiUrl} data-base-url={base}>
     <section class="thank-you-panel checkout-panel" aria-labelledby="thank-you-title">
       <p class="eyebrow">A little joy is on its way</p>
       <h1 id="thank-you-title">Thank <em>you.</em></h1>

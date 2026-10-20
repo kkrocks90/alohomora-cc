@@ -1,0 +1,26 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const base = import.meta.env.BASE_URL;
+---
+
+<SiteLayout
+  title="Order details — Chocolate Circle"
+  description="View the details, progress and invoice for your Chocolate Circle order."
+  noIndex
+>
+  <main class="order-page thank-you-page" id="order-detail-page" data-checkout-api={checkoutApiUrl} data-base-url={base}>
+    <section class="order-detail-panel thank-you-panel checkout-panel" aria-labelledby="order-title">
+      <a class="text-link order-back-link" id="order-back-link" href={`${base}account/`}>← My orders</a>
+      <p class="eyebrow">Order details</p>
+      <h1 id="order-title">Your order</h1>
+      <p class="thank-you-status" id="order-status-message" role="status" aria-live="polite">Loading your order…</p>
+      <div id="order-detail" hidden></div>
+    </section>
+    <section class="admin-invoice-print" id="order-invoice-print" aria-label="Printable order invoice" hidden></section>
+  </main>
+  <script>
+    import "../scripts/order-detail";
+  </script>
+</SiteLayout>

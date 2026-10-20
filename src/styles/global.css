@@ -6037,3 +6037,123 @@ main .store-heading > p {
 @media (prefers-reduced-motion: reduce) {
   .session-loader-spinner { animation-duration: 2.4s; }
 }
+/* Order detail page */
+.order-back-link {
+  display: inline-block;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+.order-detail-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 14px 0 4px;
+}
+.order-status-pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #efe3d6;
+  color: #59352b;
+  font-size: 12px;
+  font-weight: 700;
+}
+.order-status-pill.is-delivered { background: #dcebd9; color: #2f5a2c; }
+.order-status-pill.is-cancelled { background: #f3d9d4; color: #8a2f22; }
+.order-detail-meta {
+  color: #5f4e44;
+  font-size: 13px;
+}
+.order-detail-block {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid #eadfd2;
+}
+.order-detail-block h2 {
+  margin: 0 0 12px;
+  color: var(--cocoa-dark);
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+}
+.order-detail-rows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.order-detail-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 150px) 1fr;
+  gap: 12px;
+  font-size: 13px;
+}
+.order-detail-row dt { color: #5f4e44; font-weight: 600; }
+.order-detail-row dd { margin: 0; overflow-wrap: anywhere; }
+.is-grand-total strong { font-size: 1.1em; }
+.order-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+.order-detail-hint {
+  margin: 10px 0 0;
+  color: #5f4e44;
+  font-size: 12px;
+}
+.order-admin-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 16px;
+  border: 1px solid #eadfd2;
+  border-radius: 12px;
+  background: #faf5ee;
+}
+.order-admin-status label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.order-admin-status select {
+  min-height: 44px;
+  min-width: 190px;
+  padding: 0 12px;
+  border: 1px solid #d9c9b9;
+  border-radius: 10px;
+  background: #fff;
+}
+.order-admin-feedback {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+}
+.order-admin-feedback[data-state="error"] { color: #8a2f22; }
+.order-card-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media print {
+  body:has(#order-detail-page) > :not(main),
+  #order-detail-page > :not(#order-invoice-print) {
+    display: none !important;
+  }
+  #order-detail-page,
+  #order-invoice-print {
+    display: block !important;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+.order-detail-panel::before {
+  display: none;
+}

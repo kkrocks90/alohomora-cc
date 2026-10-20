@@ -1,6 +1,7 @@
 import { ADMIN_SESSION_KEY } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
 import { normalizeState } from "../data/indian-states";
+import { printInvoice } from "./order-view";
 
 interface AdminCustomer {
   customerId: string;
@@ -604,74 +605,7 @@ if (root) {
   }
 
   function renderInvoice(order: AdminOrder) {
-    invoice.replaceChildren();
-    const heading = document.createElement("div");
-    heading.className = "invoice-heading";
-    appendText(heading, "p", "CHOCOLATE CIRCLE", "invoice-brand");
-    appendText(heading, "h1", "Order invoice");
-    appendText(heading, "p", `Order ${order.orderId}`);
-    invoice.append(heading);
-
-    const meta = document.createElement("div");
-    meta.className = "invoice-meta";
-    const customerBlock = document.createElement("section");
-    appendText(customerBlock, "h2", "Customer");
-    appendText(customerBlock, "p", order.customerName);
-    appendText(customerBlock, "p", order.customerPhone);
-    if (order.customerEmail) appendText(customerBlock, "p", order.customerEmail);
-    appendText(customerBlock, "p", formatDeliveryAddress(order));
-    const orderBlock = document.createElement("section");
-    appendText(orderBlock, "h2", "Order details");
-    appendText(orderBlock, "p", `Date: ${new Date(order.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
-    appendText(orderBlock, "p", `Status: ${statusLabels[order.orderStatus] ?? order.orderStatus}`);
-    const paymentLabel = order.paymentMethod === "manual"
-      ? "Manual order"
-      : order.paymentMethod === "promo" ? "Promo code (no payment due)" : "Razorpay";
-    const paymentStatusLabel = order.paymentMethod === "promo"
-      ? "No payment due"
-      : order.paymentStatus === "paid" ? "Paid" : "Unpaid";
-    appendText(orderBlock, "p", `Payment: ${paymentStatusLabel} (${paymentLabel})`);
-    if (order.eventDate) appendText(orderBlock, "p", `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
-    appendText(orderBlock, "p", order.deliveryMethod);
-    meta.append(customerBlock, orderBlock);
-    invoice.append(meta);
-
-    const table = document.createElement("table");
-    table.className = "invoice-items";
-    const head = document.createElement("thead");
-    const header = document.createElement("tr");
-    ["Item", "Qty", "Unit price", "Amount"].forEach((label) => appendText(header, "th", label));
-    head.append(header);
-    const body = document.createElement("tbody");
-    for (const item of order.items) {
-      const row = document.createElement("tr");
-      const description = document.createElement("td");
-      appendText(description, "strong", item.name);
-      appendText(description, "span", [item.flavour ? `Flavour: ${item.flavour}` : "", item.wrapper].filter(Boolean).join(" · "));
-      row.append(description);
-      appendText(row, "td", String(item.quantity));
-      appendText(row, "td", currency.format(item.unitPriceRupees));
-      appendText(row, "td", currency.format(item.unitPriceRupees * item.quantity));
-      body.append(row);
-    }
-    table.append(head, body);
-    invoice.append(table);
-    const total = document.createElement("p");
-    total.className = "invoice-total";
-    total.textContent = `Product subtotal: ${currency.format(order.productSubtotalPaise / 100)}`;
-    invoice.append(total);
-    if (order.discountPaise > 0) {
-      appendText(invoice, "p", `Promo ${order.promoCode}: −${currency.format(order.discountPaise / 100)}`, "invoice-note");
-      appendText(invoice, "p", `Paid total: ${currency.format(order.amountPaise / 100)}`, "invoice-total");
-    }
-    appendText(
-      invoice,
-      "p",
-      "This is an order invoice/receipt, not a GST tax invoice. Delivery charges, if any, are not included in this product total.",
-      "invoice-note",
-    );
-    invoice.hidden = false;
-    window.print();
+    printInvoice(invoice, order);
   }
 
   function renderOrders() {
@@ -787,9 +721,13 @@ if (root) {
       const invoiceButton = document.createElement("button");
       invoiceButton.type = "button";
       invoiceButton.className = "button button-secondary";
-      invoiceButton.textContent = "Print invoice";
+      invoiceButton.textContent = "Download invoice";
       invoiceButton.addEventListener("click", () => renderInvoice(order));
-      actions.append(statusLabel, updateButton, invoiceButton);
+      const detailsLink = document.createElement("a");
+      detailsLink.className = "button button-secondary";
+      detailsLink.href = `${import.meta.env.BASE_URL}order/?id=${encodeURIComponent(order.orderId)}`;
+      detailsLink.textContent = "View details";
+      actions.append(statusLabel, updateButton, detailsLink, invoiceButton);
       card.append(heading, details, items, actions);
       orderList.append(card);
     }

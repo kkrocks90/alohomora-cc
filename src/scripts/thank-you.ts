@@ -1,5 +1,6 @@
 import { clearCustomerSessionToken, getCustomerSessionToken } from "./cart";
 import { buildOrderProgress } from "./order-progress";
+import { buildShareMessage, toOrderView } from "./order-view";
 
 interface OrderItem {
   name: string;
@@ -162,12 +163,21 @@ function renderOrder(order: OrderDetails) {
 
   const share = document.createElement("a");
   share.className = "button button-secondary thank-you-share";
-  const message = `I just ordered handmade chocolates from Chocolate Circle! ${window.location.origin}/store/`;
+  const shareOrder = toOrderView(order);
+  const message = shareOrder
+    ? buildShareMessage(shareOrder, `${window.location.origin}/store/`)
+    : `I just ordered handmade chocolates from Chocolate Circle! ${window.location.origin}/store/`;
   share.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
   share.target = "_blank";
   share.rel = "noopener";
   share.textContent = "Share on WhatsApp";
   orderContainer.append(share);
+
+  const detailsLink = document.createElement("a");
+  detailsLink.className = "button button-secondary thank-you-share";
+  detailsLink.href = `${root.dataset.baseUrl ?? "/"}order/?id=${encodeURIComponent(order.orderId)}`;
+  detailsLink.textContent = "View details & invoice";
+  orderContainer.append(detailsLink);
 }
 
 async function loadOrder() {

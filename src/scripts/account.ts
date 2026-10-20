@@ -262,6 +262,13 @@ if (root) {
       const progress = buildOrderProgress(order.orderStatus);
       if (progress) card.append(progress);
       card.append(items);
+      if (order.orderId) {
+        const detailsLink = document.createElement("a");
+        detailsLink.className = "text-link order-card-link";
+        detailsLink.href = `${baseUrl}order/?id=${encodeURIComponent(order.orderId)}`;
+        detailsLink.textContent = "View details & invoice ?";
+        card.append(detailsLink);
+      }
       orderList.append(card);
     }
     ordersSection.hidden = false;
