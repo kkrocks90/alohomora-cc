@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.21.1]
+
+### Changed
+- Admin redesign: summary tiles (new, open, unpaid, paid revenue), colour-coded status and payment chips, two-column order/customer/promo cards on desktop, sticky tabs and header, larger touch targets and tidier action buttons on mobile.
+
 ## [1.21.0]
 
 ### Added

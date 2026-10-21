@@ -273,6 +273,7 @@ if (root) {
   const orderStateInput = requireElement<HTMLSelectElement>(root, "#admin-order-state");
   const orderPincodeInput = requireElement<HTMLInputElement>(root, "#admin-order-pincode");
   const orderLines = requireElement<HTMLElement>(root, "#admin-order-lines");
+  const adminStats = requireElement<HTMLElement>(root, "#admin-stats");
   const customProductList = requireElement<HTMLDataListElement>(root, "#admin-custom-products");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
@@ -692,8 +693,34 @@ if (root) {
     printInvoice(invoice, order);
   }
 
+  function renderStats() {
+    if (!adminData) return;
+    const orders = adminData.orders;
+    const open = orders.filter((order) => order.orderStatus !== "delivered" && order.orderStatus !== "cancelled");
+    const unpaid = orders.filter((order) => order.paymentStatus === "unpaid" && order.paymentMethod !== "promo" && order.orderStatus !== "cancelled");
+    const received = orders.filter((order) => order.orderStatus === "received").length;
+    const paidTotal = orders
+      .filter((order) => order.paymentStatus === "paid" && order.orderStatus !== "cancelled")
+      .reduce((sum, order) => sum + order.amountPaise, 0);
+    const tiles: [string, string, string][] = [
+      ["New", String(received), "Awaiting confirmation"],
+      ["Open orders", String(open.length), `${orders.length} in total`],
+      ["Unpaid", String(unpaid.length), currency.format(unpaid.reduce((sum, order) => sum + order.amountPaise, 0) / 100)],
+      ["Paid revenue", currency.format(paidTotal / 100), "Excludes cancelled"],
+    ];
+    adminStats.replaceChildren(...tiles.map(([label, value, note]) => {
+      const tile = document.createElement("div");
+      tile.className = "admin-stat";
+      appendText(tile, "span", label, "admin-stat-label");
+      appendText(tile, "strong", value);
+      appendText(tile, "small", note);
+      return tile;
+    }));
+  }
+
   function renderOrders() {
     if (!adminData) return;
+    renderStats();
     orderList.replaceChildren();
     if (orderStatusFilter.options.length === 1) {
       adminData.orderStatuses.forEach((value) => {
@@ -738,12 +765,15 @@ if (root) {
     for (const order of matchingOrders.slice(start, start + pageSize)) {
       const card = document.createElement("article");
       card.className = "admin-order-card";
+      card.dataset.status = order.orderStatus;
       const heading = document.createElement("div");
       heading.className = "admin-order-card-heading";
       const identity = document.createElement("div");
       appendText(identity, "strong", order.orderId);
       appendText(identity, "span", `${order.customerName} · ${new Date(order.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
       appendText(heading, "strong", currency.format(order.amountPaise / 100), "admin-order-amount");
+      const statusChip = appendText(identity, "em", statusLabels[order.orderStatus] ?? order.orderStatus, "admin-status-chip");
+      statusChip.dataset.status = order.orderStatus;
       heading.prepend(identity);
 
       const details = document.createElement("div");
@@ -754,7 +784,8 @@ if (root) {
       const paymentStatusLabel = order.paymentMethod === "promo"
         ? "No payment due"
         : order.paymentStatus === "paid" ? "Paid" : "Unpaid";
-      appendText(details, "span", `${paymentStatusLabel} · ${paymentLabel}`, "admin-payment-badge");
+      const payBadge = appendText(details, "span", `${paymentStatusLabel} · ${paymentLabel}`, "admin-payment-badge");
+      payBadge.dataset.pay = order.paymentMethod === "promo" ? "none" : order.paymentStatus;
       if (order.discountPaise > 0) {
         appendText(details, "span", `Promo ${order.promoCode} · saved ${currency.format(order.discountPaise / 100)}`);
       }
