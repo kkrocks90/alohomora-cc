@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.20.0]
+
+### Added
+- Admin manual orders can include custom products: pick "+ New custom product...", type a name and price. Names are saved separately (migration `0011`) and reappear under "My custom products" for later orders. They never appear in the store.
+
 ## [1.19.2]
 
 ### Fixed

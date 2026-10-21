@@ -54,7 +54,7 @@ export async function getAdminData(request, env) {
   try {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
-    const [ordersResult, customersResult, promosResult, customFields] = await Promise.all([
+    const [ordersResult, customersResult, promosResult, customFields, customProducts] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
@@ -86,6 +86,7 @@ export async function getAdminData(request, env) {
         )
         .all(),
       listCustomFields(env.ORDERS_DB),
+      listCustomProducts(env.ORDERS_DB),
     ]);
     return result(200, {
       email: access.email,
@@ -131,6 +132,7 @@ export async function getAdminData(request, env) {
       products: products.map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
       categories: getPromoCategories(),
       customFields,
+      customProducts,
       promos: promosResult.results.map((promo) => ({
         promoId: promo.promo_id,
         name: promo.name,
@@ -474,6 +476,30 @@ export async function updateAdminCustomer(request, env) {
   }
 }
 
+// Custom products are admin-only names; one row per name (case-insensitive).
+async function saveCustomProduct(database, name) {
+  const key = name.toLocaleLowerCase();
+  await database
+    .prepare("INSERT OR IGNORE INTO custom_products (product_id, name, name_key, created_at) VALUES (?, ?, ?, ?)")
+    .bind(`custom_${crypto.randomUUID().slice(0, 12)}`, name, key, new Date().toISOString())
+    .run();
+  const row = await database.prepare("SELECT product_id FROM custom_products WHERE name_key = ?").bind(key).first();
+  if (!row) throw new Error("The custom product could not be saved.");
+  return row.product_id;
+}
+
+async function listCustomProducts(database) {
+  try {
+    const { results } = await database
+      .prepare("SELECT product_id, name FROM custom_products ORDER BY name COLLATE NOCASE")
+      .all();
+    return (results ?? []).map((row) => ({ id: row.product_id, name: row.name }));
+  } catch (error) {
+    if (error instanceof Error && /no such table/i.test(error.message)) return [];
+    throw error;
+  }
+}
+
 export async function createManualOrder(request, env) {
   let body;
   try {
@@ -522,7 +548,29 @@ export async function createManualOrder(request, env) {
       return result(400, { error: "Add between 1 and 8 order items." });
     }
 
-    const items = body.items.map((item) => {
+    const items = [];
+    for (const item of body.items) {
+      if (item && typeof item === "object" && item.custom === true) {
+        const name = requiredText(item.name, 80, "custom product name");
+        const price = Math.round(Number(item.unitPriceRupees) * 100) / 100;
+        if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) {
+          throw new Error("Each order item needs a valid product and quantity from 1 to 20.");
+        }
+        if (!Number.isFinite(price) || price <= 0 || price > 1_000_000) {
+          throw new Error(`Enter a valid price for ${name}.`);
+        }
+        const wrapper = typeof item.wrapper === "string" ? item.wrapper.trim() : "";
+        if (wrapper.length > 120) throw new Error("Wrapper details must be 120 characters or fewer.");
+        items.push({
+          id: await saveCustomProduct(env.ORDERS_DB, name),
+          name,
+          quantity: item.quantity,
+          unitPriceRupees: price,
+          flavour: "",
+          wrapper,
+        });
+        continue;
+      }
       if (
         !item ||
         typeof item !== "object" ||
@@ -544,16 +592,16 @@ export async function createManualOrder(request, env) {
       }
       const wrapper = typeof item.wrapper === "string" ? item.wrapper.trim() : "";
       if (wrapper.length > 120) throw new Error("Wrapper details must be 120 characters or fewer.");
-      return {
+      items.push({
         id: product.id,
         name: product.name,
         quantity: item.quantity,
         unitPriceRupees: product.price,
         flavour,
         wrapper,
-      };
-    });
-    const amountPaise = items.reduce((sum, item) => sum + item.unitPriceRupees * item.quantity * 100, 0);
+      });
+    }
+    const amountPaise = items.reduce((sum, item) => sum + Math.round(item.unitPriceRupees * 100) * item.quantity, 0);
     if (!Number.isSafeInteger(amountPaise) || amountPaise <= 0) {
       return result(400, { error: "The order total is invalid." });
     }

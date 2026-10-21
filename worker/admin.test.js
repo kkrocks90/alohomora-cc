@@ -11,6 +11,7 @@ function makeDatabase(email) {
     email,
     customers: new Map(),
     orders: new Map(),
+    customProducts: new Map(),
     prepare(sql) {
       const statement = {
         values: [],
@@ -20,6 +21,10 @@ function makeDatabase(email) {
         },
         async first() {
           if (/SELECT email FROM customer_sessions/i.test(sql)) return { email: database.email };
+          if (/FROM custom_products WHERE name_key/i.test(sql)) {
+            const found = database.customProducts.get(this.values[0]);
+            return found ? { product_id: found.id } : null;
+          }
           if (/FROM customers WHERE customer_id/i.test(sql)) return database.customers.get(this.values[0]) ?? null;
           if (/INSERT INTO customers/i.test(sql)) {
             const [customerId, customer_name, customer_phone, customer_email, default_address, city, state, pincode, created_at, updated_at] =
@@ -53,11 +58,19 @@ function makeDatabase(email) {
           return null;
         },
         async all() {
+          if (/FROM custom_products/i.test(sql)) {
+            return { results: [...database.customProducts.values()].map((p) => ({ product_id: p.id, name: p.name })) };
+          }
           if (/FROM customers/i.test(sql)) return { results: [...database.customers.values()] };
           if (/FROM orders/i.test(sql)) return { results: [...database.orders.values()] };
           return { results: [] };
         },
         async run() {
+          if (/INSERT OR IGNORE INTO custom_products/i.test(sql)) {
+            const [id, name, key] = this.values;
+            if (!database.customProducts.has(key)) database.customProducts.set(key, { id, name });
+            return { meta: { changes: 1 } };
+          }
           if (/UPDATE customers/i.test(sql)) {
             const [customer_name, customer_phone, default_address, city, state, pincode, updated_at, customerId] = this.values;
             const customer = database.customers.get(customerId);
@@ -343,4 +356,37 @@ test("admin manual order validates product flavour availability and status value
     body: { orderId: "missing", orderStatus: "paid" },
   }), env);
   assert.equal(invalidStatus.status, 400);
+});
+
+test("admin manual orders accept custom products saved separately from the catalogue", async () => {
+  const database = makeDatabase("alohomora.chocolatecircle@gmail.com");
+  database.customers.set("cus_1", {
+    customer_id: "cus_1", customer_name: "Customer Example", customer_phone: "+911234567890",
+    customer_email: "customer@example.com", default_address: "1 Street", city: "Chennai", state: "Tamil Nadu", pincode: "600001",
+  });
+  const env = { ALLOWED_ORIGIN: origin, ADMIN_EMAIL: "alohomora.chocolatecircle@gmail.com", AUTH_TOKEN_SECRET: "test-secret", ORDERS_DB: database };
+  const send = (items) => worker.fetch(makeRequest("/admin/orders/create", {
+    body: { customerId: "cus_1", deliveryMethod: "Porter (manual booking)", items },
+  }), env);
+
+  const first = await send([
+    { id: "product-1001", quantity: 1, flavour: "Dark Chocolate", wrapper: "" },
+    { custom: true, name: "Special Plum Cake", unitPriceRupees: 450.5, quantity: 2, wrapper: "" },
+  ]);
+  assert.equal(first.status, 201);
+  const stored = JSON.parse(database.orders.get((await first.json()).orderId).items_json);
+  assert.equal(stored[1].name, "Special Plum Cake");
+  assert.match(stored[1].id, /^custom_/);
+  assert.equal(database.customProducts.size, 1);
+
+  const again = await send([{ custom: true, name: "special plum cake", unitPriceRupees: 500, quantity: 1 }]);
+  assert.equal(again.status, 201);
+  assert.equal(database.customProducts.size, 1);
+  assert.equal([...database.orders.values()].at(-1).amount_paise, 50000);
+
+  assert.equal((await send([{ custom: true, name: "", unitPriceRupees: 10, quantity: 1 }])).status, 400);
+  assert.equal((await send([{ custom: true, name: "Free thing", unitPriceRupees: 0, quantity: 1 }])).status, 400);
+
+  const dashboard = await (await worker.fetch(makeRequest("/admin/data"), env)).json();
+  assert.deepEqual(dashboard.customProducts.map((p) => p.name), ["Special Plum Cake"]);
 });
