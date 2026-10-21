@@ -60,7 +60,7 @@ export async function getAdminData(request, env) {
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
                   customer_id, customer_name, customer_phone, customer_email,
                   delivery_address, city, state, pincode, items_json, custom_json, amount_paise, product_subtotal_paise,
-                  discount_paise, promo_code, currency, delivery_method, event_date, created_at
+                  discount_paise, promo_code, currency, delivery_method, event_date, created_at, payment_link_url
            FROM orders
            ORDER BY created_at DESC`,
         )
@@ -115,6 +115,7 @@ export async function getAdminData(request, env) {
         deliveryMethod: order.delivery_method,
         eventDate: order.event_date ?? "",
         createdAt: order.created_at,
+        paymentLinkUrl: order.payment_link_url ?? "",
       })),
       customers: customersResult.results.map((customer) => ({
         customerId: customer.customer_id,

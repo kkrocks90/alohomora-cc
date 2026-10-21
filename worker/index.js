@@ -26,6 +26,7 @@ import {
   loadPendingCustom,
   savePendingCustom,
 } from "./custom-fields.js";
+import { createAdminPaymentLink, handleRazorpayWebhook, markAdminOrderPaid } from "./payment-links.js";
 import { generateOrderId, ORDER_ID_PATTERN } from "./order-id.js";
 import { isValidPincode, lookupPincode, PincodeLookupError } from "./pincode.js";
 import {
@@ -706,6 +707,11 @@ export default {
       : "";
     const requestOrigin = request.headers.get("Origin");
 
+    if (request.method === "POST" && new URL(request.url).pathname.replace(/\/+$/, "") === "/razorpay/webhook") {
+      const result = await handleRazorpayWebhook(request, env);
+      return jsonResponse(result.body, result.status, null);
+    }
+
     if (!configuredOrigin || requestOrigin !== configuredOrigin) {
       return errorResponse("This checkout request is not allowed.", 403, null);
     }
@@ -816,6 +822,14 @@ export default {
     }
     if (path === "/admin/orders/create") {
       const result = await createManualOrder(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/orders/payment-link") {
+      const result = await createAdminPaymentLink(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/orders/mark-paid") {
+      const result = await markAdminOrderPaid(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/orders/update-status") {

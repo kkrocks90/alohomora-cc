@@ -36,6 +36,7 @@ interface AdminOrderItem {
 interface AdminOrder {
   orderId: string;
   razorpayOrderId?: string | null;
+  paymentLinkUrl?: string;
   paymentId: string | null;
   paymentStatus: "paid" | "unpaid";
   paymentMethod: "razorpay" | "manual" | "promo";
@@ -272,6 +273,7 @@ if (root) {
   const orderStateInput = requireElement<HTMLSelectElement>(root, "#admin-order-state");
   const orderPincodeInput = requireElement<HTMLInputElement>(root, "#admin-order-pincode");
   const orderLines = requireElement<HTMLElement>(root, "#admin-order-lines");
+  const customProductList = requireElement<HTMLDataListElement>(root, "#admin-custom-products");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
   const orderSearch = requireElement<HTMLInputElement>(root, "#admin-order-search");
@@ -550,9 +552,49 @@ if (root) {
     }
   }
 
-  const CUSTOM_PREFIX = "custom:";
-  const NEW_CUSTOM = "__new_custom__";
-  const isCustomValue = (value: string) => value === NEW_CUSTOM || value.startsWith(CUSTOM_PREFIX);
+  function renderCustomLine() {
+    if (!adminData) return;
+    const row = document.createElement("div");
+    row.className = "admin-order-line admin-custom-line";
+    row.dataset.customLine = "true";
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "Custom item";
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.maxLength = 80;
+    nameInput.required = true;
+    nameInput.dataset.customName = "true";
+    nameInput.placeholder = "Item name";
+    nameInput.setAttribute("list", "admin-custom-products");
+    nameLabel.append(nameInput);
+    const priceLabel = document.createElement("label");
+    priceLabel.textContent = "Price (Rs.)";
+    const priceInput = document.createElement("input");
+    priceInput.type = "number";
+    priceInput.min = "1";
+    priceInput.step = "any";
+    priceInput.required = true;
+    priceInput.dataset.customPrice = "true";
+    priceLabel.append(priceInput);
+    const quantityLabel = document.createElement("label");
+    quantityLabel.textContent = "Qty";
+    const quantitySelect = document.createElement("select");
+    quantitySelect.dataset.customQuantity = "true";
+    for (let quantity = 1; quantity <= 20; quantity += 1) quantitySelect.append(new Option(String(quantity), String(quantity)));
+    quantityLabel.append(quantitySelect);
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "account-text-button admin-remove-line";
+    removeButton.textContent = "Remove";
+    removeButton.setAttribute("aria-label", "Remove custom item");
+    removeButton.addEventListener("click", () => {
+      row.remove();
+      updateOrderTotal();
+    });
+    row.append(nameLabel, priceLabel, quantityLabel, removeButton);
+    orderLines.append(row);
+    nameInput.focus();
+  }
 
   function renderOrderLine() {
     if (!adminData) return;
@@ -567,13 +609,6 @@ if (root) {
     productSelect.required = true;
     productSelect.append(new Option("Choose a product", ""));
     adminData.products.forEach((product) => productSelect.append(new Option(`${product.name} — ${currency.format(product.price)}`, product.id)));
-    if (adminData.customProducts.length > 0) {
-      const saved = document.createElement("optgroup");
-      saved.label = "My custom products";
-      adminData.customProducts.forEach((product) => saved.append(new Option(product.name, `${CUSTOM_PREFIX}${product.name}`)));
-      productSelect.append(saved);
-    }
-    productSelect.append(new Option("+ New custom product...", NEW_CUSTOM));
     productLabel.append(productSelect);
 
     const quantityLabel = document.createElement("label");
@@ -609,37 +644,6 @@ if (root) {
 
     productSelect.addEventListener("change", () => {
       options.querySelector("[data-line-flavour]")?.remove();
-      row.querySelector("[data-custom-extra]")?.remove();
-      if (isCustomValue(productSelect.value)) {
-        const extra = document.createElement("div");
-        extra.dataset.customExtra = "true";
-        extra.className = "admin-line-options";
-        if (productSelect.value === NEW_CUSTOM) {
-          const nameLabel = document.createElement("label");
-          nameLabel.textContent = "Product name";
-          const nameInput = document.createElement("input");
-          nameInput.type = "text";
-          nameInput.maxLength = 80;
-          nameInput.required = true;
-          nameInput.dataset.lineCustomName = "true";
-          nameInput.placeholder = "Type the product name";
-          nameLabel.append(nameInput);
-          extra.append(nameLabel);
-        }
-        const priceLabel = document.createElement("label");
-        priceLabel.textContent = "Price per item (Rs.)";
-        const priceInput = document.createElement("input");
-        priceInput.type = "number";
-        priceInput.min = "1";
-        priceInput.step = "any";
-        priceInput.required = true;
-        priceInput.dataset.lineCustomPrice = "true";
-        priceLabel.append(priceInput);
-        extra.append(priceLabel);
-        options.insertBefore(extra, wrapperLabel);
-        updateOrderTotal();
-        return;
-      }
       const selected = adminData?.products.find((product) => product.id === productSelect.value);
       if (selected?.flavours.length) {
         const flavourLabel = document.createElement("label");
@@ -668,9 +672,10 @@ if (root) {
       const quantity = Number(requireElement<HTMLSelectElement>(row, "[data-line-quantity]").value);
       const product = adminData?.products.find((entry) => entry.id === productId);
       if (product) total += product.price * quantity;
-      else if (isCustomValue(productId)) {
-        total += (Number(row.querySelector<HTMLInputElement>("[data-line-custom-price]")?.value) || 0) * quantity;
-      }
+    });
+    orderLines.querySelectorAll<HTMLElement>("[data-custom-line]").forEach((row) => {
+      const price = Number(row.querySelector<HTMLInputElement>("[data-custom-price]")?.value) || 0;
+      total += price * Number(row.querySelector<HTMLSelectElement>("[data-custom-quantity]")?.value);
     });
     orderTotal.textContent = `Product total: ${currency.format(total)}`;
   }
@@ -799,6 +804,74 @@ if (root) {
           updateButton.disabled = false;
         }
       });
+      const payActions: HTMLElement[] = [];
+      if (order.paymentStatus === "unpaid" && order.paymentMethod === "manual") {
+        const linkButton = document.createElement("button");
+        linkButton.type = "button";
+        linkButton.className = "button button-secondary";
+        linkButton.textContent = order.paymentLinkUrl ? "Show payment link" : "Get payment link";
+        const linkBox = document.createElement("div");
+        linkBox.className = "admin-payment-link";
+        linkBox.hidden = true;
+        const showLink = (url: string) => {
+          linkBox.replaceChildren();
+          const input = document.createElement("input");
+          input.type = "text";
+          input.readOnly = true;
+          input.value = url;
+          input.setAttribute("aria-label", "Payment link");
+          const copy = document.createElement("button");
+          copy.type = "button";
+          copy.className = "button button-secondary";
+          copy.textContent = "Copy";
+          copy.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(url);
+            } catch {
+              input.select();
+            }
+            copy.textContent = "Copied";
+          });
+          const share = document.createElement("a");
+          share.className = "button button-secondary";
+          share.target = "_blank";
+          share.rel = "noopener";
+          const text = `Hi ${order.customerName}, here is your payment link for Chocolate Circle order ${order.orderId} (${currency.format(order.amountPaise / 100)}): ${url}`;
+          const phone = order.customerPhone.replace(/\D/g, "");
+          share.href = `https://wa.me/${phone.length === 10 ? `91${phone}` : phone}?text=${encodeURIComponent(text)}`;
+          share.textContent = "WhatsApp";
+          linkBox.append(input, copy, share);
+          linkBox.hidden = false;
+        };
+        linkButton.addEventListener("click", async () => {
+          linkButton.disabled = true;
+          try {
+            const created = await post("/admin/orders/payment-link", { orderId: order.orderId });
+            showLink(String(created.paymentLinkUrl));
+            linkButton.textContent = "Show payment link";
+          } catch (error) {
+            setStatus(error instanceof Error ? error.message : "Could not create the payment link.", true);
+          } finally {
+            linkButton.disabled = false;
+          }
+        });
+        const paidButton = document.createElement("button");
+        paidButton.type = "button";
+        paidButton.className = "account-text-button";
+        paidButton.textContent = "Mark as paid";
+        paidButton.addEventListener("click", async () => {
+          if (!window.confirm(`Mark order ${order.orderId} as paid?`)) return;
+          try {
+            await post("/admin/orders/mark-paid", { orderId: order.orderId });
+            await loadDashboard();
+            setStatus(`Marked ${order.orderId} as paid.`);
+          } catch (error) {
+            setStatus(error instanceof Error ? error.message : "Could not update this order.", true);
+          }
+        });
+        payActions.push(linkButton, paidButton, linkBox);
+        if (order.paymentLinkUrl) showLink(order.paymentLinkUrl);
+      }
       const invoiceButton = document.createElement("button");
       invoiceButton.type = "button";
       invoiceButton.className = "button button-secondary";
@@ -808,7 +881,7 @@ if (root) {
       detailsLink.className = "button button-secondary";
       detailsLink.href = `${import.meta.env.BASE_URL}order/?id=${encodeURIComponent(order.orderId)}`;
       detailsLink.textContent = "View details";
-      actions.append(statusLabel, updateButton, detailsLink, invoiceButton);
+      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, ...payActions);
       card.append(heading, details, items, actions);
       orderList.append(card);
     }
@@ -921,6 +994,7 @@ if (root) {
     renderPromos();
     customFieldsAdmin.render(adminData.customFields);
     syncPromoFormFields();
+    customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     orderLines.replaceChildren();
     renderOrderLine();
     renderOrders();
@@ -1090,30 +1164,26 @@ if (root) {
   });
 
   requireElement<HTMLButtonElement>(root, "#admin-add-line").addEventListener("click", renderOrderLine);
+  requireElement<HTMLButtonElement>(root, "#admin-add-custom-line").addEventListener("click", renderCustomLine);
   orderForm.addEventListener("input", updateOrderTotal);
   orderForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!orderForm.reportValidity() || !adminData) return;
     const formData = new FormData(orderForm);
-    const items = Array.from(orderLines.querySelectorAll<HTMLElement>("[data-order-line]")).map((row) => {
-      const id = requireElement<HTMLSelectElement>(row, "[data-line-product]").value;
-      const base = {
-        quantity: Number(requireElement<HTMLSelectElement>(row, "[data-line-quantity]").value),
-        wrapper: row.querySelector<HTMLInputElement>("[data-line-wrapper]")?.value ?? "",
-      };
-      if (isCustomValue(id)) {
-        return {
-          ...base,
-          id,
-          custom: true,
-          name: id === NEW_CUSTOM
-            ? row.querySelector<HTMLInputElement>("[data-line-custom-name]")?.value.trim() ?? ""
-            : id.slice(CUSTOM_PREFIX.length),
-          unitPriceRupees: Number(row.querySelector<HTMLInputElement>("[data-line-custom-price]")?.value),
-        };
-      }
-      return { ...base, id, flavour: row.querySelector<HTMLSelectElement>("[data-line-flavour]")?.value ?? "" };
-    });
+    const catalogueItems = Array.from(orderLines.querySelectorAll<HTMLElement>("[data-order-line]")).map((row) => ({
+      id: requireElement<HTMLSelectElement>(row, "[data-line-product]").value,
+      quantity: Number(requireElement<HTMLSelectElement>(row, "[data-line-quantity]").value),
+      wrapper: row.querySelector<HTMLInputElement>("[data-line-wrapper]")?.value ?? "",
+      flavour: row.querySelector<HTMLSelectElement>("[data-line-flavour]")?.value ?? "",
+    }));
+    const customItems = Array.from(orderLines.querySelectorAll<HTMLElement>("[data-custom-line]")).map((row) => ({
+      id: "custom",
+      custom: true,
+      name: row.querySelector<HTMLInputElement>("[data-custom-name]")?.value.trim() ?? "",
+      unitPriceRupees: Number(row.querySelector<HTMLInputElement>("[data-custom-price]")?.value),
+      quantity: Number(row.querySelector<HTMLSelectElement>("[data-custom-quantity]")?.value),
+    }));
+    const items = [...catalogueItems, ...customItems];
     if (items.length === 0 || items.length > 8 || items.some((item) => !item.id)) {
       setStatus("Add between 1 and 8 valid order items.", true);
       return;

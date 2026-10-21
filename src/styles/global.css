@@ -6250,3 +6250,41 @@ main .store-heading > p {
 .checkout-form .custom-field input[type="radio"] {
   min-height: 0;
 }
+
+.admin-add-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-custom-line {
+  grid-template-columns: minmax(0, 1.6fr) 110px 75px auto;
+}
+
+.admin-payment-link {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-payment-link input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+@media (max-width: 620px) {
+  .admin-custom-line {
+    grid-template-columns: minmax(0, 1fr) 100px;
+  }
+
+  .admin-custom-line > label:first-child,
+  .admin-custom-line .admin-remove-line {
+    grid-column: 1 / -1;
+  }
+
+  .admin-custom-line > label:nth-child(2) {
+    grid-column: 1;
+  }
+}

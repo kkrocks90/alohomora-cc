@@ -5,6 +5,14 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## [1.21.0]
+
+### Added
+- Admin: "Get payment link" on unpaid manual orders creates a Razorpay payment link with Copy and WhatsApp buttons. Paid links mark the order paid automatically through a signed webhook (`POST /razorpay/webhook`, needs the `RAZORPAY_WEBHOOK_SECRET` Worker secret). A "Mark as paid" button is the manual fallback. Requires migration `0012`.
+
+### Changed
+- Custom products in manual orders now use a separate "+ Custom item" row (name with saved-name suggestions, price, quantity) instead of being mixed into the product dropdown.
+
 ## [1.20.0]
 
 ### Added

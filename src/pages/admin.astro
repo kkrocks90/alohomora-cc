@@ -317,7 +317,11 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <fieldset class="admin-order-items">
               <legend>Order items</legend>
               <div id="admin-order-lines"></div>
-              <button class="button button-secondary" id="admin-add-line" type="button">Add another item <span aria-hidden="true">+</span></button>
+              <datalist id="admin-custom-products"></datalist>
+              <div class="admin-add-buttons">
+                <button class="button button-secondary" id="admin-add-line" type="button">Add another item <span aria-hidden="true">+</span></button>
+                <button class="account-text-button" id="admin-add-custom-line" type="button">+ Custom item</button>
+              </div>
             </fieldset>
             <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
             <p class="admin-payment-note">Manual orders are recorded as unpaid. No payment is initiated or collected here.</p>
