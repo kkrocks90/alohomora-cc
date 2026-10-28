@@ -501,16 +501,7 @@ async function listCustomProducts(database) {
   }
 }
 
-export async function createManualOrder(request, env) {
-  let body;
-  try {
-    body = await readBody(request);
-  } catch (error) {
-    return result(400, { error: error.message });
-  }
-  try {
-    const access = await requireAdmin(request, env);
-    if (access.error) return access.error;
+async function parseManualOrderInput(body, env) {
     const customerId = requiredText(body?.customerId, 80, "customer");
     const customer = await env.ORDERS_DB
       .prepare(
@@ -593,11 +584,17 @@ export async function createManualOrder(request, env) {
       }
       const wrapper = typeof item.wrapper === "string" ? item.wrapper.trim() : "";
       if (wrapper.length > 120) throw new Error("Wrapper details must be 120 characters or fewer.");
+      const unitPrice = item.unitPriceRupees === undefined
+        ? product.price
+        : Math.round(Number(item.unitPriceRupees) * 100) / 100;
+      if (!Number.isFinite(unitPrice) || unitPrice <= 0 || unitPrice > 1_000_000) {
+        throw new Error(`Enter a valid price for ${product.name}.`);
+      }
       items.push({
         id: product.id,
         name: product.name,
         quantity: item.quantity,
-        unitPriceRupees: product.price,
+        unitPriceRupees: unitPrice,
         flavour,
         wrapper,
       });
@@ -606,6 +603,22 @@ export async function createManualOrder(request, env) {
     if (!Number.isSafeInteger(amountPaise) || amountPaise <= 0) {
       return result(400, { error: "The order total is invalid." });
     }
+    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise };
+}
+
+export async function createManualOrder(request, env) {
+  let body;
+  try {
+    body = await readBody(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const access = await requireAdmin(request, env);
+    if (access.error) return access.error;
+    const parsed = await parseManualOrderInput(body, env);
+    if (parsed.status) return parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise } = parsed;
 
     const orderId = generateOrderId();
     const createdAt = new Date().toISOString();
@@ -641,6 +654,76 @@ export async function createManualOrder(request, env) {
   } catch (error) {
     console.error("Could not create a manual admin order.", error);
     return result(400, { error: error instanceof Error ? error.message : "Could not create the order." });
+  }
+}
+
+export async function updateManualOrder(request, env) {
+  let body;
+  try {
+    body = await readBody(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  try {
+    const access = await requireAdmin(request, env);
+    if (access.error) return access.error;
+    const orderId = requiredText(body?.orderId, 100, "order number");
+    const existing = await env.ORDERS_DB
+      .prepare("SELECT payment_method, payment_status, amount_paise, payment_link_id FROM orders WHERE order_id = ?")
+      .bind(orderId)
+      .first();
+    if (!existing) return result(404, { error: "Order not found." });
+    if (existing.payment_method !== "manual") {
+      return result(400, { error: "Only manual orders can be edited." });
+    }
+    const parsed = await parseManualOrderInput(body, env);
+    if (parsed.status) return parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise } = parsed;
+    const amountChanged = amountPaise !== existing.amount_paise;
+    const dropLink = amountChanged && existing.payment_link_id && existing.payment_status !== "paid";
+    if (dropLink && env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET) {
+      try {
+        await fetch(`https://api.razorpay.com/v1/payment_links/${encodeURIComponent(existing.payment_link_id)}/cancel`, {
+          method: "POST",
+          headers: { Authorization: `Basic ${btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`)}` },
+        });
+      } catch (error) {
+        console.error("Could not cancel the old payment link.", error);
+      }
+    }
+    await env.ORDERS_DB
+      .prepare(
+        `UPDATE orders SET
+          customer_id = ?, customer_name = ?, customer_phone = ?, customer_email = ?,
+          delivery_address = ?, city = ?, state = ?, pincode = ?, items_json = ?,
+          amount_paise = ?, product_subtotal_paise = ?, delivery_method = ?, event_date = ?,
+          payment_link_id = CASE WHEN ? THEN NULL ELSE payment_link_id END,
+          payment_link_url = CASE WHEN ? THEN NULL ELSE payment_link_url END
+         WHERE order_id = ? AND payment_method = 'manual'`,
+      )
+      .bind(
+        customer.customer_id,
+        customer.customer_name,
+        customer.customer_phone,
+        customer.customer_email,
+        deliveryAddress,
+        city,
+        state,
+        pincode,
+        JSON.stringify(items),
+        amountPaise,
+        amountPaise,
+        deliveryMethod,
+        eventDate,
+        dropLink ? 1 : 0,
+        dropLink ? 1 : 0,
+        orderId,
+      )
+      .run();
+    return result(200, { orderId, amountPaise, paymentLinkReset: Boolean(dropLink) });
+  } catch (error) {
+    console.error("Could not update a manual admin order.", error);
+    return result(400, { error: error instanceof Error ? error.message : "Could not update the order." });
   }
 }
 

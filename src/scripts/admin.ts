@@ -273,6 +273,10 @@ if (root) {
   const orderStateInput = requireElement<HTMLSelectElement>(root, "#admin-order-state");
   const orderPincodeInput = requireElement<HTMLInputElement>(root, "#admin-order-pincode");
   const orderLines = requireElement<HTMLElement>(root, "#admin-order-lines");
+  const orderEditBanner = requireElement<HTMLElement>(root, "#admin-order-edit-banner");
+  const orderEditText = requireElement<HTMLElement>(root, "#admin-order-edit-text");
+  const orderSubmit = requireElement<HTMLButtonElement>(root, "#admin-order-submit");
+  const orderFormTitle = requireElement<HTMLElement>(root, "#admin-create-order-title");
   const adminStats = requireElement<HTMLElement>(root, "#admin-stats");
   const customProductList = requireElement<HTMLDataListElement>(root, "#admin-custom-products");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
@@ -312,6 +316,7 @@ if (root) {
   let customerPage = 0;
   let orderPage = 0;
   let editingCustomerId: string | null = null;
+  let editingOrderId: string | null = null;
 
   function activateAdminTab(tab: HTMLButtonElement, moveFocus = false) {
     const selectedTab = tab.dataset.adminTab;
@@ -553,7 +558,7 @@ if (root) {
     }
   }
 
-  function renderCustomLine() {
+  function renderCustomLine(item?: AdminOrderItem) {
     if (!adminData) return;
     const row = document.createElement("div");
     row.className = "admin-order-line admin-custom-line";
@@ -567,6 +572,7 @@ if (root) {
     nameInput.dataset.customName = "true";
     nameInput.placeholder = "Item name";
     nameInput.setAttribute("list", "admin-custom-products");
+    if (item) nameInput.value = item.name;
     nameLabel.append(nameInput);
     const priceLabel = document.createElement("label");
     priceLabel.textContent = "Price (Rs.)";
@@ -576,6 +582,7 @@ if (root) {
     priceInput.step = "any";
     priceInput.required = true;
     priceInput.dataset.customPrice = "true";
+    if (item) priceInput.value = String(item.unitPriceRupees);
     priceLabel.append(priceInput);
     const quantityLabel = document.createElement("label");
     quantityLabel.textContent = "Qty";
@@ -587,6 +594,7 @@ if (root) {
     quantitySelect.step = "1";
     quantitySelect.value = "1";
     quantitySelect.dataset.customQuantity = "true";
+    if (item) quantitySelect.value = String(item.quantity);
     quantitySelect.addEventListener("input", updateOrderTotal);
     quantityLabel.append(quantitySelect);
     const removeButton = document.createElement("button");
@@ -600,10 +608,10 @@ if (root) {
     });
     row.append(nameLabel, priceLabel, quantityLabel, removeButton);
     orderLines.append(row);
-    nameInput.focus();
+    if (!item) nameInput.focus();
   }
 
-  function renderOrderLine() {
+  function renderOrderLine(item?: AdminOrderItem) {
     if (!adminData) return;
     const row = document.createElement("div");
     row.className = "admin-order-line";
@@ -640,7 +648,16 @@ if (root) {
     wrapperInput.dataset.lineWrapper = "true";
     wrapperInput.placeholder = "Gift message, colours, or design";
     wrapperLabel.append(wrapperInput);
-    options.append(wrapperLabel);
+    const priceLabel = document.createElement("label");
+    priceLabel.textContent = "Price (Rs.)";
+    const priceInput = document.createElement("input");
+    priceInput.type = "number";
+    priceInput.min = "1";
+    priceInput.step = "any";
+    priceInput.required = true;
+    priceInput.dataset.linePrice = "true";
+    priceLabel.append(priceInput);
+    options.append(priceLabel, wrapperLabel);
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
@@ -664,24 +681,34 @@ if (root) {
         flavourSelect.append(new Option("Choose a flavour", ""));
         selected.flavours.forEach((flavour) => flavourSelect.append(new Option(flavour, flavour)));
         flavourLabel.append(flavourSelect);
-        options.insertBefore(flavourLabel, wrapperLabel);
+        options.insertBefore(flavourLabel, priceLabel);
       }
+      priceInput.value = selected ? String(selected.price) : "";
       updateOrderTotal();
     });
     quantitySelect.addEventListener("input", updateOrderTotal);
 
     row.append(productLabel, quantityLabel, options, removeButton);
     orderLines.append(row);
+    if (item) {
+      productSelect.value = item.id;
+      productSelect.dispatchEvent(new Event("change"));
+      quantitySelect.value = String(item.quantity);
+      priceInput.value = String(item.unitPriceRupees);
+      wrapperInput.value = item.wrapper;
+      const flavourSelect = options.querySelector<HTMLSelectElement>("[data-line-flavour]");
+      if (flavourSelect) flavourSelect.value = item.flavour;
+      updateOrderTotal();
+    }
   }
 
   function updateOrderTotal() {
     if (!adminData) return;
     let total = 0;
     orderLines.querySelectorAll<HTMLElement>("[data-order-line]").forEach((row) => {
-      const productId = requireElement<HTMLSelectElement>(row, "[data-line-product]").value;
       const quantity = Number(requireElement<HTMLInputElement>(row, "[data-line-quantity]").value);
-      const product = adminData?.products.find((entry) => entry.id === productId);
-      if (product) total += product.price * quantity;
+      const price = Number(row.querySelector<HTMLInputElement>("[data-line-price]")?.value) || 0;
+      total += price * quantity;
     });
     orderLines.querySelectorAll<HTMLElement>("[data-custom-line]").forEach((row) => {
       const price = Number(row.querySelector<HTMLInputElement>("[data-custom-price]")?.value) || 0;
@@ -725,6 +752,56 @@ if (root) {
       appendText(tile, "small", note);
       return tile;
     }));
+  }
+
+  function resetOrderForm() {
+    editingOrderId = null;
+    orderForm.reset();
+    addressInput.value = "";
+    orderLines.replaceChildren();
+    renderOrderLine();
+    orderEditBanner.hidden = true;
+    orderFormTitle.textContent = "Create manual order";
+    orderSubmit.textContent = "Create unpaid order";
+    updateOrderTotal();
+  }
+
+  function startOrderEdit(order: AdminOrder) {
+    if (!adminData) return;
+    editingOrderId = order.orderId;
+    customerSelectSearch.value = "";
+    renderCustomerSelect();
+    if (order.customerId && !Array.from(customerSelect.options).some((option) => option.value === order.customerId)) {
+      const customer = adminData.customers.find((entry) => entry.customerId === order.customerId);
+      customerSelect.append(new Option(customer ? (customer.name || customer.email) : order.customerName, order.customerId));
+    }
+    customerSelect.value = order.customerId ?? "";
+    addressInput.value = order.deliveryAddress;
+    orderCityInput.value = order.city;
+    orderStateInput.value = normalizeState(order.state);
+    orderPincodeInput.value = order.pincode;
+    const methodSelect = orderForm.elements.namedItem("deliveryMethod");
+    if (methodSelect instanceof HTMLSelectElement) {
+      if (!Array.from(methodSelect.options).some((option) => option.value === order.deliveryMethod)) {
+        methodSelect.append(new Option(order.deliveryMethod, order.deliveryMethod));
+      }
+      methodSelect.value = order.deliveryMethod;
+    }
+    const eventInput = orderForm.elements.namedItem("eventDate");
+    if (eventInput instanceof HTMLInputElement) eventInput.value = order.eventDate;
+    orderLines.replaceChildren();
+    for (const item of order.items) {
+      if (adminData.products.some((product) => product.id === item.id)) renderOrderLine(item);
+      else renderCustomLine(item);
+    }
+    orderEditBanner.hidden = false;
+    orderEditText.textContent = `Editing ${order.orderId}`;
+    orderFormTitle.textContent = "Edit manual order";
+    orderSubmit.textContent = "Save changes";
+    updateOrderTotal();
+    const createTab = adminTabs.find((tab) => tab.dataset.adminTab === "create-order");
+    if (createTab) activateAdminTab(createTab);
+    orderForm.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function renderOrders() {
@@ -921,7 +998,16 @@ if (root) {
       detailsLink.className = "button button-secondary";
       detailsLink.href = `${import.meta.env.BASE_URL}order/?id=${encodeURIComponent(order.orderId)}`;
       detailsLink.textContent = "View details";
-      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, ...payActions);
+      const editButtons: HTMLElement[] = [];
+      if (order.paymentMethod === "manual") {
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "button button-secondary";
+        editButton.textContent = "Edit order";
+        editButton.addEventListener("click", () => startOrderEdit(order));
+        editButtons.push(editButton);
+      }
+      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, ...editButtons, ...payActions);
       card.append(heading, details, items, actions);
       orderList.append(card);
     }
@@ -1035,8 +1121,10 @@ if (root) {
     customFieldsAdmin.render(adminData.customFields);
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
-    orderLines.replaceChildren();
-    renderOrderLine();
+    if (!editingOrderId) {
+      orderLines.replaceChildren();
+      renderOrderLine();
+    }
     renderOrders();
     updateOrderTotal();
   }
@@ -1203,8 +1291,9 @@ if (root) {
     }
   });
 
-  requireElement<HTMLButtonElement>(root, "#admin-add-line").addEventListener("click", renderOrderLine);
-  requireElement<HTMLButtonElement>(root, "#admin-add-custom-line").addEventListener("click", renderCustomLine);
+  requireElement<HTMLButtonElement>(root, "#admin-add-line").addEventListener("click", () => renderOrderLine());
+  requireElement<HTMLButtonElement>(root, "#admin-add-custom-line").addEventListener("click", () => renderCustomLine());
+  requireElement<HTMLButtonElement>(root, "#admin-order-cancel-edit").addEventListener("click", resetOrderForm);
   orderForm.addEventListener("input", updateOrderTotal);
   orderForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1213,6 +1302,7 @@ if (root) {
     const catalogueItems = Array.from(orderLines.querySelectorAll<HTMLElement>("[data-order-line]")).map((row) => ({
       id: requireElement<HTMLSelectElement>(row, "[data-line-product]").value,
       quantity: Number(requireElement<HTMLInputElement>(row, "[data-line-quantity]").value),
+      unitPriceRupees: Number(row.querySelector<HTMLInputElement>("[data-line-price]")?.value),
       wrapper: row.querySelector<HTMLInputElement>("[data-line-wrapper]")?.value ?? "",
       flavour: row.querySelector<HTMLSelectElement>("[data-line-flavour]")?.value ?? "",
     }));
@@ -1230,7 +1320,9 @@ if (root) {
     }
     setBusy(orderForm, true);
     try {
-      const result = await post("/admin/orders/create", {
+      const wasEditing = editingOrderId;
+      const result = await post(wasEditing ? "/admin/orders/update" : "/admin/orders/create", {
+        ...(wasEditing ? { orderId: wasEditing } : {}),
         customerId: formData.get("customerId"),
         address: formData.get("address"),
         city: formData.get("city"),
@@ -1240,12 +1332,15 @@ if (root) {
         eventDate: formData.get("eventDate"),
         items,
       });
-      orderForm.reset();
-      addressInput.value = "";
-      orderLines.replaceChildren();
-      renderOrderLine();
+      resetOrderForm();
       await loadDashboard();
-      setStatus(`Manual order ${String(result.orderId)} created as unpaid.`);
+      setStatus(wasEditing
+        ? `Order ${String(result.orderId)} updated.${result.paymentLinkReset ? " The old payment link was cancelled - generate a new one." : ""}`
+        : `Manual order ${String(result.orderId)} created as unpaid.`);
+      if (wasEditing) {
+        const ordersTab = adminTabs.find((tab) => tab.dataset.adminTab === "orders");
+        if (ordersTab) activateAdminTab(ordersTab);
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not create this order.", true);
     } finally {

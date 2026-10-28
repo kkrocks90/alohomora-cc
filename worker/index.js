@@ -4,6 +4,7 @@ import {
   createAdminCustomer,
   createAdminCustomField,
   createManualOrder,
+  updateManualOrder,
   deleteAdminCustomField,
   getAdminData,
   updateAdminCustomField,
@@ -822,6 +823,10 @@ export default {
     }
     if (path === "/admin/orders/create") {
       const result = await createManualOrder(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/orders/update") {
+      const result = await updateManualOrder(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/orders/payment-link") {

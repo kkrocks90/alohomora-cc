@@ -6667,3 +6667,23 @@ main .store-heading > p {
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+.admin-edit-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid #e6c98f;
+  border-radius: 10px;
+  background: #fbefd2;
+  color: #7a5612;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-edit-banner[hidden] {
+  display: none;
+}

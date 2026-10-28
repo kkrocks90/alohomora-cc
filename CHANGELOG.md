@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.22.0
+
+- Admin: edit manual orders (customer, address, delivery, event date, items, quantities, prices). Catalogue items now have an editable price per order.
+- Changing the amount of an unpaid order cancels its old payment link.
+
 ## 1.21.5
 
 - Manual orders: maximum quantity per item raised to 5000.

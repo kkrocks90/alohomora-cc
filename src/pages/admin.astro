@@ -297,6 +297,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <h2 id="admin-create-order-title">Create manual order</h2>
             </div>
           </div>
+          <div class="admin-edit-banner" id="admin-order-edit-banner" hidden>
+            <span id="admin-order-edit-text"></span>
+            <button class="account-text-button" id="admin-order-cancel-edit" type="button">Cancel editing</button>
+          </div>
           <form class="admin-order-form" id="admin-order-form">
             <label>Find customer<input id="admin-order-customer-search" type="search" placeholder="Search by name, phone, or email" autocomplete="off" /></label>
             <p class="admin-form-hint" id="admin-order-customer-hint"></p>
@@ -326,7 +330,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </fieldset>
             <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
             <p class="admin-payment-note">Manual orders are recorded as unpaid. No payment is initiated or collected here.</p>
-            <button class="button button-primary" type="submit">Create unpaid order</button>
+            <button class="button button-primary" id="admin-order-submit" type="submit">Create unpaid order</button>
           </form>
         </section>
       </section>

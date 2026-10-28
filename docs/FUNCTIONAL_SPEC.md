@@ -94,6 +94,7 @@ Single page at `/admin`, OTP sign-in, five tabs. A summary strip shows New, Open
 - Search (order number, customer, phone, email, address, items), status filter, pagination.
 - Card: status chip, payment badge (Paid/Unpaid/No payment due), items, custom answers, event date, delivery method, Razorpay references.
 - Actions: update status, view details, download invoice.
+- For **manual orders** (any payment state): *Edit order* reopens the manual-order form pre-filled (customer, address, delivery, event date, items, quantities, per-line prices). The total is recomputed; if the amount changes on an unpaid order, the old payment link is cancelled and a new one must be generated. Online (Razorpay) orders cannot be edited. API: `POST /admin/orders/update`.
 - For **unpaid manual orders**: *Get payment link* (Razorpay Payment Link; reused if already made), Copy, WhatsApp share, and *Mark as paid* (manual fallback).
 
 ### 6.2 Customers
