@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.21.5
+
+- Manual orders: maximum quantity per item raised to 5000.
+
 ## 1.21.4
 
 - Admin order cards: status and payment labels now share one uniform size; fixed stretched payment badge.
