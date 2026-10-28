@@ -583,7 +583,7 @@ if (root) {
     quantitySelect.type = "number";
     quantitySelect.inputMode = "numeric";
     quantitySelect.min = "1";
-    quantitySelect.max = "999";
+    quantitySelect.max = "3000";
     quantitySelect.step = "1";
     quantitySelect.value = "1";
     quantitySelect.dataset.customQuantity = "true";
@@ -624,7 +624,7 @@ if (root) {
     quantitySelect.type = "number";
     quantitySelect.inputMode = "numeric";
     quantitySelect.min = "1";
-    quantitySelect.max = "999";
+    quantitySelect.max = "3000";
     quantitySelect.step = "1";
     quantitySelect.value = "1";
     quantitySelect.dataset.lineQuantity = "true";

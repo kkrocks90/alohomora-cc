@@ -554,8 +554,8 @@ export async function createManualOrder(request, env) {
       if (item && typeof item === "object" && item.custom === true) {
         const name = requiredText(item.name, 80, "custom product name");
         const price = Math.round(Number(item.unitPriceRupees) * 100) / 100;
-        if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) {
-          throw new Error("Each order item needs a valid product and quantity from 1 to 20.");
+        if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 3000) {
+          throw new Error("Each order item needs a valid product and quantity from 1 to 3000.");
         }
         if (!Number.isFinite(price) || price <= 0 || price > 1_000_000) {
           throw new Error(`Enter a valid price for ${name}.`);
@@ -578,9 +578,9 @@ export async function createManualOrder(request, env) {
         typeof item.id !== "string" ||
         !Number.isInteger(item.quantity) ||
         item.quantity < 1 ||
-        item.quantity > 20
+        item.quantity > 3000
       ) {
-        throw new Error("Each order item needs a valid product and quantity from 1 to 20.");
+        throw new Error("Each order item needs a valid product and quantity from 1 to 3000.");
       }
       const product = productById.get(item.id);
       if (!product) throw new Error("An order item is not in the product catalog.");
