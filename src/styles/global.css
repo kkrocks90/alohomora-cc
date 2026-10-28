@@ -6644,3 +6644,26 @@ main .store-heading > p {
   padding: 4px 8px;
   font-size: 12px;
 }
+
+/* Uniform labels */
+.admin-order-card-details {
+  align-items: center;
+  align-content: flex-start;
+}
+
+.admin-status-chip,
+.admin-payment-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  width: fit-content;
+  height: 22px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
