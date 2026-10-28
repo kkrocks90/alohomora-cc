@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.21.2
+
+- Admin order cards: smaller, aligned action buttons.
+- Manual orders: quantity is now a number box instead of a dropdown.
+
 ## [1.21.1]
 
 ### Changed

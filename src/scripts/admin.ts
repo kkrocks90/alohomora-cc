@@ -579,9 +579,15 @@ if (root) {
     priceLabel.append(priceInput);
     const quantityLabel = document.createElement("label");
     quantityLabel.textContent = "Qty";
-    const quantitySelect = document.createElement("select");
+    const quantitySelect = document.createElement("input");
+    quantitySelect.type = "number";
+    quantitySelect.inputMode = "numeric";
+    quantitySelect.min = "1";
+    quantitySelect.max = "999";
+    quantitySelect.step = "1";
+    quantitySelect.value = "1";
     quantitySelect.dataset.customQuantity = "true";
-    for (let quantity = 1; quantity <= 20; quantity += 1) quantitySelect.append(new Option(String(quantity), String(quantity)));
+    quantitySelect.addEventListener("input", updateOrderTotal);
     quantityLabel.append(quantitySelect);
     const removeButton = document.createElement("button");
     removeButton.type = "button";
@@ -614,11 +620,14 @@ if (root) {
 
     const quantityLabel = document.createElement("label");
     quantityLabel.textContent = "Qty";
-    const quantitySelect = document.createElement("select");
+    const quantitySelect = document.createElement("input");
+    quantitySelect.type = "number";
+    quantitySelect.inputMode = "numeric";
+    quantitySelect.min = "1";
+    quantitySelect.max = "999";
+    quantitySelect.step = "1";
+    quantitySelect.value = "1";
     quantitySelect.dataset.lineQuantity = "true";
-    for (let quantity = 1; quantity <= 20; quantity += 1) {
-      quantitySelect.append(new Option(String(quantity), String(quantity)));
-    }
     quantityLabel.append(quantitySelect);
 
     const options = document.createElement("div");
@@ -659,7 +668,7 @@ if (root) {
       }
       updateOrderTotal();
     });
-    quantitySelect.addEventListener("change", updateOrderTotal);
+    quantitySelect.addEventListener("input", updateOrderTotal);
 
     row.append(productLabel, quantityLabel, options, removeButton);
     orderLines.append(row);
@@ -670,13 +679,13 @@ if (root) {
     let total = 0;
     orderLines.querySelectorAll<HTMLElement>("[data-order-line]").forEach((row) => {
       const productId = requireElement<HTMLSelectElement>(row, "[data-line-product]").value;
-      const quantity = Number(requireElement<HTMLSelectElement>(row, "[data-line-quantity]").value);
+      const quantity = Number(requireElement<HTMLInputElement>(row, "[data-line-quantity]").value);
       const product = adminData?.products.find((entry) => entry.id === productId);
       if (product) total += product.price * quantity;
     });
     orderLines.querySelectorAll<HTMLElement>("[data-custom-line]").forEach((row) => {
       const price = Number(row.querySelector<HTMLInputElement>("[data-custom-price]")?.value) || 0;
-      total += price * Number(row.querySelector<HTMLSelectElement>("[data-custom-quantity]")?.value);
+      total += price * Number(row.querySelector<HTMLInputElement>("[data-custom-quantity]")?.value);
     });
     orderTotal.textContent = `Product total: ${currency.format(total)}`;
   }
@@ -1203,7 +1212,7 @@ if (root) {
     const formData = new FormData(orderForm);
     const catalogueItems = Array.from(orderLines.querySelectorAll<HTMLElement>("[data-order-line]")).map((row) => ({
       id: requireElement<HTMLSelectElement>(row, "[data-line-product]").value,
-      quantity: Number(requireElement<HTMLSelectElement>(row, "[data-line-quantity]").value),
+      quantity: Number(requireElement<HTMLInputElement>(row, "[data-line-quantity]").value),
       wrapper: row.querySelector<HTMLInputElement>("[data-line-wrapper]")?.value ?? "",
       flavour: row.querySelector<HTMLSelectElement>("[data-line-flavour]")?.value ?? "",
     }));
@@ -1212,7 +1221,7 @@ if (root) {
       custom: true,
       name: row.querySelector<HTMLInputElement>("[data-custom-name]")?.value.trim() ?? "",
       unitPriceRupees: Number(row.querySelector<HTMLInputElement>("[data-custom-price]")?.value),
-      quantity: Number(row.querySelector<HTMLSelectElement>("[data-custom-quantity]")?.value),
+      quantity: Number(row.querySelector<HTMLInputElement>("[data-custom-quantity]")?.value),
     }));
     const items = [...catalogueItems, ...customItems];
     if (items.length === 0 || items.length > 8 || items.some((item) => !item.id)) {
