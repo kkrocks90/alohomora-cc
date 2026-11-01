@@ -30,12 +30,14 @@ Catalogue data lives in `src/data/products.json` and `src/data/categories.json` 
 Home, Store, Product (`/product/<id>`), Checkout, Thank-you, Account/Profile, Order detail (`/order/?id=`), About, Privacy policy, Shipping policy, Terms and conditions, Admin, branded 404, `sitemap.xml`.
 
 ### 3.2 Catalogue
-- 48 products. Fields: id, name, description, price, image, tag (category), pack size, flavour options, featured flag.
+- Products live in D1 (`products`, `catalogue_categories`), managed from the admin Products tab and seeded from `products.json`. The storefront is static: `npm run build` runs `scripts/fetch-catalogue.mjs`, which pulls `GET /products` from the Worker (falling back to the bundled JSON). Saving a product triggers the Pages workflow when the `GITHUB_DISPATCH_TOKEN` Worker secret is set.
+- Fields: id, name, description, price, images (up to 3), tag (category), pack size, flavour options, featured flag, visible flag.
+- Photos are stored in the R2 bucket `chocolate-circle-images` (public `IMAGE_BASE_URL`) and optimised to WebP at build time. The first image is the main photo.
 - Optional `extraTags` lets a product appear in more than one category. Optional `customizable: false` hides wrapper customisation.
 - Categories include Chocolate treats, Hampers, Kids B'Day Special, Elite Gifting and Bulk Specials (`categories.json`). Categories with no products are hidden on the home page but remain store filters and promo targets.
 - Store: category chips, search, sort, result count, clear-filters, sticky filter bar.
 - Home: promo banner (active featured promo), promise pills, category cards, featured slider.
-- Product page: photo, price, pack size, quantity, flavour select (when the product has flavours), custom fields scoped to the product, trust badges, preparation-time note, related products, sticky Add-to-bag on mobile.
+- Product page: photo gallery (swipe, arrows and dots when a product has more than one photo; shop and home cards show only the main photo), price, pack size, quantity, flavour select (when the product has flavours), custom fields scoped to the product, trust badges, preparation-time note, related products, sticky Add-to-bag on mobile.
 
 ### 3.3 Bag
 - Stored in the browser. A line is unique per product + flavour + customisation answers; duplicates are rejected server-side.
@@ -112,6 +114,9 @@ Create, list, activate/deactivate promos with usage counts.
 ### 6.5 Custom fields
 Create, edit, enable/disable, delete fields (section 3.4).
 
+### 6.6 Products
+Add and edit products (name, description, price, pack size, category, flavours, flags), hide/show a product, and upload up to 3 photos each (resized in the browser, stored in R2, reorderable with "Make main"). "Publish to storefront" re-runs the site build. Order prices always come from D1 immediately; the static pages update after the rebuild.
+
 ## 7. Payments
 
 - **Storefront payments**: Razorpay Standard Checkout with server-side signature, payment and amount verification.
@@ -133,6 +138,8 @@ Every browser call must come from `ALLOWED_ORIGIN`; the webhook is exempt and is
 | Webhook | `POST /razorpay/webhook` |
 
 ## 9. Data model (D1)
+
+Products: `products` (incl. `images` JSON array) and `catalogue_categories` (migrations 0013, 0014). Admin endpoints: `/admin/products/create`, `/update`, `/image` (raw image upload to R2), `/publish`.
 
 Migrations `worker/migrations/0001`-`0012`.
 

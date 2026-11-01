@@ -1,26 +1,18 @@
 ---
-import { Image, getImage, type ImageMetadata } from "astro:assets";
+import { Image, getImage } from "astro:assets";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import products from "../../data/products.json";
+import { productGallery, resolveImage } from "../../lib/product-images";
 
-const productImages = import.meta.glob<{ default: ImageMetadata }>(
-  "../../assets/products/*.{jpg,jpeg,png,webp,svg}",
-  {
-    eager: true,
-  },
-);
-const imagesByName = Object.fromEntries(
-  Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
-);
 
 export function getStaticPaths() {
   return products.map((product) => ({ params: { id: product.id }, props: { product } }));
 }
 
 const { product } = Astro.props;
-const image = imagesByName[product.image];
-if (!image) throw new Error(`Product image not found: ${product.image}`);
+const gallery = productGallery(product);
+const image = gallery[0];
 const related = [
   ...products.filter((other) => other.id !== product.id && other.tag === product.tag),
   ...products.filter((other) => other.id !== product.id && other.tag !== product.tag),
@@ -73,19 +65,37 @@ const customizable = product.customizable !== false;
       <span>{product.name}</span>
     </nav>
     <article class="product-detail">
-      <div class="product-detail-image">
-        <Image
-          src={image}
-          alt={`${product.name}, handmade by Chocolate Circle`}
-          width={800}
-          height={720}
-          widths={[400, 600, 800]}
-          sizes="(max-width: 760px) 100vw, 50vw"
-          format="webp"
-          quality={84}
-          priority
-        />
+      <div class="product-detail-image" data-gallery>
+        <div class="gallery-track" data-gallery-track tabindex="-1">
+          {gallery.map((photo, photoIndex) => (
+            <div class="gallery-slide" data-gallery-slide aria-label={`Photo ${photoIndex + 1} of ${gallery.length}`}>
+              <Image
+                src={photo}
+                alt={`${product.name}, handmade by Chocolate Circle${gallery.length > 1 ? ` (photo ${photoIndex + 1})` : ""}`}
+                width={800}
+                height={720}
+                widths={[400, 600, 800]}
+                sizes="(max-width: 760px) 100vw, 50vw"
+                format="webp"
+                quality={84}
+                priority={photoIndex === 0}
+                loading={photoIndex === 0 ? "eager" : "lazy"}
+              />
+            </div>
+          ))}
+        </div>
         <span class="product-tag">{product.tag}</span>
+        {gallery.length > 1 && (
+          <>
+            <button class="gallery-arrow gallery-arrow-prev" type="button" data-gallery-prev aria-label="Previous photo">?</button>
+            <button class="gallery-arrow gallery-arrow-next" type="button" data-gallery-next aria-label="Next photo">?</button>
+            <div class="gallery-dots" role="group" aria-label="Choose photo">
+              {gallery.map((_, dotIndex) => (
+                <button class="gallery-dot" type="button" data-gallery-dot={dotIndex} aria-label={`Show photo ${dotIndex + 1}`}></button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
       <div class="product-detail-copy">
         <p class="eyebrow">Handmade in small batches</p>
@@ -142,9 +152,7 @@ const customizable = product.customizable !== false;
         <h2 id="related-title">You may also <em>like</em></h2>
         <div class="product-grid product-related-grid">
           {related.map((other, index) => {
-            const otherImage = imagesByName[other.image];
-            if (!otherImage) throw new Error(`Product image not found: ${other.image}`);
-            return <ProductCard product={other} image={otherImage} index={index + 4} />;
+            return <ProductCard product={other} image={resolveImage(other.image)} index={index + 4} />;
           })}
         </div>
       </section>
@@ -152,3 +160,30 @@ const customizable = product.customizable !== false;
     <a class="product-back-link" href={`${base}store/`}>← Back to all treats</a>
   </main>
 </SiteLayout>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>("[data-gallery]");
+  const track = gallery?.querySelector<HTMLElement>("[data-gallery-track]");
+  if (gallery && track) {
+    const slides = Array.from(track.querySelectorAll<HTMLElement>("[data-gallery-slide]"));
+    const dots = Array.from(gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-dot]"));
+    const current = () => Math.round(track.scrollLeft / track.clientWidth);
+    const show = (index: number) => {
+      const next = (index + slides.length) % slides.length;
+      track.scrollTo({ left: next * track.clientWidth, behavior: "smooth" });
+    };
+    const sync = () => {
+      const index = current();
+      dots.forEach((dot, dotIndex) => dot.setAttribute("aria-current", String(dotIndex === index)));
+    };
+    track.addEventListener("scroll", sync, { passive: true });
+    gallery.querySelector("[data-gallery-prev]")?.addEventListener("click", () => show(current() - 1));
+    gallery.querySelector("[data-gallery-next]")?.addEventListener("click", () => show(current() + 1));
+    dots.forEach((dot, dotIndex) => dot.addEventListener("click", () => show(dotIndex)));
+    gallery.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") show(current() - 1);
+      if (event.key === "ArrowRight") show(current() + 1);
+    });
+    sync();
+  }
+</script>

@@ -1,0 +1,286 @@
+interface CatalogueProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  images: string[];
+  tag: string;
+  extraTags?: string[];
+  packSize: string;
+  flavours: string[];
+  featured: boolean;
+  customizable?: boolean;
+  active: boolean;
+}
+
+interface Deps {
+  root: HTMLElement;
+  post: (path: string, body?: unknown) => Promise<Record<string, unknown>>;
+  uploadImage: (file: Blob) => Promise<string>;
+  setStatus: (message: string, error?: boolean) => void;
+  reload: () => Promise<void>;
+  getCategories: () => string[];
+}
+
+const MAX_IMAGES = 3;
+const MAX_EDGE = 1600;
+
+function required<T extends HTMLElement>(root: HTMLElement, selector: string): T {
+  const element = root.querySelector<T>(selector);
+  if (!element) throw new Error(`The admin page is missing ${selector}.`);
+  return element;
+}
+
+export function isCatalogueProduct(value: unknown): value is CatalogueProduct {
+  if (!value || typeof value !== "object") return false;
+  const product = value as Record<string, unknown>;
+  return typeof product.id === "string" && typeof product.name === "string" &&
+    typeof product.price === "number" && Array.isArray(product.images) &&
+    Array.isArray(product.flavours) && typeof product.tag === "string";
+}
+
+// Shrinks phone photos in the browser so uploads stay small and the storefront loads fast.
+async function resizePhoto(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const toBlob = (type: string, quality: number) =>
+    new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
+  const webp = await toBlob("image/webp", 0.86);
+  if (webp && webp.type === "image/webp") return webp;
+  const jpeg = await toBlob("image/jpeg", 0.88);
+  if (!jpeg) throw new Error("That photo could not be processed.");
+  return jpeg;
+}
+
+export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, getCategories }: Deps) {
+  const form = required<HTMLFormElement>(root, "#admin-product-form");
+  const heading = required<HTMLElement>(root, "#admin-product-form-title");
+  const photos = required<HTMLElement>(root, "#admin-product-photos");
+  const photoInput = required<HTMLInputElement>(root, "#admin-product-photo-input");
+  const addPhoto = required<HTMLButtonElement>(root, "#admin-product-add-photo");
+  const categoryList = required<HTMLDataListElement>(root, "#admin-product-categories");
+  const submit = required<HTMLButtonElement>(root, "#admin-product-submit");
+  const cancel = required<HTMLButtonElement>(root, "#admin-product-cancel");
+  const list = required<HTMLElement>(root, "#admin-product-list");
+  const publish = required<HTMLButtonElement>(root, "#admin-product-publish");
+  const publishHint = required<HTMLElement>(root, "#admin-product-publish-hint");
+  let products: CatalogueProduct[] = [];
+  let images: string[] = [];
+  let editingId: string | null = null;
+  let uploading = false;
+
+  function field<T extends HTMLElement>(name: string) {
+    return form.elements.namedItem(name) as unknown as T;
+  }
+
+  function renderPhotos() {
+    photos.replaceChildren();
+    images.forEach((url, index) => {
+      const tile = document.createElement("figure");
+      tile.className = "admin-photo-tile";
+      if (/^https?:\/\//.test(url)) {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = `Product photo ${index + 1}`;
+        img.loading = "lazy";
+        tile.append(img);
+      } else {
+        const missing = document.createElement("span");
+        missing.textContent = url;
+        tile.append(missing);
+      }
+      const caption = document.createElement("figcaption");
+      const label = document.createElement("strong");
+      label.textContent = index === 0 ? "Main photo" : `Photo ${index + 1}`;
+      caption.append(label);
+      if (index > 0) {
+        const main = document.createElement("button");
+        main.type = "button";
+        main.className = "account-text-button";
+        main.textContent = "Make main";
+        main.addEventListener("click", () => {
+          images = [url, ...images.filter((_, imageIndex) => imageIndex !== index)];
+          renderPhotos();
+        });
+        caption.append(main);
+      }
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "account-text-button";
+      remove.textContent = "Remove";
+      remove.addEventListener("click", () => {
+        images = images.filter((_, imageIndex) => imageIndex !== index);
+        renderPhotos();
+      });
+      caption.append(remove);
+      tile.append(caption);
+      photos.append(tile);
+    });
+    addPhoto.hidden = images.length >= MAX_IMAGES;
+    addPhoto.disabled = uploading;
+    addPhoto.textContent = uploading ? "Uploading…" : images.length === 0 ? "Add main photo" : "Add another photo";
+  }
+
+  function resetForm() {
+    editingId = null;
+    form.reset();
+    images = [];
+    field<HTMLInputElement>("active").checked = true;
+    field<HTMLInputElement>("customizable").checked = true;
+    heading.textContent = "Add a product";
+    submit.textContent = "Add product";
+    cancel.hidden = true;
+    renderPhotos();
+  }
+
+  function startEdit(product: CatalogueProduct) {
+    editingId = product.id;
+    field<HTMLInputElement>("name").value = product.name;
+    field<HTMLTextAreaElement>("description").value = product.description;
+    field<HTMLInputElement>("price").value = String(product.price);
+    field<HTMLInputElement>("packSize").value = product.packSize;
+    field<HTMLInputElement>("tag").value = product.tag;
+    field<HTMLInputElement>("extraTags").value = (product.extraTags ?? []).join(", ");
+    field<HTMLTextAreaElement>("flavours").value = product.flavours.join("\n");
+    field<HTMLInputElement>("featured").checked = product.featured;
+    field<HTMLInputElement>("customizable").checked = product.customizable !== false;
+    field<HTMLInputElement>("active").checked = product.active;
+    images = [...product.images];
+    heading.textContent = `Edit ${product.name}`;
+    submit.textContent = "Save changes";
+    cancel.hidden = false;
+    renderPhotos();
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+    field<HTMLInputElement>("name").focus({ preventScroll: true });
+  }
+
+  function renderList() {
+    list.replaceChildren();
+    for (const product of products) {
+      const card = document.createElement("article");
+      card.className = "admin-product-card";
+      if (!product.active) card.classList.add("is-hidden");
+      const thumb = document.createElement("div");
+      thumb.className = "admin-product-thumb";
+      if (/^https?:\/\//.test(product.image)) {
+        const img = document.createElement("img");
+        img.src = product.image;
+        img.alt = "";
+        img.loading = "lazy";
+        thumb.append(img);
+      }
+      const info = document.createElement("div");
+      info.className = "admin-product-info";
+      const title = document.createElement("strong");
+      title.textContent = product.name;
+      const meta = document.createElement("span");
+      const photoCount = product.images.length;
+      meta.textContent = `₹${product.price} · ${product.tag} · ${photoCount} photo${photoCount === 1 ? "" : "s"}${product.active ? "" : " · Hidden"}`;
+      info.append(title, meta);
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "button button-secondary admin-product-edit";
+      edit.textContent = "Edit";
+      edit.addEventListener("click", () => startEdit(product));
+      card.append(thumb, info, edit);
+      list.append(card);
+    }
+  }
+
+  addPhoto.addEventListener("click", () => photoInput.click());
+  photoInput.addEventListener("change", async () => {
+    const files = Array.from(photoInput.files ?? []).slice(0, MAX_IMAGES - images.length);
+    photoInput.value = "";
+    if (files.length === 0) return;
+    uploading = true;
+    renderPhotos();
+    try {
+      for (const file of files) {
+        setStatus("Uploading photo…");
+        const url = await uploadImage(await resizePhoto(file));
+        images = [...images, url];
+        renderPhotos();
+      }
+      setStatus("Photo uploaded. Save the product to keep it.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The photo could not be uploaded.", true);
+    } finally {
+      uploading = false;
+      renderPhotos();
+    }
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (uploading) {
+      setStatus("Wait for the photo upload to finish.", true);
+      return;
+    }
+    const data = new FormData(form);
+    const lines = (value: FormDataEntryValue | null, separator: RegExp) =>
+      String(value ?? "").split(separator).map((item) => item.trim()).filter(Boolean);
+    const payload = {
+      ...(editingId ? { productId: editingId } : {}),
+      name: String(data.get("name") ?? ""),
+      description: String(data.get("description") ?? ""),
+      price: Number(data.get("price")),
+      packSize: String(data.get("packSize") ?? ""),
+      tag: String(data.get("tag") ?? ""),
+      extraTags: lines(data.get("extraTags"), /,/),
+      flavours: lines(data.get("flavours"), /\r?\n/),
+      images,
+      featured: field<HTMLInputElement>("featured").checked,
+      customizable: field<HTMLInputElement>("customizable").checked,
+      active: field<HTMLInputElement>("active").checked,
+    };
+    submit.disabled = true;
+    try {
+      const result = await post(editingId ? "/admin/products/update" : "/admin/products/create", payload);
+      const rebuilt = result.rebuildTriggered === true;
+      setStatus(
+        rebuilt
+          ? "Product saved. The storefront is updating and will show it in about a minute."
+          : "Product saved. Use “Publish to storefront” to show it to customers.",
+      );
+      resetForm();
+      await reload();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The product could not be saved.", true);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  cancel.addEventListener("click", resetForm);
+
+  publish.addEventListener("click", async () => {
+    publish.disabled = true;
+    try {
+      await post("/admin/products/publish");
+      setStatus("Storefront update started. It will be live in about a minute.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The storefront update could not be started.", true);
+    } finally {
+      publish.disabled = false;
+    }
+  });
+
+  resetForm();
+
+  return {
+    render(next: CatalogueProduct[], rebuildConfigured: boolean) {
+      products = next;
+      categoryList.replaceChildren(...getCategories().map((category) => new Option(category)));
+      publishHint.textContent = rebuildConfigured
+        ? "Saving a product updates the storefront automatically (about a minute)."
+        : "Automatic storefront updates are not set up yet, so changes appear on the site after the next manual publish. Orders always use the latest prices.";
+      renderList();
+    },
+  };
+}

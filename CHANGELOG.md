@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.25.0
+
+- Up to 3 photos per product. The product page has a swipeable gallery with arrows and dots; shop, home and related cards show the main photo only.
+- New admin Products tab: add and edit products, hide or show them, and upload photos (resized in the browser, stored in Cloudflare R2).
+- Existing product photos are copied to R2 (migration 0014).
+- The storefront build now pulls the live catalogue from the Worker. Saving a product can trigger a site rebuild once the `GITHUB_DISPATCH_TOKEN` Worker secret is set.
+
 ## 1.24.0
 
 - Products phase 1: catalogue now lives in D1 (migration 0013 seeds all 48 products and categories). The Worker reads prices, flavours and categories from D1 (30 s cache) for checkout, promos, custom fields and admin, falling back to the bundled JSON if the table is empty.

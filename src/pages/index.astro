@@ -1,19 +1,11 @@
 ---
-import { Image, type ImageMetadata } from "astro:assets";
+import { Image } from "astro:assets";
 import ProductCard from "../components/ProductCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import heroImage from "../assets/hero-chocolates.svg";
 import products from "../data/products.json";
+import { resolveImage } from "../lib/product-images";
 
-const productImages = import.meta.glob<{ default: ImageMetadata }>(
-  "../assets/products/*.{jpg,jpeg,png,webp,svg}",
-  {
-    eager: true,
-  },
-);
-const imagesByName = Object.fromEntries(
-  Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
-);
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 const highlightedProducts = products.filter((product) => product.featured);
 const categoryCards = [...new Set(products.map((product) => product.tag))]
@@ -21,8 +13,7 @@ const categoryCards = [...new Set(products.map((product) => product.tag))]
   .map((tag) => {
     const product = products.find((item) => item.tag === tag);
     if (!product) throw new Error(`No product found for category: ${tag}`);
-    const image = imagesByName[product.image];
-    if (!image) throw new Error(`Product image not found: ${product.image}`);
+    const image = resolveImage(product.image);
     return { tag, image, count: products.filter((item) => item.tag === tag).length };
   });
 const orgLd = {
@@ -156,12 +147,11 @@ const orgLd = {
       <div class="featured-slider">
         <div class="product-grid featured-grid" style={`--featured-count: ${highlightedProducts.length}`}>
           {highlightedProducts.map((product, index) => {
-            const image = imagesByName[product.image];
-            if (!image) throw new Error(`Product image not found: ${product.image}`);
+            const image = resolveImage(product.image);
             return <ProductCard product={product} image={image} index={index} />;
           })}
           {highlightedProducts.map((product, index) => {
-            const image = imagesByName[product.image];
+            const image = resolveImage(product.image);
             return (
               <div class="featured-clone" aria-hidden="true" inert>
                 <ProductCard product={product} image={image} index={index} />

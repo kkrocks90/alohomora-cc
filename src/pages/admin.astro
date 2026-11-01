@@ -114,6 +114,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="fields"
         >Custom fields</button>
+        <button
+          class="admin-tab"
+          id="admin-products-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-products-panel"
+          tabindex="-1"
+          data-admin-tab="products"
+        >Products</button>
       </div>
 
       <section
@@ -238,6 +248,62 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </form>
           <div class="admin-field-list" id="admin-field-list" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-products-panel"
+        role="tabpanel"
+        aria-labelledby="admin-products-tab"
+        data-admin-panel="products"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-product-form-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Catalogue</p>
+              <h2 id="admin-product-form-title">Add a product</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Each product can have up to 3 photos. The main photo is shown on the shop pages; customers can flip through all photos on the product page.</p>
+          <form class="admin-promo-form admin-product-form" id="admin-product-form">
+            <label>Product name<input name="name" maxlength="120" required /></label>
+            <label>Description<textarea name="description" rows="3" maxlength="500" required></textarea></label>
+            <div class="admin-order-inline-fields">
+              <label>Price (?)<input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" required /></label>
+              <label>Pack size<input name="packSize" maxlength="60" placeholder="Box of 9" required /></label>
+            </div>
+            <label>Category<input name="tag" maxlength="60" list="admin-product-categories" required /></label>
+            <datalist id="admin-product-categories"></datalist>
+            <label>Also show in (optional, comma separated)<input name="extraTags" /></label>
+            <label>Flavours (optional, one per line)<textarea name="flavours" rows="3"></textarea></label>
+            <fieldset class="admin-product-photos-field">
+              <legend>Photos (up to 3)</legend>
+              <div class="admin-product-photos" id="admin-product-photos"></div>
+              <input id="admin-product-photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden />
+              <button class="button button-secondary" id="admin-product-add-photo" type="button">Add main photo</button>
+            </fieldset>
+            <label class="admin-field-check"><input name="featured" type="checkbox" /> Feature on the home page</label>
+            <label class="admin-field-check"><input name="customizable" type="checkbox" checked /> Offers a personalised wrapper</label>
+            <label class="admin-field-check"><input name="active" type="checkbox" checked /> Visible to customers</label>
+            <div class="admin-form-actions">
+              <button class="button button-primary" id="admin-product-submit" type="submit">Add product</button>
+              <button class="button button-secondary" id="admin-product-cancel" type="button" hidden>Cancel edit</button>
+            </div>
+          </form>
+        </section>
+        <section class="admin-panel" aria-labelledby="admin-product-list-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Your products</p>
+              <h2 id="admin-product-list-title">All products</h2>
+            </div>
+            <button class="button button-secondary" id="admin-product-publish" type="button">Publish to storefront</button>
+          </div>
+          <p class="admin-form-hint" id="admin-product-publish-hint"></p>
+          <div class="admin-product-list" id="admin-product-list"></div>
         </section>
       </section>
 

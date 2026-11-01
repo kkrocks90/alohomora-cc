@@ -3,6 +3,7 @@ import { initializePincodeLookup } from "./pincode-lookup";
 import { normalizeState } from "../data/indian-states";
 import { printInvoice } from "./order-view";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
+import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import type { CustomField } from "./custom-fields";
 
 interface AdminCustomer {
@@ -88,6 +89,8 @@ interface AdminData {
   promos: AdminPromo[];
   customFields: CustomField[];
   customProducts: { id: string; name: string }[];
+  catalogueProducts: Parameters<ReturnType<typeof initProductsAdmin>["render"]>[0];
+  rebuildConfigured: boolean;
 }
 
 function isAnswerList(value: unknown): value is { label: string; value: string }[] {
@@ -210,6 +213,8 @@ function normalizeAdminData(data: AdminData): AdminData {
     ...data,
     customFields: Array.isArray(root.customFields) ? root.customFields : [],
     customProducts: Array.isArray((data as { customProducts?: unknown }).customProducts) ? data.customProducts : [],
+    catalogueProducts: Array.isArray(data.catalogueProducts) ? data.catalogueProducts.filter(isCatalogueProduct) : [],
+    rebuildConfigured: data.rebuildConfigured === true,
     orders: data.orders.map((order) => ({
       ...order,
       customFields: Array.isArray(order.customFields) ? order.customFields : [],
@@ -1118,6 +1123,7 @@ if (root) {
     renderCustomers();
     renderPromos();
     customFieldsAdmin.render(adminData.customFields);
+    productsAdmin.render(adminData.catalogueProducts, adminData.rebuildConfigured);
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     if (!editingOrderId) {
@@ -1127,6 +1133,33 @@ if (root) {
     renderOrders();
     updateOrderTotal();
   }
+
+  async function uploadImage(file: Blob) {
+    if (!apiUrl) throw new Error("Admin sign-in is not configured yet.");
+    const token = getAdminSessionToken();
+    let response: Response;
+    try {
+      response = await fetch(`${apiUrl}/admin/products/image`, {
+        method: "POST",
+        headers: { "Content-Type": file.type, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: file,
+      });
+    } catch {
+      throw new Error("Could not reach the order service. Check your connection and try again.");
+    }
+    const payload = (await response.json().catch(() => ({}))) as { url?: string; error?: string };
+    if (!response.ok || !payload.url) throw new Error(payload.error || "The photo could not be uploaded.");
+    return payload.url;
+  }
+
+  const productsAdmin = initProductsAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    uploadImage,
+    setStatus,
+    reload: () => loadDashboard(),
+    getCategories: () => adminData?.categories ?? [],
+  });
 
   const customFieldsAdmin = initCustomFieldsAdmin({
     root,

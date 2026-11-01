@@ -1,5 +1,6 @@
 ---
-import { Image, type ImageMetadata } from "astro:assets";
+import { Image } from "astro:assets";
+import type { ProductImage } from "../lib/product-images";
 
 interface Product {
   id: string;
@@ -16,7 +17,7 @@ interface Product {
 
 interface Props {
   product: Product;
-  image: ImageMetadata;
+  image: ProductImage;
   index: number;
 }
 

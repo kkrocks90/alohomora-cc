@@ -1,19 +1,10 @@
 ---
-import { Image, type ImageMetadata } from "astro:assets";
 import ProductCard from "../components/ProductCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import products from "../data/products.json";
 import extraCategories from "../data/categories.json";
+import { resolveImage } from "../lib/product-images";
 
-const productImages = import.meta.glob<{ default: ImageMetadata }>(
-  "../assets/products/*.{jpg,jpeg,png,webp,svg}",
-  {
-    eager: true,
-  },
-);
-const imagesByName = Object.fromEntries(
-  Object.entries(productImages).map(([path, image]) => [path.split("/").pop(), image.default]),
-);
 const tags = [...new Set([...products.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories])].sort((a, b) => a.localeCompare(b));
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
@@ -70,8 +61,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
       <p class="store-count" id="store-count" role="status" aria-live="polite"></p>
       <div class="product-grid store-grid" id="store-grid">
         {products.map((product, index) => {
-          const image = imagesByName[product.image];
-          if (!image) throw new Error(`Product image not found: ${product.image}`);
+          const image = resolveImage(product.image);
           return <ProductCard product={product} image={image} index={index} />;
         })}
       </div>

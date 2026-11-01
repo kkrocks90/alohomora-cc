@@ -3,7 +3,13 @@ import bundledCategories from "../src/data/categories.json" with { type: "json" 
 
 const CACHE_MS = 30_000;
 
-function buildState(products, extraCategories, source) {
+function withImages(product) {
+  const images = Array.isArray(product.images) && product.images.length > 0 ? product.images : [product.image];
+  return { ...product, image: images[0], images: images.slice(0, 3) };
+}
+
+function buildState(rawProducts, extraCategories, source) {
+  const products = rawProducts.map(withImages);
   const active = products.filter((product) => product.active !== false);
   return {
     source,
@@ -48,6 +54,7 @@ export function rowToProduct(row) {
     description: row.description,
     price: row.price,
     image: row.image,
+    images: parse(row.images),
     tag: row.tag,
     packSize: row.pack_size,
     flavours: parse(row.flavours),
@@ -58,13 +65,13 @@ export function rowToProduct(row) {
   const extraTags = parse(row.extra_tags);
   if (extraTags.length) product.extraTags = extraTags;
   if (row.customizable === 0) product.customizable = false;
-  return product;
+  return withImages(product);
 }
 
 export async function loadAllProductRows(database) {
   const { results } = await database
     .prepare(
-      `SELECT product_id, name, description, price, image, tag, extra_tags, pack_size, flavours,
+      `SELECT product_id, name, description, price, image, images, tag, extra_tags, pack_size, flavours,
               featured, customizable, active, sort_order
        FROM products ORDER BY sort_order, rowid`,
     )

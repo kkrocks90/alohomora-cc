@@ -3,6 +3,7 @@ main = "index.js"
 compatibility_date = "2025-08-01"
 
 [vars]
+IMAGE_BASE_URL = "https://pub-3e6a27e671504bceb10d039909e8722e.r2.dev"
 ALLOWED_ORIGIN = "https://chocolatecircle.in"
 STORE_LATITUDE = "12.9234"
 STORE_LONGITUDE = "80.1873"

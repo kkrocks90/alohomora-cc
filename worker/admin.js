@@ -1,4 +1,5 @@
 import { ensureCatalogue, getProductById, getProducts } from "./catalogue.js";
+import { imageBaseUrl, listAdminProducts } from "./admin-products.js";
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { generateOrderId } from "./order-id.js";
 import { assertFieldCapacity, listCustomFields, validateFieldDefinition } from "./custom-fields.js";
@@ -38,7 +39,7 @@ async function readBody(request) {
   }
 }
 
-async function requireAdmin(request, env) {
+export async function requireAdmin(request, env) {
   const adminEmail = normalizeCustomerEmail(env.ADMIN_EMAIL);
   if (!env.ORDERS_DB || !adminEmail || typeof env.AUTH_TOKEN_SECRET !== "string") {
     return { error: result(503, { error: "Admin access is not configured." }) };
@@ -54,7 +55,7 @@ export async function getAdminData(request, env) {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
     await ensureCatalogue(env, { force: true });
-    const [ordersResult, customersResult, promosResult, customFields, customProducts] = await Promise.all([
+    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
@@ -87,6 +88,7 @@ export async function getAdminData(request, env) {
         .all(),
       listCustomFields(env.ORDERS_DB),
       listCustomProducts(env.ORDERS_DB),
+      listAdminProducts(env),
     ]);
     return result(200, {
       email: access.email,
@@ -132,6 +134,9 @@ export async function getAdminData(request, env) {
       orderStatuses: ORDER_STATUSES,
       products: getProducts().map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
       categories: getPromoCategories(),
+      catalogueProducts,
+      imageBaseUrl: imageBaseUrl(env),
+      rebuildConfigured: Boolean(env.GITHUB_DISPATCH_TOKEN),
       customFields,
       customProducts,
       promos: promosResult.results.map((promo) => ({

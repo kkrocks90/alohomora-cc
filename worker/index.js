@@ -12,6 +12,7 @@ import {
   updateAdminOrderStatus,
   updateAdminPromo,
 } from "./admin.js";
+import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
 import {
   getDistanceKm,
   getFulfillmentMethod,
@@ -796,6 +797,22 @@ export default {
     }
     if (path === "/admin/data") {
       const result = await getAdminData(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/products/create") {
+      const result = await createAdminProduct(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/products/update") {
+      const result = await updateAdminProduct(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/products/image") {
+      const result = await uploadProductImage(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/products/publish") {
+      const result = await rebuildSite(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/promos/create") {
