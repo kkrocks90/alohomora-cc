@@ -7171,3 +7171,130 @@ main .store-heading > p {
 .admin-order-card-details .admin-order-balance { color: #8a5a00; font-weight: 600; }
 .admin-order-payment { display: grid; gap: 8px; margin: 0; padding: 12px 14px; border: 1px solid #e8ded3; border-radius: 12px; }
 .admin-order-payment legend { padding: 0 6px; font-weight: 700; }
+/* Shared card layout for the other admin forms */
+.apf-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.apf-form > .apf-actions,
+.admin-field-form > .apf-card:nth-child(3),
+.apf-form > .admin-order-items,
+.apf-form > .admin-order-payment {
+  grid-column: 1 / -1;
+}
+
+.admin-order-form.apf-form {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 900px;
+}
+
+.apf-card .apf-row-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.apf-card .admin-promo-fields,
+.apf-card .admin-promo-limits,
+.apf-card .admin-field-range,
+.apf-card .admin-order-inline-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+  border: 0;
+}
+
+.apf-card .admin-promo-fields[hidden],
+.apf-card .admin-field-range[hidden],
+.apf-card label[hidden],
+.apf-card [hidden] {
+  display: none;
+}
+
+.apf-card > legend {
+  padding: 0 6px;
+  color: var(--cocoa-dark, #3b2418);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.apf-card.admin-order-items,
+.apf-card.admin-order-payment {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #e8ded3;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.apf-card .admin-order-line {
+  padding: 12px;
+  border: 1px solid #efe6dc;
+  border-radius: 10px;
+  background: #faf6f0;
+}
+
+.apf-card .admin-order-line input:not([type="checkbox"]),
+.apf-card .admin-order-line select {
+  min-height: 38px;
+  padding: 7px 10px;
+}
+
+.apf-card .admin-order-line label {
+  gap: 4px;
+  font-size: 12px;
+}
+
+.admin-order-total {
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #3b2418;
+  color: #fff;
+  font-size: 20px;
+}
+
+.apf-card label.admin-field-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #efe6dc;
+  border-radius: 10px;
+  background: #faf6f0;
+  font-weight: 600;
+}
+
+.apf-card label.admin-field-check input {
+  width: 18px;
+  min-height: 0;
+  accent-color: #6b3f26;
+}
+
+.apf-card select {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid #d9cabb;
+  border-radius: 9px;
+  background-color: #fffdfa;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+}
+
+@media (max-width: 800px) {
+  .apf-form,
+  .apf-card .apf-row-3,
+  .apf-card .admin-promo-fields,
+  .apf-card .admin-promo-limits,
+  .apf-card .admin-field-range,
+  .apf-card .admin-order-inline-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.26.1
+
+- Admin: the Create manual order, Customer details, Promo code and Custom field forms now use the same sectioned card design as the product form (grouped sections, consistent inputs, dark total bar, cleaner item rows).
+
 ## 1.26.0
 
 - Manual orders can now be recorded as Unpaid, Partially paid (with the amount received) or Paid in full, when creating or editing.

@@ -168,7 +168,8 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </div>
           <p class="admin-form-hint">Codes are generated automatically. Limited-use codes are reserved during checkout and count once per signed-in customer after a successful order.</p>
-          <form class="admin-promo-form" id="admin-promo-form">
+          <form class="admin-promo-form apf-form" id="admin-promo-form">
+            <section class="apf-card"><h3>Offer</h3>
             <label>Promo name<input name="name" maxlength="80" required placeholder="Summer chocolate treat" /></label>
             <label>Discount type<select name="type" id="admin-promo-type" required>
               <option value="percentage">Percentage off</option>
@@ -187,11 +188,14 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <label>Amount off (₹)<input name="amountRupees" type="number" min="1" max="1000000" step="1" value="100" disabled required /></label>
               <label>Product subtotal must be greater than (₹)<input name="minimumRupees" type="number" min="0" max="1000000" step="1" value="0" disabled required /></label>
             </div>
+            </section>
+            <section class="apf-card"><h3>Limits</h3>
             <div class="admin-promo-limits">
               <label>Maximum distinct customers (optional)<input name="maxRedemptions" type="number" min="1" max="1000000" step="1" placeholder="No limit" /></label>
               <label>End date (optional)<input name="endDate" type="date" /></label>
             </div>
-            <button class="button button-primary" type="submit">Generate promo code</button>
+            </section>
+            <div class="apf-actions"><button class="button button-primary" type="submit">Generate promo code</button></div>
           </form>
           <div class="admin-promo-list" id="admin-promo-list" aria-live="polite"></div>
         </section>
@@ -214,7 +218,8 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </div>
           <p class="admin-form-hint">Add extra questions customers answer. <strong>Product fields</strong> appear on the product page and are saved for each item in the bag. <strong>Checkout fields</strong> are asked once per order. Answers appear on the order, invoice, and WhatsApp share.</p>
-          <form class="admin-promo-form admin-field-form" id="admin-field-form">
+          <form class="admin-promo-form admin-field-form apf-form" id="admin-field-form">
+            <section class="apf-card"><h3>Question</h3>
             <label>Field label<input name="label" maxlength="80" required placeholder="Gift message" /></label>
             <label>Where it appears<select name="scope" id="admin-field-scope" required>
               <option value="product">Product detail page</option>
@@ -227,10 +232,14 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <label>Maximum<input name="max" type="number" step="any" /></label>
             </div>
             <label class="admin-field-check" id="admin-field-future-label" hidden><input name="futureOnly" type="checkbox" /> Only allow today or later</label>
+            </section>
+            <section class="apf-card"><h3>Display</h3>
             <label id="admin-field-placeholder-label">Placeholder (optional)<input name="placeholder" maxlength="80" /></label>
             <label>Help text (optional)<input name="helpText" maxlength="200" /></label>
             <label class="admin-field-check"><input name="required" type="checkbox" /> Customers must answer this</label>
             <label>Display order<input name="sortOrder" type="number" step="1" min="-1000" max="1000" value="0" /></label>
+            </section>
+            <section class="apf-card"><h3>Where it applies</h3>
             <div class="admin-field-targets" id="admin-field-targets">
               <label>Applies to<select name="appliesMode" id="admin-field-applies-mode">
                 <option value="all">All products</option>
@@ -242,7 +251,8 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
                 <div class="admin-field-applies-list" id="admin-field-applies-list"></div>
               </fieldset>
             </div>
-            <div class="admin-form-actions">
+            </section>
+            <div class="admin-form-actions apf-actions">
               <button class="button button-primary" id="admin-field-submit" type="submit">Create field</button>
               <button class="button button-secondary" id="admin-field-cancel" type="button" hidden>Cancel edit</button>
             </div>
@@ -331,16 +341,22 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </div>
           <p class="admin-form-hint" id="admin-customer-form-hint">Add a customer profile or edit saved details. Customer email is the sign-in identity and cannot be changed here.</p>
-          <form class="admin-customer-form" id="admin-customer-form">
+          <form class="admin-customer-form apf-form" id="admin-customer-form">
+            <section class="apf-card"><h3>Contact</h3>
             <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
             <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
             <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
+            </section>
+            <section class="apf-card"><h3>Address</h3>
             <label class="admin-address-field">Default address<textarea name="address" autocomplete="street-address" rows="2" maxlength="250" required></textarea></label>
-            <label>City<input name="city" autocomplete="address-level2" maxlength="40" required /></label>
-            <label>State<StateSelect /></label>
-            <label>PIN code<input name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
+            <div class="apf-row apf-row-3">
+              <label>City<input name="city" autocomplete="address-level2" maxlength="40" required /></label>
+              <label>State<StateSelect /></label>
+              <label>PIN code<input name="pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
+            </div>
             <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
-            <div class="admin-customer-form-actions">
+            </section>
+            <div class="admin-customer-form-actions apf-actions">
               <button class="button button-primary" id="admin-customer-submit" type="submit">Save customer</button>
               <button class="button button-secondary" id="admin-customer-cancel-edit" type="button" hidden>Cancel edit</button>
             </div>
@@ -374,16 +390,19 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <span id="admin-order-edit-text"></span>
             <button class="account-text-button" id="admin-order-cancel-edit" type="button">Cancel editing</button>
           </div>
-          <form class="admin-order-form" id="admin-order-form">
+          <form class="admin-order-form apf-form" id="admin-order-form">
+            <section class="apf-card"><h3>Customer &amp; delivery</h3>
             <label>Find customer<input id="admin-order-customer-search" type="search" placeholder="Search by name, phone, or email" autocomplete="off" /></label>
             <p class="admin-form-hint" id="admin-order-customer-hint"></p>
             <label>Customer<select name="customerId" id="admin-order-customer" required>
               <option value="">Choose a saved customer</option>
             </select></label>
             <label>Delivery address<textarea name="address" id="admin-order-address" rows="2" maxlength="250" required></textarea></label>
-            <label>City<input name="city" id="admin-order-city" autocomplete="address-level2" maxlength="40" required /></label>
-            <label>State<StateSelect id="admin-order-state" /></label>
-            <label>PIN code<input name="pincode" id="admin-order-pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
+            <div class="apf-row apf-row-3">
+              <label>City<input name="city" id="admin-order-city" autocomplete="address-level2" maxlength="40" required /></label>
+              <label>State<StateSelect id="admin-order-state" /></label>
+              <label>PIN code<input name="pincode" id="admin-order-pincode" inputmode="numeric" autocomplete="postal-code" pattern="[1-9][0-9]{5}" maxlength="6" required /></label>
+            </div>
             <p class="location-privacy" data-pincode-status role="status" aria-live="polite"></p>
             <div class="admin-order-inline-fields">
               <label>Delivery method<select name="deliveryMethod" required>
@@ -392,7 +411,8 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               </select></label>
               <label>Event date (optional)<input name="eventDate" type="date" /></label>
             </div>
-            <fieldset class="admin-order-items">
+            </section>
+            <fieldset class="admin-order-items apf-card">
               <legend>Order items</legend>
               <div id="admin-order-lines"></div>
               <datalist id="admin-custom-products"></datalist>
@@ -402,7 +422,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               </div>
             </fieldset>
             <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
-            <fieldset class="admin-order-payment">
+            <fieldset class="admin-order-payment apf-card">
               <legend>Payment</legend>
               <div class="admin-order-inline-fields">
                 <label>Payment status<select name="paymentStatus" id="admin-order-payment-status">
@@ -414,7 +434,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               </div>
               <p class="admin-form-hint" id="admin-order-due">No payment is initiated here. Record what the customer has already paid you.</p>
             </fieldset>
-            <button class="button button-primary" id="admin-order-submit" type="submit">Create order</button>
+            <div class="apf-actions"><button class="button button-primary" id="admin-order-submit" type="submit">Create order</button></div>
           </form>
         </section>
       </section>
