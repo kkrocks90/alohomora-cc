@@ -14,3 +14,8 @@ binding = "ORDERS_DB"
 database_name = "cocoa-kind-orders"
 database_id = "47c716f8-d535-4705-85f0-e730284f6e77"
 migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "chocolate-circle-images"
+
