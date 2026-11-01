@@ -1,5 +1,7 @@
 import {
-  ADMIN_SESSION_KEY,
+  CUSTOMER_SESSION_KEY,
+  getAdminSessionToken,
+  saveAdminSessionToken,
   clearCustomerSessionToken,
   getCustomerSessionToken,
   saveCustomerSessionToken,
@@ -280,8 +282,9 @@ if (root) {
     try {
       const result = await post("/auth/orders", undefined, token);
       if (result.isAdmin === true) {
+        const wasRemembered = rememberMe ?? localStorage.getItem(CUSTOMER_SESSION_KEY) === token;
         clearCustomerSessionToken();
-        sessionStorage.setItem(ADMIN_SESSION_KEY, token);
+        saveAdminSessionToken(token, wasRemembered);
         window.dispatchEvent(new Event("customer-session-change"));
         redirectingToAdmin = true;
         window.location.assign(`${baseUrl}admin/`);
@@ -407,7 +410,10 @@ if (root) {
   });
 
   const existingToken = getCustomerSessionToken();
-  if (existingToken) {
+  if (getAdminSessionToken()) {
+    redirectingToAdmin = true;
+    window.location.replace(`${baseUrl}admin/`);
+  } else if (existingToken) {
     void loadOrders(existingToken).catch((error: unknown) => {
       emailForm.hidden = false;
       setStatus(error instanceof Error ? error.message : "Could not load your orders.", true);

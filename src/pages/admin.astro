@@ -14,7 +14,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
     <script is:inline>
       (function () {
         try {
-          if (sessionStorage.getItem("cocoa-kind-admin-session")) {
+          if (localStorage.getItem("cocoa-kind-admin-session") || sessionStorage.getItem("cocoa-kind-admin-session")) {
             document.currentScript.parentElement.classList.add("is-session-loading");
           }
         } catch (e) {}

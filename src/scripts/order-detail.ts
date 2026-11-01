@@ -1,4 +1,4 @@
-import { ADMIN_SESSION_KEY, clearCustomerSessionToken, getCustomerSessionToken } from "./cart";
+import { clearAdminSessionToken, clearCustomerSessionToken, getAdminSessionToken, getCustomerSessionToken } from "./cart";
 import { buildOrderProgress } from "./order-progress";
 import {
   answerLines,
@@ -181,14 +181,14 @@ for (const answer of order.customFields) rows.append(row(answer.label, answer.va
   }
 
   async function loadAsAdmin(orderId: string) {
-    const token = sessionStorage.getItem(ADMIN_SESSION_KEY) ?? "";
+    const token = getAdminSessionToken();
     if (!token) return false;
     let result: Record<string, unknown>;
     try {
       result = await post("/admin/data", token);
     } catch (error) {
       if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-        if (error.status === 401) sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        if (error.status === 401) clearAdminSessionToken();
         return false;
       }
       throw error;

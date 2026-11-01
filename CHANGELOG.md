@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.23.0
+
+- Admin sessions now persist across browser restarts (until sign out or expiry).
+- Signing in as admin from the customer sign-in page, or opening My profile with an active admin session, goes straight to the admin dashboard.
+
 ## 1.22.0
 
 - Admin: edit manual orders (customer, address, delivery, event date, items, quantities, prices). Catalogue items now have an editable price per order.

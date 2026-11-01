@@ -42,6 +42,25 @@ export function saveCustomerSessionToken(token: string, rememberMe: boolean) {
   else sessionStorage.setItem(CUSTOMER_SESSION_KEY, token);
 }
 
+export function getAdminSessionToken(): string {
+  const remembered = localStorage.getItem(ADMIN_SESSION_KEY) ?? "";
+  if (/^[0-9a-f]{64}$/.test(remembered)) return remembered;
+  const sessionToken = sessionStorage.getItem(ADMIN_SESSION_KEY) ?? "";
+  return /^[0-9a-f]{64}$/.test(sessionToken) ? sessionToken : "";
+}
+
+export function saveAdminSessionToken(token: string, rememberMe = true) {
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  if (rememberMe) localStorage.setItem(ADMIN_SESSION_KEY, token);
+  else sessionStorage.setItem(ADMIN_SESSION_KEY, token);
+}
+
+export function clearAdminSessionToken() {
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+}
+
 export function clearCustomerSessionToken() {
   localStorage.removeItem(CUSTOMER_SESSION_KEY);
   sessionStorage.removeItem(CUSTOMER_SESSION_KEY);

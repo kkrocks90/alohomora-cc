@@ -1,4 +1,4 @@
-import { ADMIN_SESSION_KEY } from "./cart";
+import { clearAdminSessionToken, getAdminSessionToken, saveAdminSessionToken } from "./cart";
 import { initializePincodeLookup } from "./pincode-lookup";
 import { normalizeState } from "../data/indian-states";
 import { printInvoice } from "./order-view";
@@ -286,7 +286,6 @@ if (root) {
   const orderCount = requireElement<HTMLElement>(root, "#admin-order-count");
   const orderPagination = requireElement<HTMLElement>(root, "#admin-order-pagination");
   const invoice = requireElement<HTMLElement>(root, "#admin-invoice-print");
-  const sessionKey = ADMIN_SESSION_KEY;
   const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
   const statusLabels: Record<string, string> = {
     received: "Received",
@@ -364,7 +363,7 @@ if (root) {
     });
   }
 
-  async function post(path: string, body?: unknown, token = sessionStorage.getItem(sessionKey) ?? "") {
+  async function post(path: string, body?: unknown, token = getAdminSessionToken()) {
     if (!apiUrl) throw new Error("Admin sign-in is not configured yet.");
     let response: Response;
     try {
@@ -1109,7 +1108,7 @@ if (root) {
     }
   }
 
-  async function loadDashboard(token = sessionStorage.getItem(sessionKey) ?? "") {
+  async function loadDashboard(token = getAdminSessionToken()) {
     const result = await post("/admin/data", undefined, token);
     if (!isAdminData(result)) throw new Error("The order service returned invalid admin data.");
     adminData = normalizeAdminData(result);
@@ -1167,12 +1166,12 @@ if (root) {
       if (typeof result.token !== "string" || !/^[0-9a-f]{64}$/.test(result.token)) {
         throw new Error("Sign-in returned an invalid session.");
       }
-      sessionStorage.setItem(sessionKey, result.token);
+      saveAdminSessionToken(result.token);
       try {
         await loadDashboard(result.token);
         window.dispatchEvent(new Event("customer-session-change"));
       } catch (error) {
-        sessionStorage.removeItem(sessionKey);
+        clearAdminSessionToken();
         if (error instanceof AdminApiError && error.status === 403) {
           throw new Error("That account is not authorized to access order management.");
         }
@@ -1358,7 +1357,7 @@ if (root) {
   });
 
   requireElement<HTMLButtonElement>(root, "#admin-sign-out").addEventListener("click", async () => {
-    const token = sessionStorage.getItem(sessionKey) ?? "";
+    const token = getAdminSessionToken();
     let signOutMessage = "You’re signed out.";
     let signOutError = false;
     try {
@@ -1367,7 +1366,7 @@ if (root) {
       signOutMessage = "Signed out on this device, but the session could not be revoked.";
       signOutError = true;
     } finally {
-      sessionStorage.removeItem(sessionKey);
+      clearAdminSessionToken();
       window.dispatchEvent(new Event("customer-session-change"));
       showSignedOut(signOutMessage);
       if (signOutError) loginStatus.dataset.state = "error";
@@ -1379,11 +1378,11 @@ if (root) {
     invoice.replaceChildren();
   });
 
-  const existingToken = sessionStorage.getItem(sessionKey);
+  const existingToken = getAdminSessionToken();
   if (existingToken) {
     void loadDashboard(existingToken).catch((error: unknown) => {
       if (error instanceof AdminApiError && error.status === 401) {
-        sessionStorage.removeItem(sessionKey);
+        clearAdminSessionToken();
         window.dispatchEvent(new Event("customer-session-change"));
       }
       showSignedOut(error instanceof AdminApiError && error.status === 403

@@ -11,7 +11,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
       (function () {
         var ok = function (v) { return /^[0-9a-f]{64}$/.test(v || ""); };
         try {
-          if (ok(localStorage.getItem("cocoa-kind-customer-session")) || ok(sessionStorage.getItem("cocoa-kind-customer-session"))) {
+          if (ok(localStorage.getItem("cocoa-kind-admin-session")) || ok(sessionStorage.getItem("cocoa-kind-admin-session")) || ok(localStorage.getItem("cocoa-kind-customer-session")) || ok(sessionStorage.getItem("cocoa-kind-customer-session"))) {
             document.currentScript.parentElement.classList.add("is-session-loading");
           }
         } catch (e) {}

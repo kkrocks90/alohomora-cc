@@ -179,3 +179,6 @@ Distance from the shop (haversine) to the PIN centroid. Up to 30 km: Porter (man
 | New products are not auto-added to the Customisation field's targeting | Open |
 | Customer account page does not show custom answers | Open |
 | Live Razorpay keys and webhook end-to-end test | Pending owner confirmation |
+
+
+> Admin sessions are stored in localStorage (persistent). An admin session visiting `/account/` redirects to `/admin/`.
