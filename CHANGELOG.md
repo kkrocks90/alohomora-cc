@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.27.1
+
+- Polished the Corporate orders page on mobile: full-width buttons, compact cards, 2-column logos, stacked steps, full-bleed enquiry form with larger inputs.
+
 ## 1.27.0
 
 - Added a Corporate orders page (/corporate) with offerings, client logos (served directly and through event management partners), and a requirements form that sends a prefilled WhatsApp message or email. Linked from the header, menu and footer.

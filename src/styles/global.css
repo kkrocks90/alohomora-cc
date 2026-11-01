@@ -7337,3 +7337,29 @@ main .store-heading > p {
 @media (max-width: 560px) {
   .corporate-form { grid-template-columns: minmax(0, 1fr); }
 }
+/* Corporate page: mobile refinements */
+@media (max-width: 560px) {
+  .corporate-page { padding: 24px 16px 64px; }
+  .corporate-hero { padding: 20px 0 8px; }
+  .corporate-hero h1 { font-size: 32px; }
+  .corporate-lead { font-size: 16px; margin-bottom: 20px; }
+  .corporate-cta { flex-direction: column; gap: 10px; }
+  .corporate-cta .button { width: 100%; justify-content: center; text-align: center; }
+  .corporate-section { margin-top: 40px; }
+  .corporate-section h2 { font-size: 24px; margin-bottom: 16px; }
+  .corporate-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .corporate-card { padding: 18px; border-left: 4px solid #3b2418; }
+  .corporate-clients { margin-inline: -16px; padding: 28px 16px 22px; border-radius: 0; }
+  .corporate-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .corporate-logos li { height: 88px; padding: 10px; }
+  .corporate-logos img { max-height: 64px; }
+  .corporate-steps { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .corporate-steps li { grid-template-columns: 30px minmax(0, 1fr); column-gap: 14px; row-gap: 2px; padding: 16px; align-items: start; }
+  .corporate-steps li::before { grid-row: 1 / span 2; }
+  .corporate-enquiry { margin-inline: -16px; padding: 28px 16px; border-radius: 0; gap: 20px; }
+  .corporate-enquiry h2 { font-size: 24px; }
+  .corporate-form { padding: 18px 14px; gap: 12px; }
+  .corporate-form input, .corporate-form select, .corporate-form textarea { font-size: 16px; min-height: 46px; }
+  .corporate-form-actions { flex-direction: column; }
+  .corporate-form-actions .button { width: 100%; justify-content: center; }
+}
