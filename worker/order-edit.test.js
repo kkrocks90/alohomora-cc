@@ -98,3 +98,26 @@ test("returns 404 for unknown orders", async () => {
   const response = await call(database, baseBody);
   assert.equal(response.status, 404);
 });
+
+test("records a partial payment on a manual order", async () => {
+  const database = makeDatabase({ payment_method: "manual", payment_status: "unpaid", amount_paise: 5000, payment_link_id: null });
+  const response = await call(database, { ...baseBody, paymentStatus: "partial", amountReceivedRupees: 400 });
+  assert.equal(response.status, 200);
+  assert.ok(database.updates[0].includes("unpaid"));
+  assert.ok(database.updates[0].includes(40000));
+});
+
+test("rejects a partial amount that covers the whole order", async () => {
+  const database = makeDatabase({ payment_method: "manual", payment_status: "unpaid", amount_paise: 5000, payment_link_id: null });
+  const response = await call(database, { ...baseBody, paymentStatus: "partial", amountReceivedRupees: 1000 });
+  assert.equal(response.status, 400);
+  assert.equal(database.updates.length, 0);
+});
+
+test("marks the order paid when payment status is paid", async () => {
+  const database = makeDatabase({ payment_method: "manual", payment_status: "unpaid", amount_paise: 5000, payment_link_id: null });
+  const response = await call(database, { ...baseBody, paymentStatus: "paid" });
+  assert.equal(response.status, 200);
+  assert.ok(database.updates[0].includes("paid"));
+  assert.ok(database.updates[0].includes(100000));
+});

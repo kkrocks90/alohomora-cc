@@ -61,7 +61,8 @@ export async function getAdminData(request, env) {
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
                   customer_id, customer_name, customer_phone, customer_email,
                   delivery_address, city, state, pincode, items_json, custom_json, amount_paise, product_subtotal_paise,
-                  discount_paise, promo_code, currency, delivery_method, event_date, created_at, payment_link_url
+                  discount_paise, promo_code, currency, delivery_method, event_date, created_at, payment_link_url,
+                  amount_received_paise
            FROM orders
            ORDER BY created_at DESC`,
         )
@@ -98,6 +99,7 @@ export async function getAdminData(request, env) {
         paymentId: order.payment_id,
         paymentStatus: order.payment_status,
         paymentMethod: order.payment_method,
+        amountReceivedPaise: order.amount_received_paise ?? 0,
         orderStatus: order.order_status,
         customerId: order.customer_id,
         customerName: order.customer_name,
@@ -608,7 +610,19 @@ async function parseManualOrderInput(body, env) {
     if (!Number.isSafeInteger(amountPaise) || amountPaise <= 0) {
       return result(400, { error: "The order total is invalid." });
     }
-    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise };
+    const paymentState = body?.paymentStatus ?? "unpaid";
+    let amountReceivedPaise = 0;
+    if (paymentState === "paid") {
+      amountReceivedPaise = amountPaise;
+    } else if (paymentState === "partial") {
+      amountReceivedPaise = Math.round(Number(body?.amountReceivedRupees) * 100);
+      if (!Number.isSafeInteger(amountReceivedPaise) || amountReceivedPaise <= 0 || amountReceivedPaise >= amountPaise) {
+        return result(400, { error: "Enter an amount received that is more than 0 and less than the order total." });
+      }
+    } else if (paymentState !== "unpaid") {
+      return result(400, { error: "Choose a valid payment status." });
+    }
+    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, amountReceivedPaise };
 }
 
 export async function createManualOrder(request, env) {
@@ -623,7 +637,7 @@ export async function createManualOrder(request, env) {
     if (access.error) return access.error;
     const parsed = await parseManualOrderInput(body, env);
     if (parsed.status) return parsed;
-    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise } = parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, amountReceivedPaise } = parsed;
 
     const orderId = generateOrderId();
     const createdAt = new Date().toISOString();
@@ -634,11 +648,12 @@ export async function createManualOrder(request, env) {
           customer_id, customer_name, customer_phone, customer_email,
           delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
           discount_paise, promo_code, currency,
-          delivery_method, distance_km, policies_accepted, event_date, created_at
-        ) VALUES (?, NULL, 'unpaid', 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, '', 'INR', ?, 0, 'admin_manual_order', ?, ?)`,
+          delivery_method, distance_km, policies_accepted, event_date, created_at, amount_received_paise
+        ) VALUES (?, NULL, ?, 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, '', 'INR', ?, 0, 'admin_manual_order', ?, ?, ?)`,
       )
       .bind(
         orderId,
+        amountReceivedPaise >= amountPaise ? "paid" : "unpaid",
         customer.customer_id,
         customer.customer_name,
         customer.customer_phone,
@@ -653,9 +668,14 @@ export async function createManualOrder(request, env) {
         deliveryMethod,
         eventDate,
         createdAt,
+        amountReceivedPaise,
       )
       .run();
-    return result(201, { orderId, orderStatus: "received", paymentStatus: "unpaid" });
+    return result(201, {
+      orderId,
+      orderStatus: "received",
+      paymentStatus: amountReceivedPaise >= amountPaise ? "paid" : amountReceivedPaise > 0 ? "partial" : "unpaid",
+    });
   } catch (error) {
     console.error("Could not create a manual admin order.", error);
     return result(400, { error: error instanceof Error ? error.message : "Could not create the order." });
@@ -674,7 +694,7 @@ export async function updateManualOrder(request, env) {
     if (access.error) return access.error;
     const orderId = requiredText(body?.orderId, 100, "order number");
     const existing = await env.ORDERS_DB
-      .prepare("SELECT payment_method, payment_status, amount_paise, payment_link_id FROM orders WHERE order_id = ?")
+      .prepare("SELECT payment_method, payment_status, amount_paise, amount_received_paise, payment_link_id FROM orders WHERE order_id = ?")
       .bind(orderId)
       .first();
     if (!existing) return result(404, { error: "Order not found." });
@@ -683,9 +703,9 @@ export async function updateManualOrder(request, env) {
     }
     const parsed = await parseManualOrderInput(body, env);
     if (parsed.status) return parsed;
-    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise } = parsed;
-    const amountChanged = amountPaise !== existing.amount_paise;
-    const dropLink = amountChanged && existing.payment_link_id && existing.payment_status !== "paid";
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, amountReceivedPaise } = parsed;
+    const dueChanged = amountPaise - amountReceivedPaise !== existing.amount_paise - (existing.amount_received_paise ?? 0);
+    const dropLink = dueChanged && existing.payment_link_id && existing.payment_status !== "paid";
     if (dropLink && env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET) {
       try {
         await fetch(`https://api.razorpay.com/v1/payment_links/${encodeURIComponent(existing.payment_link_id)}/cancel`, {
@@ -702,6 +722,7 @@ export async function updateManualOrder(request, env) {
           customer_id = ?, customer_name = ?, customer_phone = ?, customer_email = ?,
           delivery_address = ?, city = ?, state = ?, pincode = ?, items_json = ?,
           amount_paise = ?, product_subtotal_paise = ?, delivery_method = ?, event_date = ?,
+          payment_status = ?, amount_received_paise = ?,
           payment_link_id = CASE WHEN ? THEN NULL ELSE payment_link_id END,
           payment_link_url = CASE WHEN ? THEN NULL ELSE payment_link_url END
          WHERE order_id = ? AND payment_method = 'manual'`,
@@ -720,6 +741,8 @@ export async function updateManualOrder(request, env) {
         amountPaise,
         deliveryMethod,
         eventDate,
+        amountReceivedPaise >= amountPaise ? "paid" : "unpaid",
+        amountReceivedPaise,
         dropLink ? 1 : 0,
         dropLink ? 1 : 0,
         orderId,

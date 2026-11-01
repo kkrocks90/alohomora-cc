@@ -37,12 +37,12 @@ function makeDatabase() {
           if (/SET payment_link_id/i.test(sql)) {
             [database.order.payment_link_id, database.order.payment_link_url] = this.values;
           }
-          if (/SET payment_status = 'paid', payment_id/i.test(sql)) {
+          if (/SET payment_status = 'paid', amount_received_paise = amount_paise, payment_id/i.test(sql)) {
             database.order.payment_status = "paid";
             database.order.payment_id = this.values[0];
             database.order.payment_method = "razorpay";
           }
-          if (/SET payment_status = 'paid' WHERE/i.test(sql)) database.order.payment_status = "paid";
+          if (/SET payment_status = 'paid', amount_received_paise = amount_paise WHERE/i.test(sql)) database.order.payment_status = "paid";
           return { meta: { changes: 1 } };
         },
       };

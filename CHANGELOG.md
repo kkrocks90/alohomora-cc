@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.26.0
+
+- Manual orders can now be recorded as Unpaid, Partially paid (with the amount received) or Paid in full, when creating or editing.
+- Order cards show the received amount and balance due; the Unpaid stat counts balances; payment links are issued for the balance only.
+- New migration 0015 adds `amount_received_paise` to orders.
+
 ## 1.25.2
 
 - Fixed the admin dashboard hanging on "Opening dashboard..." (leftover add-photo handler removed in the product form redesign).

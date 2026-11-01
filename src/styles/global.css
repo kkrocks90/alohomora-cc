@@ -7166,3 +7166,8 @@ main .store-heading > p {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Partial payments */
+.admin-payment-badge[data-pay="partial"] { background: #fff1cc; color: #8a5a00; }
+.admin-order-card-details .admin-order-balance { color: #8a5a00; font-weight: 600; }
+.admin-order-payment { display: grid; gap: 8px; margin: 0; padding: 12px 14px; border: 1px solid #e8ded3; border-radius: 12px; }
+.admin-order-payment legend { padding: 0 6px; font-weight: 700; }

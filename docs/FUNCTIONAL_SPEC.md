@@ -105,7 +105,7 @@ Create and edit customers (email is the identity and cannot change), search, pag
 ### 6.3 Create manual order
 - Pick customer (prefills address), address, PIN, city, state, delivery method, event date.
 - Items: catalogue products (flavour, qty, wrapper note) and **custom items** (name, price, qty).
-- Order is created **unpaid** with payment method `manual`.
+- Order has payment method `manual`. A *Payment* section sets **Unpaid** (default), **Partially paid** (with the amount received; must be more than 0 and less than the total) or **Paid in full**. The same section appears when editing. Partial payments are stored in `orders.amount_received_paise` (migration 0015) while `payment_status` stays `unpaid`; the card shows "Partially paid", the amount received and the balance due. Payment links are created for the balance due, and *Mark as paid* settles the whole order.
 - **Custom products**: names are typed freely, saved separately in `custom_products` (case-insensitive unique), suggested on later orders, and never shown in the storefront. They have no image or other details. Price is entered per order line.
 
 ### 6.4 Promo codes

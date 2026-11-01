@@ -41,6 +41,7 @@ interface AdminOrder {
   paymentId: string | null;
   paymentStatus: "paid" | "unpaid";
   paymentMethod: "razorpay" | "manual" | "promo";
+  amountReceivedPaise?: number;
   orderStatus: string;
   customerId: string | null;
   customerName: string;
@@ -285,6 +286,10 @@ if (root) {
   const adminStats = requireElement<HTMLElement>(root, "#admin-stats");
   const customProductList = requireElement<HTMLDataListElement>(root, "#admin-custom-products");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
+  const paymentSelect = requireElement<HTMLSelectElement>(root, "#admin-order-payment-status");
+  const receivedLabel = requireElement<HTMLElement>(root, "#admin-order-received-label");
+  const receivedInput = requireElement<HTMLInputElement>(root, "#admin-order-received");
+  const dueNote = requireElement<HTMLElement>(root, "#admin-order-due");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
   const orderSearch = requireElement<HTMLInputElement>(root, "#admin-order-search");
   const orderStatusFilter = requireElement<HTMLSelectElement>(root, "#admin-order-status-filter");
@@ -719,6 +724,21 @@ if (root) {
       total += price * Number(row.querySelector<HTMLInputElement>("[data-custom-quantity]")?.value);
     });
     orderTotal.textContent = `Product total: ${currency.format(total)}`;
+    const partial = paymentSelect.value === "partial";
+    receivedLabel.hidden = !partial;
+    receivedInput.required = partial;
+    if (partial) {
+      const due = total - (Number(receivedInput.value) || 0);
+      dueNote.textContent = `Balance due: ${currency.format(Math.max(due, 0))}`;
+    } else {
+      dueNote.textContent = paymentSelect.value === "paid"
+        ? "The order will be recorded as fully paid."
+        : "No payment is initiated here. Record what the customer has already paid you.";
+    }
+  }
+
+  function amountDue(order: AdminOrder) {
+    return Math.max(order.amountPaise - (order.paymentStatus === "paid" ? order.amountPaise : order.amountReceivedPaise ?? 0), 0);
   }
 
   function appendText(parent: HTMLElement, tagName: string, value: string, className = "") {
@@ -738,14 +758,15 @@ if (root) {
     const orders = adminData.orders;
     const open = orders.filter((order) => order.orderStatus !== "delivered" && order.orderStatus !== "cancelled");
     const unpaid = orders.filter((order) => order.paymentStatus === "unpaid" && order.paymentMethod !== "promo" && order.orderStatus !== "cancelled");
+    const partialReceived = unpaid.reduce((sum, order) => sum + (order.amountReceivedPaise ?? 0), 0);
     const received = orders.filter((order) => order.orderStatus === "received").length;
     const paidTotal = orders
       .filter((order) => order.paymentStatus === "paid" && order.orderStatus !== "cancelled")
-      .reduce((sum, order) => sum + order.amountPaise, 0);
+      .reduce((sum, order) => sum + order.amountPaise, 0) + partialReceived;
     const tiles: [string, string, string][] = [
       ["New", String(received), "Awaiting confirmation"],
       ["Open orders", String(open.length), `${orders.length} in total`],
-      ["Unpaid", String(unpaid.length), currency.format(unpaid.reduce((sum, order) => sum + order.amountPaise, 0) / 100)],
+      ["Unpaid", String(unpaid.length), currency.format(unpaid.reduce((sum, order) => sum + amountDue(order), 0) / 100)],
       ["Paid revenue", currency.format(paidTotal / 100), "Excludes cancelled"],
     ];
     adminStats.replaceChildren(...tiles.map(([label, value, note]) => {
@@ -766,7 +787,9 @@ if (root) {
     renderOrderLine();
     orderEditBanner.hidden = true;
     orderFormTitle.textContent = "Create manual order";
-    orderSubmit.textContent = "Create unpaid order";
+    orderSubmit.textContent = "Create order";
+    paymentSelect.value = "unpaid";
+    receivedInput.value = "";
     updateOrderTotal();
   }
 
@@ -802,6 +825,9 @@ if (root) {
     orderEditText.textContent = `Editing ${order.orderId}`;
     orderFormTitle.textContent = "Edit manual order";
     orderSubmit.textContent = "Save changes";
+    const receivedPaise = order.paymentStatus === "paid" ? order.amountPaise : order.amountReceivedPaise ?? 0;
+    paymentSelect.value = order.paymentStatus === "paid" ? "paid" : receivedPaise > 0 ? "partial" : "unpaid";
+    receivedInput.value = receivedPaise > 0 ? String(receivedPaise / 100) : "";
     updateOrderTotal();
     const createTab = adminTabs.find((tab) => tab.dataset.adminTab === "create-order");
     if (createTab) activateAdminTab(createTab);
@@ -868,14 +894,18 @@ if (root) {
 
       const details = document.createElement("div");
       details.className = "admin-order-card-details";
+      const partialPaise = order.amountReceivedPaise ?? 0;
       const paymentLabel = order.paymentMethod === "manual"
         ? "Manual"
         : order.paymentMethod === "promo" ? "Promo-covered" : "Razorpay";
       const paymentStatusLabel = order.paymentMethod === "promo"
         ? "No payment due"
-        : order.paymentStatus === "paid" ? "Paid" : "Unpaid";
+        : order.paymentStatus === "paid" ? "Paid" : partialPaise > 0 ? "Partially paid" : "Unpaid";
       const payBadge = appendText(details, "span", `${paymentStatusLabel} · ${paymentLabel}`, "admin-payment-badge");
-      payBadge.dataset.pay = order.paymentMethod === "promo" ? "none" : order.paymentStatus;
+      payBadge.dataset.pay = order.paymentMethod === "promo" ? "none" : order.paymentStatus === "unpaid" && partialPaise > 0 ? "partial" : order.paymentStatus;
+      if (order.paymentStatus === "unpaid" && partialPaise > 0 && order.paymentMethod !== "promo") {
+        appendText(details, "span", `Received ${currency.format(partialPaise / 100)}, balance due ${currency.format(amountDue(order) / 100)}`, "admin-order-balance");
+      }
       if (order.discountPaise > 0) {
         appendText(details, "span", `Promo ${order.promoCode} · saved ${currency.format(order.discountPaise / 100)}`);
       }
@@ -962,7 +992,7 @@ if (root) {
           share.className = "button button-secondary";
           share.target = "_blank";
           share.rel = "noopener";
-          const text = `Hi ${order.customerName}, here is your payment link for Chocolate Circle order ${order.orderId} (${currency.format(order.amountPaise / 100)}): ${url}`;
+          const text = `Hi ${order.customerName}, here is your payment link for Chocolate Circle order ${order.orderId} (${currency.format(amountDue(order) / 100)}): ${url}`;
           const phone = order.customerPhone.replace(/\D/g, "");
           share.href = `https://wa.me/${phone.length === 10 ? `91${phone}` : phone}?text=${encodeURIComponent(text)}`;
           share.textContent = "WhatsApp";
@@ -986,7 +1016,7 @@ if (root) {
         paidButton.className = "account-text-button";
         paidButton.textContent = "Mark as paid";
         paidButton.addEventListener("click", async () => {
-          if (!window.confirm(`Mark order ${order.orderId} as paid?`)) return;
+          if (!window.confirm(`Mark order ${order.orderId} as fully paid?`)) return;
           try {
             await post("/admin/orders/mark-paid", { orderId: order.orderId });
             await loadDashboard();
@@ -1367,13 +1397,15 @@ if (root) {
         pincode: formData.get("pincode"),
         deliveryMethod: formData.get("deliveryMethod"),
         eventDate: formData.get("eventDate"),
+        paymentStatus: formData.get("paymentStatus"),
+        amountReceivedRupees: formData.get("amountReceivedRupees"),
         items,
       });
       resetOrderForm();
       await loadDashboard();
       setStatus(wasEditing
         ? `Order ${String(result.orderId)} updated.${result.paymentLinkReset ? " The old payment link was cancelled - generate a new one." : ""}`
-        : `Manual order ${String(result.orderId)} created as unpaid.`);
+        : `Manual order ${String(result.orderId)} created.`);
       if (wasEditing) {
         const ordersTab = adminTabs.find((tab) => tab.dataset.adminTab === "orders");
         if (ordersTab) activateAdminTab(ordersTab);

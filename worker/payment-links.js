@@ -43,7 +43,7 @@ export async function createAdminPaymentLink(request, env) {
     const order = await env.ORDERS_DB
       .prepare(
         `SELECT order_id, payment_status, payment_method, amount_paise, customer_name,
-                customer_phone, customer_email, payment_link_id, payment_link_url
+                customer_phone, customer_email, payment_link_id, payment_link_url, amount_received_paise
          FROM orders WHERE order_id = ?`,
       )
       .bind(orderId)
@@ -64,7 +64,7 @@ export async function createAdminPaymentLink(request, env) {
         method: "POST",
         headers: { Authorization: basicAuth(env), ...JSON_HEADERS },
         body: JSON.stringify({
-          amount: order.amount_paise,
+          amount: order.amount_paise - (order.amount_received_paise ?? 0),
           currency: "INR",
           reference_id: order.order_id,
           description: `Chocolate Circle order ${order.order_id}`,
@@ -103,7 +103,7 @@ export async function markAdminOrderPaid(request, env) {
   if (!orderId) return result(400, { error: "Choose an order." });
   try {
     const updated = await env.ORDERS_DB
-      .prepare("UPDATE orders SET payment_status = 'paid' WHERE order_id = ? AND payment_status <> 'paid'")
+      .prepare("UPDATE orders SET payment_status = 'paid', amount_received_paise = amount_paise WHERE order_id = ? AND payment_status <> 'paid'")
       .bind(orderId)
       .run();
     if (updated.meta?.changes === 0) return result(404, { error: "Order not found or already paid." });
@@ -152,18 +152,19 @@ export async function handleRazorpayWebhook(request, env) {
   if (!link?.id || !payment?.id || link.status !== "paid") return result(200, { ignored: true });
   try {
     const order = await env.ORDERS_DB
-      .prepare("SELECT order_id, amount_paise, payment_status FROM orders WHERE payment_link_id = ?")
+      .prepare("SELECT order_id, amount_paise, amount_received_paise, payment_status FROM orders WHERE payment_link_id = ?")
       .bind(link.id)
       .first();
     if (!order) return result(200, { ignored: true });
     if (order.payment_status === "paid") return result(200, { alreadyPaid: true });
-    if (link.amount_paid !== order.amount_paise && payment.amount !== order.amount_paise) {
+    const due = order.amount_paise - (order.amount_received_paise ?? 0);
+    if (link.amount_paid !== due && payment.amount !== due) {
       console.error("Payment link amount did not match order", order.order_id);
       return result(200, { ignored: true });
     }
     await env.ORDERS_DB
       .prepare(
-        "UPDATE orders SET payment_status = 'paid', payment_id = ?, payment_method = 'razorpay' WHERE order_id = ? AND payment_status <> 'paid'",
+        "UPDATE orders SET payment_status = 'paid', amount_received_paise = amount_paise, payment_id = ?, payment_method = 'razorpay' WHERE order_id = ? AND payment_status <> 'paid'",
       )
       .bind(payment.id, order.order_id)
       .run();

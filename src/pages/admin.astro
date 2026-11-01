@@ -402,8 +402,19 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               </div>
             </fieldset>
             <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
-            <p class="admin-payment-note">Manual orders are recorded as unpaid. No payment is initiated or collected here.</p>
-            <button class="button button-primary" id="admin-order-submit" type="submit">Create unpaid order</button>
+            <fieldset class="admin-order-payment">
+              <legend>Payment</legend>
+              <div class="admin-order-inline-fields">
+                <label>Payment status<select name="paymentStatus" id="admin-order-payment-status">
+                  <option value="unpaid">Unpaid</option>
+                  <option value="partial">Partially paid</option>
+                  <option value="paid">Paid in full</option>
+                </select></label>
+                <label id="admin-order-received-label" hidden>Amount received (&#8377;)<input name="amountReceivedRupees" id="admin-order-received" type="number" inputmode="decimal" min="1" step="0.01" /></label>
+              </div>
+              <p class="admin-form-hint" id="admin-order-due">No payment is initiated here. Record what the customer has already paid you.</p>
+            </fieldset>
+            <button class="button button-primary" id="admin-order-submit" type="submit">Create order</button>
           </form>
         </section>
       </section>

@@ -97,14 +97,15 @@ function makeDatabase(email) {
           }
           if (/INSERT INTO orders/i.test(sql)) {
             const [
-              order_id, customer_id, customer_name, customer_phone, customer_email, delivery_address,
+              order_id, payment_status, customer_id, customer_name, customer_phone, customer_email, delivery_address,
               city, state, pincode, items_json, amount_paise, product_subtotal_paise,
-              delivery_method, distance_km, policies_accepted, event_date, created_at,
+              delivery_method, distance_km, policies_accepted, event_date, created_at, amount_received_paise,
             ] = this.values;
             database.orders.set(order_id, {
               order_id,
               payment_id: null,
-              payment_status: "unpaid",
+              payment_status,
+              amount_received_paise,
               payment_method: "manual",
               order_status: "received",
               customer_id,
