@@ -1,4 +1,4 @@
-import products from "../src/data/products.json" with { type: "json" };
+import { ensureCatalogue, getProductById, getProducts } from "./catalogue.js";
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { generateOrderId } from "./order-id.js";
 import { assertFieldCapacity, listCustomFields, validateFieldDefinition } from "./custom-fields.js";
@@ -15,7 +15,6 @@ export const ORDER_STATUSES = [
 ];
 
 const DELIVERY_METHODS = ["Porter (manual booking)", "Courier (manual booking)"];
-const productById = new Map(products.map((product) => [product.id, product]));
 const phonePattern = /^\+?[0-9\s()-]{7,20}$/;
 
 function result(status, body) {
@@ -54,6 +53,7 @@ export async function getAdminData(request, env) {
   try {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
+    await ensureCatalogue(env, { force: true });
     const [ordersResult, customersResult, promosResult, customFields, customProducts] = await Promise.all([
       env.ORDERS_DB
         .prepare(
@@ -130,7 +130,7 @@ export async function getAdminData(request, env) {
         updatedAt: customer.updated_at,
       })),
       orderStatuses: ORDER_STATUSES,
-      products: products.map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
+      products: getProducts().map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
       categories: getPromoCategories(),
       customFields,
       customProducts,
@@ -573,7 +573,7 @@ async function parseManualOrderInput(body, env) {
       ) {
         throw new Error("Each order item needs a valid product and quantity from 1 to 5000.");
       }
-      const product = productById.get(item.id);
+      const product = getProductById(item.id);
       if (!product) throw new Error("An order item is not in the product catalog.");
       const flavour = typeof item.flavour === "string" ? item.flavour : "";
       if (

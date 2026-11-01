@@ -1,4 +1,4 @@
-import products from "../src/data/products.json" with { type: "json" };
+import { getProductById } from "./catalogue.js";
 
 export const FIELD_SCOPES = ["product", "checkout"];
 export const FIELD_TYPES = ["text", "textarea", "number", "date", "dropdown", "radio", "checkboxes", "checkbox"];
@@ -8,7 +8,6 @@ const MAX_OPTIONS = 30;
 const TEXT_LIMIT = 200;
 const TEXTAREA_LIMIT = 500;
 const APPLIES_MODES = ["all", "products", "categories"];
-const productById = new Map(products.map((product) => [product.id, product]));
 
 function boundedText(value, maximum, label, { required = false } = {}) {
   const text = typeof value === "string" ? value.trim() : "";
@@ -67,7 +66,7 @@ export function validateFieldDefinition(body, categories) {
         ? [...new Set(body.appliesTo.values.filter((value) => typeof value === "string"))]
         : [];
       if (values.length === 0) throw new Error(`Choose at least one ${mode === "products" ? "product" : "category"}.`);
-      const known = mode === "products" ? (id) => productById.has(id) : (name) => categories.includes(name);
+      const known = mode === "products" ? (id) => Boolean(getProductById(id)) : (name) => categories.includes(name);
       if (!values.every(known)) throw new Error(`One of the chosen ${mode} is not available.`);
       appliesTo.values = values;
     }

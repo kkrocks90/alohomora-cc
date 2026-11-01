@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.24.0
+
+- Products phase 1: catalogue now lives in D1 (migration 0013 seeds all 48 products and categories). The Worker reads prices, flavours and categories from D1 (30 s cache) for checkout, promos, custom fields and admin, falling back to the bundled JSON if the table is empty.
+- New public `GET /products` endpoint. The storefront still builds from products.json until the next phases.
+
 ## 1.23.0
 
 - Admin sessions now persist across browser restarts (until sign out or expiry).

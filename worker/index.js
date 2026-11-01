@@ -1,4 +1,4 @@
-import products from "../src/data/products.json" with { type: "json" };
+import { ensureCatalogue, getProductById, getProducts, publicCatalogue } from "./catalogue.js";
 import {
   createAdminPromo,
   createAdminCustomer,
@@ -139,7 +139,6 @@ function validateOrder(body, storeLocation, customFields = []) {
     throw new Error("Your bag does not contain a valid selection.");
   }
 
-  const productById = new Map(products.map((product) => [product.id, product]));
   const seen = new Set();
   const items = body.items.map((item) => {
     if (!item || typeof item !== "object" || typeof item.id !== "string" ||
@@ -148,7 +147,7 @@ function validateOrder(body, storeLocation, customFields = []) {
         typeof item.wrapper !== "string") {
       throw new Error("Each product needs a valid quantity, any required flavour choice, and a wrapper description (3 to 120 characters).");
     }
-    const product = productById.get(item.id);
+    const product = getProductById(item.id);
     if (!product) throw new Error("A product in your bag is no longer available.");
     const wrapperLength = item.wrapper.trim().length;
     if (product.customizable === false ? item.wrapper !== "" : wrapperLength > 120) {
@@ -198,7 +197,7 @@ function validatePromoCart(body) {
         !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > MAX_QUANTITY) {
       throw new Error("Each product needs a valid quantity.");
     }
-    const product = products.find((entry) => entry.id === item.id);
+    const product = getProductById(item.id);
     if (!product) throw new Error("A product in your bag is no longer available.");
     return { product, quantity: item.quantity };
   });
@@ -727,6 +726,12 @@ export default {
       },
     });
     const path = new URL(request.url).pathname.replace(/\/+$/, "");
+    await ensureCatalogue(env, { force: path.startsWith("/admin") });
+    if (request.method === "GET" && path === "/products") {
+      const response = jsonResponse(publicCatalogue(), 200, configuredOrigin);
+      response.headers.set("Cache-Control", "public, max-age=30, s-maxage=30");
+      return response;
+    }
     if (request.method === "GET" && path === "/promos/featured") {
       if (!env.ORDERS_DB) return errorResponse("The promo service is not configured.", 503, configuredOrigin);
       try {

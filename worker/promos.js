@@ -1,8 +1,5 @@
-import products from "../src/data/products.json" with { type: "json" };
-import extraCategories from "../src/data/categories.json" with { type: "json" };
+import { getCategories, getProductById } from "./catalogue.js";
 
-const productById = new Map(products.map((product) => [product.id, product]));
-const categories = [...new Set([...products.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories])];
 const RESERVATION_MINUTES = 30;
 
 function validDate(value) {
@@ -244,7 +241,7 @@ export function validatePromoDefinition(body) {
     }
     if (
       targetType !== "all" &&
-      !(targetType === "product" && productById.has(targetValue)) &&
+      !(targetType === "product" && getProductById(targetValue)) &&
       !(targetType === "category" && categories.includes(targetValue))
     ) throw new Error("Choose all products, a valid product, or a valid category.");
     return {
@@ -296,7 +293,7 @@ export function validatePromoLimits(body) {
 }
 
 export function getPromoCategories() {
-  return categories;
+  return getCategories();
 }
 
 export async function getFeaturedPromo(database, now = new Date()) {
@@ -327,7 +324,7 @@ export async function getFeaturedPromo(database, now = new Date()) {
     percentage: promo.percentage,
     targetType: promo.target_type,
     targetLabel: promo.target_type === "product"
-      ? productById.get(promo.target_value)?.name ?? promo.target_value
+      ? getProductById(promo.target_value)?.name ?? promo.target_value
       : promo.target_value ?? "",
     amountPaise: promo.amount_paise,
     minimumSubtotalPaise: promo.minimum_subtotal_paise,

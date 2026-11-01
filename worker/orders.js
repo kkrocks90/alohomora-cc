@@ -1,8 +1,7 @@
-import products from "../src/data/products.json" with { type: "json" };
+import { getProductByIdAny, getProducts } from "./catalogue.js";
 import { getFulfillmentMethod } from "./delivery.js";
 import { preparePromoRedemption } from "./promos.js";
 
-const productById = new Map(products.map((product) => [product.id, product]));
 const MAX_QUANTITY = 20;
 
 function requireNoteText(notes, field, maximum) {
@@ -66,7 +65,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise, pend
   } catch {
     throw new Error("The paid order items could not be read.");
   }
-  if (!Array.isArray(requestedItems) || requestedItems.length === 0 || requestedItems.length > products.length) {
+  if (!Array.isArray(requestedItems) || requestedItems.length === 0 || requestedItems.length > getProducts().length) {
     throw new Error("The paid order does not contain a valid product list.");
   }
 
@@ -87,7 +86,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise, pend
     ) {
       throw new Error("The paid order contains an invalid product, quantity, flavour, or wrapper.");
     }
-    const product = productById.get(item[0]);
+    const product = getProductByIdAny(item[0]);
     if (!product) throw new Error("The paid order contains an unknown product.");
     const legacyOptions = item.length === 3;
     const flavour = legacyOptions ? "" : item[3];
