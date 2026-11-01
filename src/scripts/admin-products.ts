@@ -206,7 +206,6 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
     }
   }
 
-  addPhoto.addEventListener("click", () => photoInput.click());
   photoInput.addEventListener("change", async () => {
     const files = Array.from(photoInput.files ?? []).slice(0, MAX_IMAGES - images.length);
     photoInput.value = "";

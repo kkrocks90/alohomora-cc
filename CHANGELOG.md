@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.25.2
+
+- Fixed the admin dashboard hanging on "Opening dashboard..." (leftover add-photo handler removed in the product form redesign).
+
 ## 1.25.1
 
 - Admin order cards: items are now a tidy list (name and extras on the left, quantity on the right) directly under the delivery details, with the status controls pinned to the bottom so side-by-side cards line up.
