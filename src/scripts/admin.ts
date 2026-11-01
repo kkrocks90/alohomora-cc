@@ -883,20 +883,25 @@ if (root) {
       if (order.paymentId) appendText(details, "span", `Razorpay payment: ${order.paymentId}`);
       appendText(details, "span", order.customerPhone);
       if (order.customerEmail) appendText(details, "span", order.customerEmail);
-      appendText(details, "span", formatDeliveryAddress(order));
-      appendText(details, "span", order.deliveryMethod);
+      appendText(details, "span", formatDeliveryAddress(order), "admin-order-address");
+      appendText(details, "span", order.deliveryMethod, "admin-order-delivery");
       if (order.eventDate) appendText(details, "span", `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
       for (const answer of order.customFields ?? []) appendText(details, "span", `${answer.label}: ${answer.value}`);
       const items = document.createElement("ul");
       items.className = "admin-order-items-list";
+      items.dataset.count = String(order.items.length);
       order.items.forEach((item) => {
         const line = document.createElement("li");
-        line.textContent = [
-          `${item.name} × ${item.quantity}`,
+        const info = document.createElement("div");
+        appendText(info, "span", item.name, "admin-order-item-name");
+        const extras = [
           item.flavour,
           item.wrapper,
           ...(item.custom ?? []).map((answer) => `${answer.label}: ${answer.value}`),
-        ].filter(Boolean).join(" · ");
+        ].filter(Boolean).join(" \u00b7 ");
+        if (extras) appendText(info, "span", extras, "admin-order-item-meta");
+        line.append(info);
+        appendText(line, "strong", `\u00d7 ${item.quantity}`, "admin-order-item-qty");
         items.append(line);
       });
 

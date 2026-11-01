@@ -267,28 +267,35 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <h2 id="admin-product-form-title">Add a product</h2>
             </div>
           </div>
-          <p class="admin-form-hint">Each product can have up to 3 photos. The main photo is shown on the shop pages; customers can flip through all photos on the product page.</p>
-          <form class="admin-promo-form admin-product-form" id="admin-product-form">
-            <label>Product name<input name="name" maxlength="120" required /></label>
-            <label>Description<textarea name="description" rows="3" maxlength="500" required></textarea></label>
-            <div class="admin-order-inline-fields">
-              <label>Price (?)<input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" required /></label>
-              <label>Pack size<input name="packSize" maxlength="60" placeholder="Box of 9" required /></label>
-            </div>
-            <label>Category<input name="tag" maxlength="60" list="admin-product-categories" required /></label>
-            <datalist id="admin-product-categories"></datalist>
-            <label>Also show in (optional, comma separated)<input name="extraTags" /></label>
-            <label>Flavours (optional, one per line)<textarea name="flavours" rows="3"></textarea></label>
-            <fieldset class="admin-product-photos-field">
-              <legend>Photos (up to 3)</legend>
+          <form class="admin-product-form" id="admin-product-form">
+            <section class="apf-card apf-photos" aria-labelledby="apf-photos-title">
+              <h3 id="apf-photos-title">Photos <small>Up to 3 &middot; the first is the main photo</small></h3>
               <div class="admin-product-photos" id="admin-product-photos"></div>
               <input id="admin-product-photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden />
-              <button class="button button-secondary" id="admin-product-add-photo" type="button">Add main photo</button>
-            </fieldset>
-            <label class="admin-field-check"><input name="featured" type="checkbox" /> Feature on the home page</label>
-            <label class="admin-field-check"><input name="customizable" type="checkbox" checked /> Offers a personalised wrapper</label>
-            <label class="admin-field-check"><input name="active" type="checkbox" checked /> Visible to customers</label>
-            <div class="admin-form-actions">
+              <p class="admin-form-hint">Shop and home pages show the main photo. Customers can flip through all photos on the product page.</p>
+            </section>
+            <section class="apf-card" aria-labelledby="apf-details-title">
+              <h3 id="apf-details-title">Details</h3>
+              <label>Product name<input name="name" maxlength="120" required placeholder="Dark Chocolate Truffles" /></label>
+              <label>Description<textarea name="description" rows="3" maxlength="500" required placeholder="What makes this treat special"></textarea></label>
+              <div class="apf-row">
+                <label>Price<span class="apf-money"><span aria-hidden="true">&#8377;</span><input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" required /></span></label>
+                <label>Pack size<input name="packSize" maxlength="60" placeholder="Box of 9" required /></label>
+              </div>
+              <label>Category<input name="tag" maxlength="60" list="admin-product-categories" required placeholder="Choose or type a new one" /></label>
+              <datalist id="admin-product-categories"></datalist>
+            </section>
+            <section class="apf-card" aria-labelledby="apf-options-title">
+              <h3 id="apf-options-title">Options</h3>
+              <label>Flavours <small>one per line, optional</small><textarea name="flavours" rows="4" placeholder="Dark Chocolate&#10;Almonds"></textarea></label>
+              <label>Also show in <small>other categories, comma separated</small><input name="extraTags" /></label>
+              <div class="apf-toggles">
+                <label class="apf-toggle"><input name="active" type="checkbox" checked /><span><strong>Visible to customers</strong><small>Turn off to hide it from the shop</small></span></label>
+                <label class="apf-toggle"><input name="featured" type="checkbox" /><span><strong>Feature on home page</strong><small>Shown in the featured slider</small></span></label>
+                <label class="apf-toggle"><input name="customizable" type="checkbox" checked /><span><strong>Personalised wrapper</strong><small>Customers can customise the wrapper</small></span></label>
+              </div>
+            </section>
+            <div class="apf-actions">
               <button class="button button-primary" id="admin-product-submit" type="submit">Add product</button>
               <button class="button button-secondary" id="admin-product-cancel" type="button" hidden>Cancel edit</button>
             </div>

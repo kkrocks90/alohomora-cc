@@ -63,7 +63,6 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
   const heading = required<HTMLElement>(root, "#admin-product-form-title");
   const photos = required<HTMLElement>(root, "#admin-product-photos");
   const photoInput = required<HTMLInputElement>(root, "#admin-product-photo-input");
-  const addPhoto = required<HTMLButtonElement>(root, "#admin-product-add-photo");
   const categoryList = required<HTMLDataListElement>(root, "#admin-product-categories");
   const submit = required<HTMLButtonElement>(root, "#admin-product-submit");
   const cancel = required<HTMLButtonElement>(root, "#admin-product-cancel");
@@ -81,28 +80,46 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
 
   function renderPhotos() {
     photos.replaceChildren();
-    images.forEach((url, index) => {
+    for (let index = 0; index < MAX_IMAGES; index++) {
+      const url = images[index];
+      if (url === undefined) {
+        const slot = document.createElement("button");
+        slot.type = "button";
+        slot.className = "admin-photo-slot";
+        slot.disabled = uploading || index > images.length;
+        const busy = uploading && index === images.length;
+        const plus = document.createElement("span");
+        plus.setAttribute("aria-hidden", "true");
+        plus.textContent = busy ? "\u2026" : "+";
+        const label = document.createElement("small");
+        label.textContent = busy ? "Uploading" : index === 0 ? "Add main photo" : "Add photo";
+        slot.append(plus, label);
+        slot.addEventListener("click", () => photoInput.click());
+        photos.append(slot);
+        continue;
+      }
       const tile = document.createElement("figure");
       tile.className = "admin-photo-tile";
       if (/^https?:\/\//.test(url)) {
         const img = document.createElement("img");
         img.src = url;
         img.alt = `Product photo ${index + 1}`;
-        img.loading = "lazy";
         tile.append(img);
       } else {
         const missing = document.createElement("span");
         missing.textContent = url;
         tile.append(missing);
       }
+      if (index === 0) {
+        const badge = document.createElement("span");
+        badge.className = "admin-photo-badge";
+        badge.textContent = "Main";
+        tile.append(badge);
+      }
       const caption = document.createElement("figcaption");
-      const label = document.createElement("strong");
-      label.textContent = index === 0 ? "Main photo" : `Photo ${index + 1}`;
-      caption.append(label);
       if (index > 0) {
         const main = document.createElement("button");
         main.type = "button";
-        main.className = "account-text-button";
         main.textContent = "Make main";
         main.addEventListener("click", () => {
           images = [url, ...images.filter((_, imageIndex) => imageIndex !== index)];
@@ -112,7 +129,6 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
       }
       const remove = document.createElement("button");
       remove.type = "button";
-      remove.className = "account-text-button";
       remove.textContent = "Remove";
       remove.addEventListener("click", () => {
         images = images.filter((_, imageIndex) => imageIndex !== index);
@@ -121,10 +137,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
       caption.append(remove);
       tile.append(caption);
       photos.append(tile);
-    });
-    addPhoto.hidden = images.length >= MAX_IMAGES;
-    addPhoto.disabled = uploading;
-    addPhoto.textContent = uploading ? "Uploading…" : images.length === 0 ? "Add main photo" : "Add another photo";
+    }
   }
 
   function resetForm() {
