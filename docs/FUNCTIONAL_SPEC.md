@@ -74,6 +74,10 @@ Customer-facing number `CC-YYMMDD-XXXXX`. The Razorpay order ID is stored separa
 - Order detail (`/order/?id=`): items, totals, delivery, progress tracker, invoice download (print to PDF). The admin also sees payment references and can change status here.
 - Order statuses: received, confirmed, preparing, ready, out for delivery, delivered, cancelled.
 
+### 3.x Corporate orders (/corporate)
+
+Static page with offerings, a client logo grid (with a note that clients were served directly and through event management partners), and an enquiry form. The form needs no backend: it opens WhatsApp (+91 95008 68468) or the email app with the details prefilled. Linked from header, menu and footer.
+
 ## 4. Accounts
 
 - Sign-in by emailed one-time code (Resend). Codes expire after 10 minutes; resend is rate-limited to once per 60 s.

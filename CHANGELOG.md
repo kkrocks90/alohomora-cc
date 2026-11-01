@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.27.0
+
+- Added a Corporate orders page (/corporate) with offerings, client logos (served directly and through event management partners), and a requirements form that sends a prefilled WhatsApp message or email. Linked from the header, menu and footer.
+
 ## 1.26.1
 
 - Admin: the Create manual order, Customer details, Promo code and Custom field forms now use the same sectioned card design as the product form (grouped sections, consistent inputs, dark total bar, cleaner item rows).

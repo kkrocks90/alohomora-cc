@@ -1,0 +1,182 @@
+---
+import { Image } from "astro:assets";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import pinkRibbon from "../assets/clients/pink-ribbon.jpg";
+import sbi from "../assets/clients/sbi.png";
+import hogarth from "../assets/clients/hogarth.webp";
+import zeeTamil from "../assets/clients/zee-tamil.png";
+import aswad from "../assets/clients/aswad.jpg";
+import suitLounge from "../assets/clients/suit-lounge.png";
+import ascott from "../assets/clients/ascott.webp";
+
+const base = import.meta.env.BASE_URL;
+const clients = [
+  { name: "State Bank of India", image: sbi },
+  { name: "The Ascott Limited", image: ascott },
+  { name: "Zee Tamil", image: zeeTamil },
+  { name: "Hogarth", image: hogarth },
+  { name: "Aswad Gold & Diamond", image: aswad },
+  { name: "Suit Lounge", image: suitLounge },
+  { name: "Pink Ribbon Shop", image: pinkRibbon },
+];
+const offerings = [
+  {
+    title: "Corporate gifting",
+    text: "Thoughtful handmade boxes for clients, partners and teams, packed with care and ready to present.",
+  },
+  {
+    title: "Festive hampers",
+    text: "Diwali, year-end and seasonal hampers in the quantities your company needs.",
+  },
+  {
+    title: "Events & launches",
+    text: "Favours and welcome treats for conferences, store openings, weddings and celebrations.",
+  },
+  {
+    title: "Personalised wrappers",
+    text: "Add a custom wrapper or message so every box feels like it came from you.",
+  },
+];
+const steps = [
+  ["Tell us what you need", "Share the occasion, quantity, budget and date."],
+  ["We suggest and quote", "We recommend flavours and packaging, then send a clear quote."],
+  ["We make it by hand", "Your order is prepared in small batches, with samples on request."],
+  ["Delivered on time", "We pack and arrange delivery to one address or many."],
+];
+---
+
+<SiteLayout
+  title="Corporate orders — Chocolate Circle"
+  description="Handmade chocolate gifting for companies, events and celebrations. Bulk orders, custom wrappers and delivery across India from Chennai."
+>
+  <main class="corporate-page">
+    <section class="corporate-hero">
+      <p class="eyebrow">Corporate orders</p>
+      <h1>Handmade chocolates for <em>your business</em></h1>
+      <p class="corporate-lead">
+        From client gifts to festive hampers and event favours, we make handmade chocolates in the
+        quantities you need, wrapped the way you want.
+      </p>
+      <div class="corporate-cta">
+        <a class="button button-primary" href="#enquiry">Send an enquiry</a>
+        <a
+          class="button button-secondary"
+          href="https://wa.me/919500868468?text=Hi%20Chocolate%20Circle%2C%20I%27d%20like%20to%20discuss%20a%20corporate%20order."
+          target="_blank"
+          rel="noopener"
+        >WhatsApp us</a>
+      </div>
+    </section>
+
+    <section class="corporate-section" aria-labelledby="corp-offer-title">
+      <h2 id="corp-offer-title">What we can do for you</h2>
+      <div class="corporate-grid">
+        {offerings.map((item) => (
+          <article class="corporate-card">
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="corporate-section corporate-clients" aria-labelledby="corp-clients-title">
+      <h2 id="corp-clients-title">Brands we have served</h2>
+      <ul class="corporate-logos">
+        {clients.map((client) => (
+          <li>
+            <Image src={client.image} alt={client.name} width={220} loading="lazy" />
+          </li>
+        ))}
+      </ul>
+      <p class="corporate-note">Served directly and through event management partners.</p>
+    </section>
+
+    <section class="corporate-section" aria-labelledby="corp-how-title">
+      <h2 id="corp-how-title">How it works</h2>
+      <ol class="corporate-steps">
+        {steps.map(([title, text]) => (
+          <li>
+            <strong>{title}</strong>
+            <span>{text}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="corporate-section corporate-enquiry" id="enquiry" aria-labelledby="corp-enquiry-title">
+      <div class="corporate-enquiry-intro">
+        <h2 id="corp-enquiry-title">Tell us your requirements</h2>
+        <p>
+          Share a few details and we will get back to you with options and a quote. Please allow at
+          least 3 to 4 days for preparation, and more for larger orders.
+        </p>
+        <p>
+          Prefer to talk? Reach us at
+          <a href="mailto:alohomora.chocolatecircle@gmail.com">alohomora.chocolatecircle@gmail.com</a>
+          or on <a href="https://wa.me/919500868468">WhatsApp at +91 95008 68468</a>.
+        </p>
+      </div>
+      <form class="corporate-form" id="corporate-form">
+        <label>Your name<input name="name" autocomplete="name" maxlength="80" required /></label>
+        <label>Company<input name="company" autocomplete="organization" maxlength="120" required /></label>
+        <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
+        <label>Email<input name="email" type="email" autocomplete="email" maxlength="120" /></label>
+        <label>Occasion<select name="occasion" required>
+          <option value="Corporate gifting">Corporate gifting</option>
+          <option value="Festive hampers">Festive hampers</option>
+          <option value="Event or launch">Event or launch</option>
+          <option value="Wedding or celebration">Wedding or celebration</option>
+          <option value="Something else">Something else</option>
+        </select></label>
+        <label>Approximate quantity<input name="quantity" inputmode="numeric" maxlength="40" placeholder="e.g. 100 boxes" required /></label>
+        <label>Needed by (optional)<input name="date" type="date" /></label>
+        <label>Budget per box (optional)<input name="budget" maxlength="40" placeholder="e.g. Rs. 500" /></label>
+        <label class="corporate-wide">Requirements<textarea name="message" rows="4" maxlength="800" placeholder="Flavours, packaging, branding, delivery locations..."></textarea></label>
+        <div class="corporate-wide corporate-form-actions">
+          <button class="button button-primary" type="submit">Send on WhatsApp</button>
+          <button class="button button-secondary" type="button" id="corporate-email">Send by email</button>
+        </div>
+        <p class="corporate-form-hint corporate-wide">
+          This opens WhatsApp or your email app with your details filled in. Nothing is stored on this site.
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>("#corporate-form");
+    const emailButton = document.querySelector<HTMLButtonElement>("#corporate-email");
+
+    function buildMessage(data: FormData) {
+      const value = (key: string) => String(data.get(key) ?? "").trim();
+      const lines = [
+        "Corporate order enquiry",
+        `Name: ${value("name")}`,
+        `Company: ${value("company")}`,
+        `Phone: ${value("phone")}`,
+        value("email") && `Email: ${value("email")}`,
+        `Occasion: ${value("occasion")}`,
+        `Quantity: ${value("quantity")}`,
+        value("date") && `Needed by: ${value("date")}`,
+        value("budget") && `Budget per box: ${value("budget")}`,
+        value("message") && `Requirements: ${value("message")}`,
+      ];
+      return lines.filter(Boolean).join("\n");
+    }
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const text = encodeURIComponent(buildMessage(new FormData(form)));
+      window.open(`https://wa.me/919500868468?text=${text}`, "_blank", "noopener");
+    });
+
+    emailButton?.addEventListener("click", () => {
+      if (!form || !form.reportValidity()) return;
+      const body = encodeURIComponent(buildMessage(new FormData(form)));
+      const subject = encodeURIComponent("Corporate order enquiry");
+      window.location.href = `mailto:alohomora.chocolatecircle@gmail.com?subject=${subject}&body=${body}`;
+    });
+  </script>
+</SiteLayout>

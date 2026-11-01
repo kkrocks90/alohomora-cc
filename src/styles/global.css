@@ -7298,3 +7298,42 @@ main .store-heading > p {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Corporate orders page */
+.corporate-page { max-width: 1120px; margin: 0 auto; padding: 48px 20px 80px; }
+.corporate-hero { padding: 40px 0 28px; text-align: center; }
+.corporate-hero h1 { margin: 8px 0 14px; font-size: clamp(34px, 6vw, 56px); line-height: 1.08; }
+.corporate-hero h1 em { font-style: italic; }
+.corporate-lead { max-width: 640px; margin: 0 auto 24px; color: #5d4639; font-size: 18px; line-height: 1.6; }
+.corporate-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.corporate-section { margin-top: 56px; }
+.corporate-section h2 { margin: 0 0 20px; text-align: center; font-size: clamp(26px, 4vw, 34px); }
+.corporate-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.corporate-card { padding: 22px; border: 1px solid #e8ded3; border-radius: 16px; background: #fff; }
+.corporate-card h3 { margin: 0 0 8px; font-size: 18px; }
+.corporate-card p { margin: 0; color: #6b5549; font-size: 14px; line-height: 1.6; }
+.corporate-clients { padding: 36px 24px 28px; border-radius: 20px; background: #faf6f0; }
+.corporate-logos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.corporate-logos li { display: grid; place-items: center; height: 110px; padding: 14px; border-radius: 12px; background: #fff; }
+.corporate-logos img { width: auto; max-width: 100%; height: auto; max-height: 82px; object-fit: contain; }
+.corporate-note { margin: 18px 0 0; color: #8a7565; font-size: 12px; text-align: center; }
+.corporate-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.corporate-steps li { display: grid; gap: 6px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #e8ded3; counter-increment: step; }
+.corporate-steps li::before { content: counter(step); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #3b2418; color: #fff; font-size: 14px; font-weight: 700; }
+.corporate-steps span { color: #6b5549; font-size: 14px; line-height: 1.5; }
+.corporate-enquiry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; align-items: start; padding: 32px; border-radius: 20px; background: #3b2418; color: #fff; }
+.corporate-enquiry h2 { text-align: left; }
+.corporate-enquiry-intro p { color: #e9dcd0; line-height: 1.7; }
+.corporate-enquiry a:not(.button) { color: #fff; text-decoration: underline; }
+.corporate-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 22px; border-radius: 16px; background: #fff; color: #3b2418; }
+.corporate-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+.corporate-form input, .corporate-form select, .corporate-form textarea { width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid #d9cabb; border-radius: 9px; background: #fffdfa; color: inherit; font: inherit; font-weight: 400; }
+.corporate-wide { grid-column: 1 / -1; }
+.corporate-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.corporate-form-hint { margin: 0; color: #8a7565; font-size: 12px; }
+@media (max-width: 900px) {
+  .corporate-grid, .corporate-steps, .corporate-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .corporate-enquiry { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+}
+@media (max-width: 560px) {
+  .corporate-form { grid-template-columns: minmax(0, 1fr); }
+}
