@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import ProductCard from "../components/ProductCard.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
+import ThemeHeroBanner from "../components/ThemeHeroBanner.astro";
 import heroImage from "../assets/hero-chocolates.svg";
 import products from "../data/products.json";
 import { resolveImage } from "../lib/product-images";
@@ -47,6 +48,7 @@ const orgLd = {
       </span>
       <button class="promo-banner-code" type="button" data-promo-copy>Use code <strong data-promo-code></strong></button>
     </div>
+    <ThemeHeroBanner />
     <section class="hero-section" id="top">
       <div class="hero-copy">
         <p class="eyebrow"><span class="eyebrow-dot"></span> Little batches, lots of love</p>

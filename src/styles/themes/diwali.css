@@ -190,3 +190,42 @@ html[data-theme="diwali"] .product-name-row :is(h2, h3) {
   html[data-theme="diwali"] .theme-banner::after { display: none; }
   html[data-theme="diwali"] .site-header::after { height: 14px; background-size: 22px 14px, 22px 14px, 100% 1px; }
 }
+
+/* Hero banner (ThemeHeroBanner.astro) */
+html[data-theme="diwali"] .theme-hero-banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1180px;
+  margin: 1.25rem auto 0;
+  padding: 1.5rem 2rem;
+  border-radius: 24px;
+  border: 2px solid var(--diwali-gold, #d9a441);
+  color: #fff3d6;
+  text-align: center;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(246, 210, 122, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(232, 116, 42, 0.3), transparent 45%),
+    linear-gradient(135deg, #5a1220, #7a1d2c 55%, #8f2a1a);
+  overflow: hidden;
+}
+html[data-theme="diwali"] .theme-hero-lantern { width: 44px; height: auto; align-self: start; margin-top: -1.5rem; animation: diwali-sway 4s ease-in-out infinite; transform-origin: top center; }
+html[data-theme="diwali"] .theme-hero-lantern-right { grid-column: 4; animation-delay: -2s; }
+html[data-theme="diwali"] .theme-hero-diya { grid-column: 3; width: 88px; filter: drop-shadow(0 0 14px rgba(255, 209, 102, 0.7)); }
+html[data-theme="diwali"] .theme-hero-copy { grid-column: 2; grid-row: 1; }
+html[data-theme="diwali"] .theme-hero-kicker { margin: 0; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.75rem; color: #f6d27a; }
+html[data-theme="diwali"] .theme-hero-copy h2 { margin: 0.2rem 0 0.4rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: #ffd166; }
+html[data-theme="diwali"] .theme-hero-copy p:not(.theme-hero-kicker) { margin: 0 auto 1rem; max-width: 46ch; }
+html[data-theme="diwali"] .theme-hero-cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; background: #ffd166; color: #5a1220; font-weight: 700; text-decoration: none; }
+@keyframes diwali-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { html[data-theme="diwali"] .theme-hero-lantern { animation: none; } }
+@media (max-width: 620px) {
+  html[data-theme="diwali"] .theme-hero-banner { grid-template-columns: 1fr; margin: 1rem 1rem 0; padding: 1.5rem 1.25rem; }
+  html[data-theme="diwali"] .theme-hero-lantern { position: absolute; top: 0; width: 30px; margin: 0; }
+  html[data-theme="diwali"] .theme-hero-lantern-left { left: 10px; }
+  html[data-theme="diwali"] .theme-hero-lantern-right { right: 10px; }
+  html[data-theme="diwali"] .theme-hero-diya { display: none; }
+  html[data-theme="diwali"] .theme-hero-copy { grid-column: 1; padding: 0 1.5rem; }
+}

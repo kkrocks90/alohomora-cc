@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.33.0
+
+- Added a Diwali hero banner (maroon and gold panel with swaying lanterns, diya and a "Shop Diwali gifts" button) on the home page. It is part of the theme config (`heroBanner` in `src/config/theme.ts`), so it disappears when the theme is switched to `default`.
+
 ## 1.32.0
 
 - Added a theme system and a Diwali theme (maroon and gold palette, ribbon banner, marigold garland under the header, twinkling hero lights) for desktop and mobile. Switch with the GitHub variable SITE_THEME (`default` restores the base look). Admin pages are unchanged.
