@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.30.2
+
+- Buttons are now pill-shaped on mobile too, matching desktop.
+
 ## 1.30.1
 
 - Mobile polish for the redesigned admin forms (add product, order, customer, promo, custom field): tighter cards, 16px tap-friendly inputs, stacked order lines, sticky full-width action bar.

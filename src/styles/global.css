@@ -7400,3 +7400,6 @@ main .store-heading > p {
   .apf-card label.admin-field-check { padding: 12px; }
   .apf-card label.apf-toggle { padding: 10px 12px; }
 }
+/* Pill buttons on every screen size, matching desktop */
+.button { border-radius: 999px; }
+.button-primary { box-shadow: 0 8px 20px rgb(98 66 52 / 28%); }
