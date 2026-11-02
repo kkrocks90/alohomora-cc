@@ -7380,3 +7380,23 @@ main .store-heading > p {
   .slider-arrow { display: none; }
 }
 .corporate-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* Admin forms: mobile polish */
+@media (max-width: 620px) {
+  .admin-page { padding-left: 12px; padding-right: 12px; }
+  .apf-form { gap: 12px; }
+  .apf-card, .apf-card.admin-order-items, .apf-card.admin-order-payment { padding: 14px 12px; border-radius: 12px; }
+  .apf-card input:not([type="checkbox"]), .apf-card textarea, .apf-card select,
+  .apf-card .admin-order-line input:not([type="checkbox"]), .apf-card .admin-order-line select { font-size: 16px; min-height: 46px; }
+  .apf-card label { font-size: 13px; }
+  .apf-card .admin-order-line { grid-template-columns: minmax(0, 1fr) 90px; gap: 10px; padding: 12px; }
+  .apf-card .admin-order-line > :first-child, .apf-card .admin-order-line > .admin-line-options { grid-column: 1 / -1; }
+  .apf-card .admin-order-line .admin-remove-line { grid-column: 1 / -1; justify-self: end; }
+  .apf-card .admin-line-options { grid-template-columns: minmax(0, 1fr); }
+  .admin-product-photos { gap: 8px; }
+  .apf-actions { position: sticky; bottom: 0; z-index: 5; flex-direction: column; margin: 0 -12px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgba(255, 253, 250, .96); border-top: 1px solid #e8ded3; backdrop-filter: blur(6px); }
+  .apf-actions .button, .apf-actions button { width: 100%; min-height: 46px; justify-content: center; }
+  .admin-order-total { padding: 12px 14px; font-size: 18px; }
+  .apf-card label.admin-field-check { padding: 12px; }
+  .apf-card label.apf-toggle { padding: 10px 12px; }
+}
