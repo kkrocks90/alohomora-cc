@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.34.0
+
+- Themes can now swap the home hero image (`heroImage` in `src/config/theme.ts`). Diwali uses a new illustration with a lit diya, marigold and a warm saffron background; the base theme keeps the original.
+
 ## 1.33.0
 
 - Added a Diwali hero banner (maroon and gold panel with swaying lanterns, diya and a "Shop Diwali gifts" button) on the home page. It is part of the theme config (`heroBanner` in `src/config/theme.ts`), so it disappears when the theme is switched to `default`.

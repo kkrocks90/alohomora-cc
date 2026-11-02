@@ -5,6 +5,7 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 import ThemeHeroBanner from "../components/ThemeHeroBanner.astro";
 import heroImage from "../assets/hero-chocolates.svg";
 import products from "../data/products.json";
+import { theme } from "../config/theme";
 import { resolveImage } from "../lib/product-images";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
@@ -71,8 +72,8 @@ const orgLd = {
       <div class="hero-art">
         <div class="hero-art-frame">
           <Image
-            src={heroImage}
-            alt="Handmade chocolate bar surrounded by cacao and pistachio"
+            src={theme.heroImage?.src ?? heroImage}
+            alt={theme.heroImage?.alt ?? "Handmade chocolate bar surrounded by cacao and pistachio"}
             width={880}
             height={760}
             widths={[440, 660, 880]}

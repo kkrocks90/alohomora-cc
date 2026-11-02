@@ -7,6 +7,8 @@
 // SITE_THEME (Settings > Secrets and variables > Actions > Variables) to a theme
 // id, or leave it empty to use FALLBACK_THEME, then run the Pages deploy.
 
+import diwaliHero from "../assets/hero-chocolates-diwali.svg";
+
 export interface ThemeBanner {
   text: string;
   href: string;
@@ -26,6 +28,7 @@ export interface Theme {
   themeColor: string;
   banner?: ThemeBanner;
   heroBanner?: ThemeHeroBanner;
+  heroImage?: { src: ImageMetadata; alt: string };
 }
 
 export const THEMES: Record<string, Theme> = {
@@ -41,6 +44,10 @@ export const THEMES: Record<string, Theme> = {
     banner: {
       text: "Happy Diwali! Gift boxes and corporate hampers are open for orders.",
       href: "store/",
+    },
+    heroImage: {
+      src: diwaliHero,
+      alt: "Handmade chocolate bar with a lit diya and marigold for Diwali",
     },
     heroBanner: {
       kicker: "Festival of lights",
