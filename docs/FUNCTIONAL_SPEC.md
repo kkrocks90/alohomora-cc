@@ -76,7 +76,7 @@ Customer-facing number `CC-YYMMDD-XXXXX`. The Razorpay order ID is stored separa
 
 ### 3.x Corporate orders (/corporate)
 
-Static page with offerings, a client logo grid (with a note that clients were served directly and through event management partners), and an enquiry form. The form needs no backend: it opens WhatsApp (+91 95008 68468) or the email app with the details prefilled. Linked from header, menu and footer.
+Enquiries POST to /corporate/enquiry on the Worker, which emails ADMIN_EMAIL via Resend (reply-to = enquirer, honeypot field "website"); a WhatsApp button is the fallback. Static page with offerings, a client logo grid (with a note that clients were served directly and through event management partners), and an enquiry form. The form needs no backend: it opens WhatsApp (+91 95008 68468) or the email app with the details prefilled. Linked from header, menu and footer.
 
 ## 4. Accounts
 

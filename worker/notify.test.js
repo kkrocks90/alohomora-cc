@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { sendOrderEmails } from "./notify.js";
+import { parseCorporateEnquiry, sendCorporateEnquiry, sendOrderEmails } from "./notify.js";
 
 const order = {
   orderId: "CC-1",
@@ -41,4 +41,21 @@ test("does nothing when email is not configured", async () => {
   } finally {
     globalThis.fetch = original;
   }
+});
+
+test("corporate enquiry is validated and emailed with a clear subject", async () => {
+  assert.ok(parseCorporateEnquiry({ website: "spam" }).spam);
+  assert.ok(parseCorporateEnquiry({ name: "A" }).error);
+  const { enquiry } = parseCorporateEnquiry({ name: "Ravi", company: "Acme", phone: "9876543210", quantity: "100 boxes", occasion: "Festive hampers", email: "r@acme.com", message: "Hi" });
+  const sent = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (_url, init) => { sent.push(JSON.parse(init.body)); return new Response("{}", { status: 200 }); };
+  try {
+    await sendCorporateEnquiry({ RESEND_API_KEY: "k", LOGIN_FROM_EMAIL: "a@b.com", ADMIN_EMAIL: "owner@b.com" }, enquiry);
+  } finally {
+    globalThis.fetch = original;
+  }
+  assert.equal(sent[0].subject, "Corporate enquiry: Acme - 100 boxes (Festive hampers)");
+  assert.equal(sent[0].reply_to, "r@acme.com");
+  assert.deepEqual(sent[0].to, ["owner@b.com"]);
 });

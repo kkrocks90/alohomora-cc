@@ -75,3 +75,69 @@ export async function sendOrderEmails(env, order) {
     });
   }
 }
+
+const OCCASIONS = ["Corporate gifting", "Festive hampers", "Event or launch", "Wedding or celebration", "Something else"];
+
+function clean(value, max) {
+  return typeof value === "string" ? value.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").trim().slice(0, max) : "";
+}
+
+export function parseCorporateEnquiry(body) {
+  if (clean(body?.website, 200)) return { spam: true };
+  const enquiry = {
+    name: clean(body?.name, 80),
+    company: clean(body?.company, 120),
+    phone: clean(body?.phone, 20),
+    email: clean(body?.email, 120),
+    occasion: OCCASIONS.includes(body?.occasion) ? body.occasion : "Something else",
+    quantity: clean(body?.quantity, 40),
+    date: /^\d{4}-\d{2}-\d{2}$/.test(body?.date ?? "") ? body.date : "",
+    budget: clean(body?.budget, 40),
+    message: clean(body?.message, 800),
+  };
+  if (!enquiry.name || !enquiry.company || !enquiry.quantity || !/^[0-9+()\-\s]{7,20}$/.test(enquiry.phone)) {
+    return { error: "Please fill in your name, company, phone and quantity." };
+  }
+  if (enquiry.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiry.email)) {
+    return { error: "Please enter a valid email address or leave it blank." };
+  }
+  return { enquiry };
+}
+
+// Throws on failure so the page can tell the visitor to use WhatsApp instead.
+export async function sendCorporateEnquiry(env, enquiry) {
+  if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL || typeof env.LOGIN_FROM_EMAIL !== "string" || !env.LOGIN_FROM_EMAIL.includes("@")) {
+    throw new Error("Email is not configured.");
+  }
+  const rows = [
+    ["Name", enquiry.name],
+    ["Company", enquiry.company],
+    ["Phone", enquiry.phone],
+    ["Email", enquiry.email || "-"],
+    ["Occasion", enquiry.occasion],
+    ["Quantity", enquiry.quantity],
+    ["Needed by", enquiry.date || "-"],
+    ["Budget per box", enquiry.budget || "-"],
+    ["Requirements", enquiry.message || "-"],
+  ];
+  const text = rows.map(([label, value]) => `${label}: ${value}`).join("\n");
+  const html = `<table cellpadding="6" style="border-collapse:collapse">${rows
+    .map(([label, value]) => `<tr><td style="vertical-align:top"><b>${escapeHtml(label)}</b></td><td style="white-space:pre-wrap">${escapeHtml(value)}</td></tr>`)
+    .join("")}</table>`;
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: env.LOGIN_FROM_EMAIL,
+      to: [env.ADMIN_EMAIL],
+      reply_to: enquiry.email || undefined,
+      subject: `Corporate enquiry: ${enquiry.company} - ${enquiry.quantity} (${enquiry.occasion})`.replace(/[\r\n]+/g, " "),
+      text,
+      html,
+    }),
+  });
+  if (!response.ok) {
+    console.error("The enquiry email provider returned status", response.status);
+    throw new Error("Could not send the enquiry.");
+  }
+}

@@ -10,6 +10,7 @@ import suitLounge from "../assets/clients/suit-lounge.png";
 import ascott from "../assets/clients/ascott.webp";
 
 const base = import.meta.env.BASE_URL;
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 const clients = [
   { name: "State Bank of India", image: sbi },
   { name: "The Ascott Limited", image: ascott },
@@ -123,7 +124,8 @@ const steps = [
           or on <a href="https://wa.me/919500868468">WhatsApp at +91 95008 68468</a>.
         </p>
       </div>
-      <form class="corporate-form" id="corporate-form">
+      <form class="corporate-form" id="corporate-form" data-checkout-api={checkoutApiUrl}>
+        <input class="corporate-trap" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label>Your name<input name="name" autocomplete="name" maxlength="80" required /></label>
         <label>Company<input name="company" autocomplete="organization" maxlength="120" required /></label>
         <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="20" required /></label>
@@ -140,11 +142,11 @@ const steps = [
         <label>Budget per box (optional)<input name="budget" maxlength="40" placeholder="e.g. Rs. 500" /></label>
         <label class="corporate-wide">Requirements<textarea name="message" rows="4" maxlength="800" placeholder="Flavours, packaging, branding, delivery locations..."></textarea></label>
         <div class="corporate-wide corporate-form-actions">
-          <button class="button button-primary" type="submit">Send on WhatsApp</button>
-          <button class="button button-secondary" type="button" id="corporate-email">Send by email</button>
+          <button class="button button-primary" type="submit" id="corporate-send">Send enquiry</button>
+          <button class="button button-secondary" type="button" id="corporate-whatsapp">Send on WhatsApp instead</button>
         </div>
-        <p class="corporate-form-hint corporate-wide">
-          This opens WhatsApp or your email app with your details filled in. Nothing is stored on this site.
+        <p class="corporate-form-hint corporate-wide" id="corporate-status" role="status">
+          We email your enquiry to the team and reply within a day. Prefer WhatsApp? Use the second button.
         </p>
       </form>
     </section>
@@ -230,7 +232,9 @@ const steps = [
     }
 
     const form = document.querySelector<HTMLFormElement>("#corporate-form");
-    const emailButton = document.querySelector<HTMLButtonElement>("#corporate-email");
+    const whatsappButton = document.querySelector<HTMLButtonElement>("#corporate-whatsapp");
+    const sendButton = document.querySelector<HTMLButtonElement>("#corporate-send");
+    const status = document.querySelector<HTMLElement>("#corporate-status");
 
     function buildMessage(data: FormData) {
       const value = (key: string) => String(data.get(key) ?? "").trim();
@@ -249,18 +253,41 @@ const steps = [
       return lines.filter(Boolean).join("\n");
     }
 
-    form?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
+    function openWhatsApp() {
+      if (!form || !form.reportValidity()) return;
       const text = encodeURIComponent(buildMessage(new FormData(form)));
       window.open(`https://wa.me/919500868468?text=${text}`, "_blank", "noopener");
+    }
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity() || !sendButton || !status) return;
+      const apiUrl = (form.dataset.checkoutApi ?? "").replace(/\/+$/, "");
+      if (!apiUrl) {
+        status.textContent = "Online enquiries are unavailable right now. Please use WhatsApp.";
+        return;
+      }
+      sendButton.disabled = true;
+      sendButton.textContent = "Sending...";
+      status.textContent = "";
+      try {
+        const response = await fetch(`${apiUrl}/corporate/enquiry`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "We could not send your enquiry. Please use WhatsApp.");
+        form.reset();
+        status.textContent = "Thank you! Your enquiry has been sent. We will get back to you soon.";
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : "We could not send your enquiry. Please use WhatsApp.";
+      } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = "Send enquiry";
+      }
     });
 
-    emailButton?.addEventListener("click", () => {
-      if (!form || !form.reportValidity()) return;
-      const body = encodeURIComponent(buildMessage(new FormData(form)));
-      const subject = encodeURIComponent("Corporate order enquiry");
-      window.location.href = `mailto:alohomora.chocolatecircle@gmail.com?subject=${subject}&body=${body}`;
-    });
+    whatsappButton?.addEventListener("click", openWhatsApp);
   </script>
 </SiteLayout>

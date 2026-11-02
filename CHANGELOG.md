@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.30.0
+
+- Corporate enquiry form now emails the shop directly (subject: "Corporate enquiry: <company> - <quantity> (<occasion>)", reply-to set to the enquirer). WhatsApp remains as a second button. Includes a spam honeypot.
+
 ## 1.29.0
 
 - Corporate page client logos are now an endless auto-scrolling slider: drag with the mouse, swipe on mobile, use the arrows or keyboard to move faster. Pauses on hover/touch; respects reduced motion.

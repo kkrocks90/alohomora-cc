@@ -1,4 +1,5 @@
 import { ensureCatalogue, getProductById, getProducts, publicCatalogue } from "./catalogue.js";
+import { parseCorporateEnquiry, sendCorporateEnquiry } from "./notify.js";
 import {
   createAdminPromo,
   createAdminCustomer,
@@ -732,6 +733,24 @@ export default {
       const response = jsonResponse(publicCatalogue(), 200, configuredOrigin);
       response.headers.set("Cache-Control", "public, max-age=30, s-maxage=30");
       return response;
+    }
+    if (request.method === "POST" && path === "/corporate/enquiry") {
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return errorResponse("Please check the form and try again.", 400, configuredOrigin);
+      }
+      const parsed = parseCorporateEnquiry(body);
+      if (parsed.spam) return jsonResponse({ sent: true }, 200, configuredOrigin);
+      if (parsed.error) return errorResponse(parsed.error, 400, configuredOrigin);
+      try {
+        await sendCorporateEnquiry(env, parsed.enquiry);
+        return jsonResponse({ sent: true }, 200, configuredOrigin);
+      } catch (error) {
+        console.error("Could not send a corporate enquiry.", error);
+        return errorResponse("We could not send your enquiry. Please use WhatsApp or email us directly.", 503, configuredOrigin);
+      }
     }
     if (request.method === "GET" && path === "/promos/featured") {
       if (!env.ORDERS_DB) return errorResponse("The promo service is not configured.", 503, configuredOrigin);

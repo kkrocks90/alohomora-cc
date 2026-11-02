@@ -7379,3 +7379,4 @@ main .store-heading > p {
   .corporate-slider .corporate-logos li { flex-basis: 140px; width: 140px; height: 88px; }
   .slider-arrow { display: none; }
 }
+.corporate-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
