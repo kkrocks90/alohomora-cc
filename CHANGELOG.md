@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.35.1
+
+- Diwali theme: added a small gap so the garland no longer overlaps the promo banner on mobile.
+
 ## 1.35.0
 
 - The Pages deploy workflow now has a theme selector (repo-setting, default, diwali) when run manually.
