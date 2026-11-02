@@ -7411,3 +7411,4 @@ img.wordmark-mark { display: block; width: 40px; height: 40px; border: 0; border
 img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contain; }
 /* Footer logo is white on the dark footer */
 .footer-wordmark img.wordmark-mark { filter: brightness(0) invert(1); }
+.admin-order-discount { display: grid; gap: 6px; max-width: 240px; margin: 0 0 14px; font-weight: 600; }

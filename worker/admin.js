@@ -607,10 +607,16 @@ async function parseManualOrderInput(body, env) {
         wrapper,
       });
     }
-    const amountPaise = items.reduce((sum, item) => sum + Math.round(item.unitPriceRupees * 100) * item.quantity, 0);
-    if (!Number.isSafeInteger(amountPaise) || amountPaise <= 0) {
+    const subtotalPaise = items.reduce((sum, item) => sum + Math.round(item.unitPriceRupees * 100) * item.quantity, 0);
+    if (!Number.isSafeInteger(subtotalPaise) || subtotalPaise <= 0) {
       return result(400, { error: "The order total is invalid." });
     }
+    const rawDiscount = body?.discountRupees;
+    const discountPaise = rawDiscount === undefined || rawDiscount === null || rawDiscount === "" ? 0 : Math.round(Number(rawDiscount) * 100);
+    if (!Number.isSafeInteger(discountPaise) || discountPaise < 0 || discountPaise >= subtotalPaise) {
+      return result(400, { error: "Enter a discount that is less than the product total." });
+    }
+    const amountPaise = subtotalPaise - discountPaise;
     const paymentState = body?.paymentStatus ?? "unpaid";
     let amountReceivedPaise = 0;
     if (paymentState === "paid") {
@@ -623,7 +629,7 @@ async function parseManualOrderInput(body, env) {
     } else if (paymentState !== "unpaid") {
       return result(400, { error: "Choose a valid payment status." });
     }
-    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, amountReceivedPaise };
+    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, amountReceivedPaise };
 }
 
 export async function createManualOrder(request, env) {
@@ -638,7 +644,7 @@ export async function createManualOrder(request, env) {
     if (access.error) return access.error;
     const parsed = await parseManualOrderInput(body, env);
     if (parsed.status) return parsed;
-    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, amountReceivedPaise } = parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, amountReceivedPaise } = parsed;
 
     const orderId = generateOrderId();
     const createdAt = new Date().toISOString();
@@ -650,7 +656,7 @@ export async function createManualOrder(request, env) {
           delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
           discount_paise, promo_code, currency,
           delivery_method, distance_km, policies_accepted, event_date, created_at, amount_received_paise
-        ) VALUES (?, NULL, ?, 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, '', 'INR', ?, 0, 'admin_manual_order', ?, ?, ?)`,
+        ) VALUES (?, NULL, ?, 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', 'INR', ?, 0, 'admin_manual_order', ?, ?, ?)`,
       )
       .bind(
         orderId,
@@ -665,7 +671,8 @@ export async function createManualOrder(request, env) {
         pincode,
         JSON.stringify(items),
         amountPaise,
-        amountPaise,
+        subtotalPaise,
+        discountPaise,
         deliveryMethod,
         eventDate,
         createdAt,
@@ -685,6 +692,7 @@ export async function createManualOrder(request, env) {
       eventDate,
       items,
       amountPaise,
+      discountPaise,
       amountReceivedPaise,
     });
     return result(201, {
@@ -719,7 +727,7 @@ export async function updateManualOrder(request, env) {
     }
     const parsed = await parseManualOrderInput(body, env);
     if (parsed.status) return parsed;
-    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, amountReceivedPaise } = parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, amountReceivedPaise } = parsed;
     const dueChanged = amountPaise - amountReceivedPaise !== existing.amount_paise - (existing.amount_received_paise ?? 0);
     const dropLink = dueChanged && existing.payment_link_id && existing.payment_status !== "paid";
     if (dropLink && env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET) {
@@ -737,7 +745,7 @@ export async function updateManualOrder(request, env) {
         `UPDATE orders SET
           customer_id = ?, customer_name = ?, customer_phone = ?, customer_email = ?,
           delivery_address = ?, city = ?, state = ?, pincode = ?, items_json = ?,
-          amount_paise = ?, product_subtotal_paise = ?, delivery_method = ?, event_date = ?,
+          amount_paise = ?, product_subtotal_paise = ?, discount_paise = ?, delivery_method = ?, event_date = ?,
           payment_status = ?, amount_received_paise = ?,
           payment_link_id = CASE WHEN ? THEN NULL ELSE payment_link_id END,
           payment_link_url = CASE WHEN ? THEN NULL ELSE payment_link_url END
@@ -754,7 +762,8 @@ export async function updateManualOrder(request, env) {
         pincode,
         JSON.stringify(items),
         amountPaise,
-        amountPaise,
+        subtotalPaise,
+        discountPaise,
         deliveryMethod,
         eventDate,
         amountReceivedPaise >= amountPaise ? "paid" : "unpaid",

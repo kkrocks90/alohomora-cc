@@ -38,6 +38,7 @@ async function send(env, message) {
 export async function sendOrderEmails(env, order) {
   const { items, payment, address } = summarise(order);
   const lines = items.map(itemLine);
+  if (Number(order.discountPaise) > 0) lines.push(`Discount: -${rupees(order.discountPaise)}`);
   const listHtml = `<ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>`;
   const total = rupees(order.amountPaise);
 

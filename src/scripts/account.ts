@@ -245,7 +245,7 @@ if (root) {
         typeof order.amountPaise === "number"
           ? `${order.paymentMethod === "promo" ? "Promo-covered" : "Paid"} ${formatPrice.format(order.amountPaise / 100)}`
           : "",
-        order.discountPaise ? `Promo ${order.promoCode ?? ""}: saved ${formatPrice.format(order.discountPaise / 100)}` : "",
+        order.discountPaise ? `${order.promoCode ? `Promo ${order.promoCode}` : "Discount"}: saved ${formatPrice.format(order.discountPaise / 100)}` : "",
         order.deliveryMethod ?? "",
         order.eventDate ? `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}` : "",
       ].filter(Boolean).join(" · ");

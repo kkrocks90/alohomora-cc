@@ -145,7 +145,7 @@ if (root) {
     };
     if (order.discountPaise > 0) {
       totals("Product subtotal", formatMoney(order.productSubtotalPaise));
-      totals(`Promo ${order.promoCode}`, `−${formatMoney(order.discountPaise)}`);
+      totals(order.promoCode ? `Promo ${order.promoCode}` : "Discount", `−${formatMoney(order.discountPaise)}`);
     }
     totals(order.paymentMethod === "promo" ? "Total due" : order.paymentStatus === "paid" ? "Paid" : "Total", formatMoney(order.amountPaise), true);
     container!.append(items);

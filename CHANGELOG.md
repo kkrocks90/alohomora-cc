@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.36.0
+
+- Admin manual orders can now have a discount (INR amount). It reduces the order total, shows in the invoice, order details, customer account and order emails, and is included when editing an order.
+- Diwali theme: more space between the garland and the promo banner on mobile.
+
 ## 1.35.1
 
 - Diwali theme: added a small gap so the garland no longer overlaps the promo banner on mobile.

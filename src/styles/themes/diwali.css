@@ -230,4 +230,4 @@ html[data-theme="diwali"] .theme-hero-cta { display: inline-block; padding: 0.7r
   html[data-theme="diwali"] .theme-hero-copy { grid-column: 1; padding: 0 1.5rem; }
 }
 /* Keep the garland clear of the promo banner */
-html[data-theme="diwali"] .promo-banner { margin-top: 12px; }
+html[data-theme="diwali"] .promo-banner { margin-top: 22px; }

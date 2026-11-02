@@ -189,8 +189,8 @@ export function renderInvoice(container: HTMLElement, order: OrderView, customer
 
   appendText(container, "p", `Product subtotal: ${formatMoney(order.productSubtotalPaise)}`, "invoice-total");
   if (order.discountPaise > 0) {
-    appendText(container, "p", `Promo ${order.promoCode}: −${formatMoney(order.discountPaise)}`, "invoice-note");
-    appendText(container, "p", `${order.paymentMethod === "promo" ? "Total due" : "Paid total"}: ${formatMoney(order.amountPaise)}`, "invoice-total");
+    appendText(container, "p", `${order.promoCode ? `Promo ${order.promoCode}` : "Discount"}: −${formatMoney(order.discountPaise)}`, "invoice-note");
+    appendText(container, "p", `${order.paymentMethod === "promo" ? "Total due" : order.paymentMethod === "manual" ? "Order total" : "Paid total"}: ${formatMoney(order.amountPaise)}`, "invoice-total");
   }
   appendText(
     container,
@@ -227,7 +227,7 @@ export function buildShareMessage(order: OrderView, storeUrl: string) {
     }),
     "",
     order.discountPaise > 0
-      ? `Total: ${formatMoney(order.amountPaise)} (promo ${order.promoCode} applied)`
+      ? `Total: ${formatMoney(order.amountPaise)} (${order.promoCode ? `promo ${order.promoCode}` : "discount"} applied)`
       : `Total: ${formatMoney(order.amountPaise)}`,
   ];
   if (order.eventDate) lines.push(`Event date: ${formatEventDate(order.eventDate, "long")}`);

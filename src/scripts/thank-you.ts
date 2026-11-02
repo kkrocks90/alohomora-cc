@@ -124,7 +124,7 @@ function renderOrder(order: OrderDetails) {
     orderContainer.append(subtotal);
     const discount = document.createElement("div");
     discount.className = "subtotal-row thank-you-total";
-    appendText(discount, "span", `Promo ${order.promoCode}`);
+    appendText(discount, "span", order.promoCode ? `Promo ${order.promoCode}` : "Discount");
     appendText(discount, "strong", `−${currency.format(order.discountPaise / 100)}`);
     orderContainer.append(discount);
   }
