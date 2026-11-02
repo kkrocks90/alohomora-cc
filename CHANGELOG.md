@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.31.2
+
+- Footer logo is now white so it is visible on the dark footer.
+
 ## 1.31.1
 
 - Home page "our story" section now shows the new brand logo instead of the ringed "C".
