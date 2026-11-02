@@ -7407,3 +7407,5 @@ main .store-heading > p {
 img.wordmark-mark { display: block; width: 40px; height: 40px; border: 0; border-radius: 0; object-fit: contain; }
 .footer-wordmark img.wordmark-mark { width: 36px; height: 36px; }
 @media (max-width: 620px) { img.wordmark-mark { width: 36px; height: 36px; } }
+/* Story section uses the brand logo image */
+img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contain; }

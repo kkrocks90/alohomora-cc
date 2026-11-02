@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.31.1
+
+- Home page "our story" section now shows the new brand logo instead of the ringed "C".
+
 ## 1.31.0
 
 - New brand logo (C in a circle with a cocoa pod) replaces the plain "c" mark in the site header, footer and admin header, plus the favicon, Apple touch icon and structured-data logo.
