@@ -30,7 +30,7 @@ test("sends owner and customer emails with escaped content", async () => {
   assert.deepEqual(sent[0].to, ["owner@b.com"]);
   assert.deepEqual(sent[1].to, ["asha@example.com"]);
   assert.match(sent[0].text, /Partially paid/);
-  assert.ok(!sent[0].html.includes("<b>"));
+  assert.ok(sent[0].html.includes("Asha &lt;b&gt;"));
 });
 
 test("does nothing when email is not configured", async () => {
