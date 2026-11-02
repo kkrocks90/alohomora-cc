@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.28.0
+
+- New orders now send an email to the shop (ADMIN_EMAIL) and a confirmation email to the customer via Resend. Covers online checkout, promo-covered free orders and admin manual orders. Email failures never block an order.
+
 ## 1.27.1
 
 - Polished the Corporate orders page on mobile: full-width buttons, compact cards, 2-column logos, stacked steps, full-bleed enquiry form with larger inputs.

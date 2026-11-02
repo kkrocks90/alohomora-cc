@@ -349,7 +349,7 @@ async function handleCreateOrder(request, env, origin) {
         distanceKm: order.distanceKm,
         policiesAccepted: "terms_conditions, privacy_policy, shipping_policy",
         promoReservation: redemption,
-      });
+      }, env);
     } catch (error) {
       console.error("Could not save a promo-covered free order.", error);
       return errorResponse(
@@ -681,7 +681,7 @@ async function handleVerifyPayment(request, env, origin) {
   }
 
   try {
-    await savePaidOrder(env.ORDERS_DB, paidOrder);
+    await savePaidOrder(env.ORDERS_DB, paidOrder, env);
   } catch (error) {
     console.error("Could not save the captured Razorpay order in D1.", error);
     return errorResponse(

@@ -85,6 +85,10 @@ Static page with offerings, a client logo grid (with a note that clients were se
 - Profile: name, phone, email (read-only), default address, PIN, city, state.
 - Order history with progress tracker and status pill, link to order detail.
 
+### Order emails
+
+On every new order (online, free promo, manual) the Worker emails the shop (ADMIN_EMAIL) and, if an address exists, the customer, using Resend and LOGIN_FROM_EMAIL. Sent once per new order; failures are logged and ignored. WhatsApp automation is not included.
+
 ## 5. Promo codes
 
 - Types: **percentage** off all products / a category / a product; **fixed amount** off above a minimum bill.

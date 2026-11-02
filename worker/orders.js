@@ -1,4 +1,5 @@
 import { getProductByIdAny, getProducts } from "./catalogue.js";
+import { sendOrderEmails } from "./notify.js";
 import { getFulfillmentMethod } from "./delivery.js";
 import { preparePromoRedemption } from "./promos.js";
 
@@ -219,7 +220,7 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise, pend
   };
 }
 
-export async function savePaidOrder(database, order) {
+export async function savePaidOrder(database, order, env) {
   const createdAt = new Date().toISOString();
 
   const insertSql = `INSERT INTO orders (
@@ -273,6 +274,7 @@ export async function savePaidOrder(database, order) {
     order.razorpayOrderId ?? null,
   ];
 
+  let inserted = true;
   if (order.promoReservation) {
     const email = order.customerEmail.trim().toLowerCase();
     const reservation = order.promoReservation;
@@ -289,10 +291,12 @@ export async function savePaidOrder(database, order) {
       WHERE r.reservation_id = ? AND r.order_id = ?
         AND r.customer_email = ? AND r.status = 'redeemed'
       ON CONFLICT(order_id) DO NOTHING`;
-    await database.batch([
+    const batchResults = await database.batch([
       preparePromoRedemption(database, reservation, order.orderId, email),
       database.prepare(promoInsertSql).bind(...insertValues, reservation.reservation_id, order.orderId, email),
     ]);
+    const promoChanges = batchResults?.[1]?.meta?.changes;
+    inserted = promoChanges === undefined ? true : promoChanges > 0;
     const redeemedReservation = await database
       .prepare(
         `SELECT status FROM promo_redemptions
@@ -304,7 +308,8 @@ export async function savePaidOrder(database, order) {
       throw new Error("The promo reservation expired or could not be redeemed.");
     }
   } else {
-    await database.prepare(insertSql).bind(...insertValues).run();
+    const insertResult = await database.prepare(insertSql).bind(...insertValues).run();
+    inserted = insertResult?.meta?.changes === undefined ? true : insertResult.meta.changes > 0;
   }
 
   if (order.customFields?.length > 0) {
@@ -364,4 +369,6 @@ export async function savePaidOrder(database, order) {
       .bind(customer.customer_id, order.orderId)
       .run();
   }
+
+  if (inserted && env) await sendOrderEmails(env, { ...order, amountReceivedPaise: order.amountPaise });
 }

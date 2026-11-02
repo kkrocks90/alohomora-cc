@@ -1,6 +1,7 @@
 import { ensureCatalogue, getProductById, getProducts } from "./catalogue.js";
 import { imageBaseUrl, listAdminProducts } from "./admin-products.js";
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
+import { sendOrderEmails } from "./notify.js";
 import { generateOrderId } from "./order-id.js";
 import { assertFieldCapacity, listCustomFields, validateFieldDefinition } from "./custom-fields.js";
 import { getPromoCategories, validatePromoDefinition, validatePromoLimits } from "./promos.js";
@@ -671,6 +672,21 @@ export async function createManualOrder(request, env) {
         amountReceivedPaise,
       )
       .run();
+    await sendOrderEmails(env, {
+      orderId,
+      customerName: customer.customer_name,
+      customerPhone: customer.customer_phone,
+      customerEmail: customer.customer_email,
+      deliveryAddress,
+      city,
+      state,
+      pincode,
+      deliveryMethod,
+      eventDate,
+      items,
+      amountPaise,
+      amountReceivedPaise,
+    });
     return result(201, {
       orderId,
       orderStatus: "received",
