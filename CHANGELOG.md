@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.35.0
+
+- The Pages deploy workflow now has a theme selector (repo-setting, default, diwali) when run manually.
+
 ## 1.34.0
 
 - Themes can now swap the home hero image (`heroImage` in `src/config/theme.ts`). Diwali uses a new illustration with a lit diya, marigold and a warm saffron background; the base theme keeps the original.
