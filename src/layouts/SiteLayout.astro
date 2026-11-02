@@ -49,14 +49,15 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImageUrl} />
     <meta name="twitter:image:alt" content={socialImageAlt} />
-    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="icon" type="image/png" href={`${base}favicon.png`} />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
     <title>{title}</title>
     {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replaceAll("<", "\\u003c")} />)}
   </head>
   <body>
     <header class="site-header">
       <a class="wordmark" href={base}>
-        <span class="wordmark-mark" aria-hidden="true">c</span>
+        <img class="wordmark-mark" src={`${base}logo-mark.png`} alt="" width="40" height="40" />
         <span>chocolate <i>circle</i></span>
       </a>
       <nav class="main-nav" aria-label="Main navigation">
@@ -136,7 +137,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
 
     <footer class="site-footer">
       <a class="wordmark footer-wordmark" href={base}>
-        <span class="wordmark-mark" aria-hidden="true">c</span>
+        <img class="wordmark-mark" src={`${base}logo-mark.png`} alt="" width="40" height="40" />
         <span>chocolate <i>circle</i></span>
       </a>
       <p>A little chocolate. A lot of heart.</p>
