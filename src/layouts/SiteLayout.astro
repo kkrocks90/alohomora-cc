@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import "../styles/themes/diwali.css";
+import { theme } from "../config/theme";
 
 interface Props {
   title?: string;
@@ -26,14 +28,14 @@ const socialImageUrl = new URL(socialImage, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme={theme.id}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
-    <meta name="theme-color" content="#faf7f1" />
+    <meta name="theme-color" content={theme.themeColor} />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Chocolate Circle" />
     <meta property="og:locale" content="en_IN" />
@@ -55,6 +57,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replaceAll("<", "\\u003c")} />)}
   </head>
   <body>
+    {theme.banner && <a class="theme-banner" href={`${base}${theme.banner.href}`}>{theme.banner.text}</a>}
     <header class="site-header">
       <a class="wordmark" href={base}>
         <img class="wordmark-mark" src={`${base}logo-mark.png`} alt="" width="40" height="40" />

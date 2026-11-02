@@ -1,0 +1,192 @@
+/* Diwali theme. Applies only when <html data-theme="diwali">. Customer pages only. */
+html[data-theme="diwali"] {
+  --paper: #fff8ea;
+  --paper-dark: #fbecd0;
+  --ink: #3a1a12;
+  --muted: #8a6a52;
+  --cocoa: #7a1d2c;
+  --cocoa-dark: #4e0f1b;
+  --rose: #e08a3c;
+  --line: #efdcb8;
+  --diwali-maroon: #7a1d2c;
+  --diwali-maroon-dark: #5c1424;
+  --diwali-deep: #4e0f1b;
+  --diwali-gold: #d9a233;
+  --diwali-gold-soft: #f3d48a;
+  --diwali-saffron: #e8590c;
+  --diwali-cream: #fff1cf;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Ribbon above the header */
+html[data-theme="diwali"] .theme-banner {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, var(--diwali-deep), var(--diwali-maroon), var(--diwali-deep));
+  color: var(--diwali-gold-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+html[data-theme="diwali"] .theme-banner::before,
+html[data-theme="diwali"] .theme-banner::after {
+  content: "\2736";
+  color: var(--diwali-gold);
+  font-size: 13px;
+}
+
+/* Header with a gold rule and a marigold garland */
+html[data-theme="diwali"] .site-header {
+  border-bottom: 1px solid rgb(217 162 51 / 45%);
+  background: rgb(255 248 234 / 94%);
+}
+
+html[data-theme="diwali"] .site-header::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 18px;
+  background:
+    radial-gradient(circle at 8px 8px, var(--diwali-saffron) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    radial-gradient(circle at 21px 10px, var(--diwali-gold) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    linear-gradient(var(--diwali-gold), var(--diwali-gold)) 0 0 / 100% 1px no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+html[data-theme="diwali"] .wordmark i {
+  color: #b5532a;
+}
+
+/* Dark surfaces become deep maroon */
+html[data-theme="diwali"] .announcement-strip,
+html[data-theme="diwali"] .promise-strip,
+html[data-theme="diwali"] .site-footer {
+  background: var(--diwali-deep);
+}
+
+html[data-theme="diwali"] .announcement-strip:hover {
+  background: var(--diwali-maroon);
+}
+
+html[data-theme="diwali"] .promo-banner,
+html[data-theme="diwali"] .button-primary,
+html[data-theme="diwali"] .add-button,
+html[data-theme="diwali"] .bag-button,
+html[data-theme="diwali"] .whatsapp-float,
+html[data-theme="diwali"] .mobile-menu-cta,
+html[data-theme="diwali"] .tab-bag-count,
+html[data-theme="diwali"] .store-chip.is-active,
+html[data-theme="diwali"] .corporate-steps li::before {
+  background: var(--diwali-maroon);
+  border-color: var(--diwali-maroon);
+  color: var(--diwali-cream);
+}
+
+html[data-theme="diwali"] .menu-toggle span {
+  background: var(--diwali-maroon);
+}
+
+html[data-theme="diwali"] .promo-banner:hover,
+html[data-theme="diwali"] .button-primary:hover,
+html[data-theme="diwali"] .add-button:hover,
+html[data-theme="diwali"] .bag-button:hover,
+html[data-theme="diwali"] .whatsapp-float:hover {
+  background: var(--diwali-maroon-dark);
+}
+
+html[data-theme="diwali"] .bag-button .bag-count {
+  color: var(--diwali-maroon-dark);
+}
+
+html[data-theme="diwali"] .button-primary {
+  box-shadow: 0 8px 20px rgb(122 29 44 / 30%);
+}
+
+html[data-theme="diwali"] .closing-banner,
+html[data-theme="diwali"] .corporate-enquiry {
+  background: var(--diwali-maroon-dark);
+}
+
+html[data-theme="diwali"] .closing-banner h2 em,
+html[data-theme="diwali"] .closing-banner .eyebrow {
+  color: var(--diwali-gold-soft);
+}
+
+html[data-theme="diwali"] .site-footer > p {
+  color: var(--diwali-gold-soft);
+}
+
+html[data-theme="diwali"] .tab-bar [aria-current="page"] {
+  color: var(--diwali-maroon);
+}
+
+/* Warm cream sections */
+html[data-theme="diwali"] .story-section {
+  background: #fbe8c4;
+}
+
+html[data-theme="diwali"] .kindness-icon,
+html[data-theme="diwali"] .mobile-menu-links a span:last-child,
+html[data-theme="diwali"] .mobile-menu-cta-light {
+  background: #fbe3b4;
+}
+
+html[data-theme="diwali"] .mobile-menu-cta-light {
+  color: var(--diwali-maroon-dark);
+}
+
+html[data-theme="diwali"] .hero-section {
+  position: relative;
+  background: radial-gradient(ellipse 60% 70% at 78% 45%, #fbe3b4 0%, rgb(255 248 234 / 0%) 70%);
+}
+
+/* Twinkling lights behind the hero */
+html[data-theme="diwali"] .hero-section::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 8% 22%, var(--diwali-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 20% 78%, var(--diwali-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 12%, var(--diwali-gold) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 62% 86%, var(--diwali-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 18%, var(--diwali-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 70%, var(--diwali-gold) 0 1.5px, transparent 2.5px);
+  content: "";
+  opacity: 0.8;
+  pointer-events: none;
+  animation: diwali-twinkle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes diwali-twinkle {
+  from { opacity: 0.25; }
+  to { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="diwali"] .hero-section::before { animation: none; }
+}
+
+/* Product cards pick up a gold edge */
+html[data-theme="diwali"] .product-card {
+  border-color: rgb(217 162 51 / 35%);
+}
+
+html[data-theme="diwali"] .product-name-row :is(h2, h3) {
+  color: var(--diwali-deep);
+}
+
+@media (max-width: 620px) {
+  html[data-theme="diwali"] .theme-banner { min-height: 34px; padding: 6px 12px; font-size: 11px; }
+  html[data-theme="diwali"] .theme-banner::before,
+  html[data-theme="diwali"] .theme-banner::after { display: none; }
+  html[data-theme="diwali"] .site-header::after { height: 14px; background-size: 22px 14px, 22px 14px, 100% 1px; }
+}

@@ -78,6 +78,10 @@ Customer-facing number `CC-YYMMDD-XXXXX`. The Razorpay order ID is stored separa
 
 Enquiries POST to /corporate/enquiry on the Worker, which emails ADMIN_EMAIL via Resend (reply-to = enquirer, honeypot field "website"); a WhatsApp button is the fallback. Static page with offerings, a client logo grid (with a note that clients were served directly and through event management partners), and an enquiry form. The form needs no backend: it opens WhatsApp (+91 95008 68468) or the email app with the details prefilled. Linked from header, menu and footer.
 
+### Themes
+
+Seasonal themes are CSS-only overlays on the base theme. `src/config/theme.ts` lists them; each has a stylesheet in `src/styles/themes/` scoped to `html[data-theme="<id>"]`, plus an optional ribbon banner. The active theme is chosen at build time from the GitHub repo variable `SITE_THEME` (empty = the fallback in `theme.ts`, currently `diwali`; `default` = base theme). To revert: set `SITE_THEME` to `default` and run the Pages deploy. To add a theme: add an entry in `theme.ts`, a CSS file, and import it in `SiteLayout.astro`. Admin pages are not themed.
+
 ## 4. Accounts
 
 - Sign-in by emailed one-time code (Resend). Codes expire after 10 minutes; resend is rate-limited to once per 60 s.

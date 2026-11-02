@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.32.0
+
+- Added a theme system and a Diwali theme (maroon and gold palette, ribbon banner, marigold garland under the header, twinkling hero lights) for desktop and mobile. Switch with the GitHub variable SITE_THEME (`default` restores the base look). Admin pages are unchanged.
+
 ## 1.31.2
 
 - Footer logo is now white so it is visible on the dark footer.
