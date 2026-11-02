@@ -82,13 +82,19 @@ const steps = [
 
     <section class="corporate-section corporate-clients" aria-labelledby="corp-clients-title">
       <h2 id="corp-clients-title">Brands we have served</h2>
-      <ul class="corporate-logos">
-        {clients.map((client) => (
-          <li>
-            <Image src={client.image} alt={client.name} width={220} loading="lazy" />
-          </li>
-        ))}
-      </ul>
+      <div class="corporate-slider" id="client-slider">
+        <button class="slider-arrow slider-prev" type="button" aria-label="Previous clients">&#8249;</button>
+        <div class="slider-track" id="client-track" tabindex="0" aria-label="Client logos, swipe or drag to scroll">
+          <ul class="corporate-logos">
+            {clients.map((client) => (
+              <li>
+                <Image src={client.image} alt={client.name} width={220} loading="eager" draggable="false" />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <button class="slider-arrow slider-next" type="button" aria-label="Next clients">&#8250;</button>
+      </div>
       <p class="corporate-note">Served directly and through event management partners.</p>
     </section>
 
@@ -145,6 +151,84 @@ const steps = [
   </main>
 
   <script>
+    const track = document.querySelector<HTMLElement>("#client-track");
+    const list = track?.querySelector<HTMLElement>("ul");
+    if (track && list) {
+      // Duplicate the logos so the loop looks endless.
+      Array.from(list.children).forEach((item) => {
+        const clone = item.cloneNode(true) as HTMLElement;
+        clone.setAttribute("aria-hidden", "true");
+        clone.querySelector("img")?.setAttribute("alt", "");
+        list.appendChild(clone);
+      });
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let paused = false;
+      let dragging = false;
+      let startX = 0;
+      let startScroll = 0;
+      let resume: number | undefined;
+      const half = () => list.scrollWidth / 2;
+      const wrap = () => {
+        const h = half();
+        if (track.scrollLeft >= h) track.scrollLeft -= h;
+        else if (track.scrollLeft <= 0) track.scrollLeft += h;
+      };
+      const hold = (ms = 2500) => {
+        paused = true;
+        window.clearTimeout(resume);
+        resume = window.setTimeout(() => { paused = false; }, ms);
+      };
+      let last = performance.now();
+      let acc = 0;
+      const tick = (now: number) => {
+        const dt = now - last;
+        last = now;
+        if (!paused && !dragging && !reduce) {
+          acc += dt * 0.04;
+          const step = Math.floor(acc);
+          if (step > 0) { track.scrollLeft += step; acc -= step; wrap(); }
+        }
+        requestAnimationFrame(tick);
+      };
+      track.scrollLeft = 1;
+      requestAnimationFrame(tick);
+      track.addEventListener("scroll", wrap, { passive: true });
+      track.addEventListener("mouseenter", () => { paused = true; });
+      track.addEventListener("mouseleave", () => { if (!dragging) hold(300); });
+      track.addEventListener("touchstart", () => hold(3000), { passive: true });
+      track.addEventListener("touchmove", () => hold(3000), { passive: true });
+      track.addEventListener("pointerdown", (event) => {
+        if (event.pointerType !== "mouse") return;
+        dragging = true;
+        startX = event.clientX;
+        startScroll = track.scrollLeft;
+        track.classList.add("is-dragging");
+        track.setPointerCapture(event.pointerId);
+      });
+      track.addEventListener("pointermove", (event) => {
+        if (!dragging) return;
+        track.scrollLeft = startScroll - (event.clientX - startX);
+      });
+      const endDrag = () => {
+        if (!dragging) return;
+        dragging = false;
+        track.classList.remove("is-dragging");
+        hold(1500);
+      };
+      track.addEventListener("pointerup", endDrag);
+      track.addEventListener("pointercancel", endDrag);
+      const jump = (dir: number) => {
+        hold(3000);
+        track.scrollBy({ left: dir * track.clientWidth * 0.8, behavior: "smooth" });
+      };
+      document.querySelector(".slider-prev")?.addEventListener("click", () => jump(-1));
+      document.querySelector(".slider-next")?.addEventListener("click", () => jump(1));
+      track.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") jump(1);
+        if (event.key === "ArrowLeft") jump(-1);
+      });
+    }
+
     const form = document.querySelector<HTMLFormElement>("#corporate-form");
     const emailButton = document.querySelector<HTMLButtonElement>("#corporate-email");
 

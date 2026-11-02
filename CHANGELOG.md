@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.29.0
+
+- Corporate page client logos are now an endless auto-scrolling slider: drag with the mouse, swipe on mobile, use the arrows or keyboard to move faster. Pauses on hover/touch; respects reduced motion.
+
 ## 1.28.0
 
 - New orders now send an email to the shop (ADMIN_EMAIL) and a confirmation email to the customer via Resend. Covers online checkout, promo-covered free orders and admin manual orders. Email failures never block an order.
