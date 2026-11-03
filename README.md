@@ -32,7 +32,7 @@ Before launch, verify names, prices, ingredient and allergen details, storage, d
 
 The site has a base theme and seasonal themes: `diwali` (the default fallback), `monsoon`, `christmas`, `republic-day`, `pongal`, `birthday`, `independence-day` and `valentines-day`. A theme changes colours, header garland, ribbon banner, hero banner, footer and store toolbar. Themes live in `src/config/theme.ts` and `src/styles/themes/`.
 
-- Pick a theme when you run the **Deploy to GitHub Pages** workflow (the `theme` dropdown). `repo-setting` uses the `SITE_THEME` repository variable.
+- Pick a theme when you run the **Deploy website to GitHub Pages** workflow (the `theme` dropdown). `repo-setting` uses the `SITE_THEME` repository variable.
 - To go back to the base theme, deploy with `theme=default` or set `SITE_THEME` to `default`.
 - To add a theme, add an entry in `theme.ts`, a stylesheet scoped to `html[data-theme="<id>"]`, and import it in `src/layouts/SiteLayout.astro`. Add the id to the workflow's `theme` options.
 
@@ -55,8 +55,8 @@ Deploy only when you intend to publish. The order is: apply migrations, deploy t
    npx wrangler d1 migrations apply cocoa-kind-orders --remote --config worker/wrangler.toml
    ```
 
-2. Deploy the Worker with `npm run worker:deploy`, or run the **Deploy Worker** workflow in GitHub Actions. The workflow needs the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` and can apply pending migrations first.
-3. Run the **Deploy to GitHub Pages** workflow and choose a theme. In **Settings > Pages**, the source must be **GitHub Actions**. `site` and `base` in `astro.config.mjs` are set for `https://chocolatecircle.in/`.
+2. Deploy the Worker with `npm run worker:deploy`, or run the **Deploy Worker to Cloudflare** workflow in GitHub Actions. The workflow needs the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` and can apply pending migrations first.
+3. Run the **Deploy website to GitHub Pages** workflow and choose a theme. In **Settings > Pages**, the source must be **GitHub Actions**. `site` and `base` in `astro.config.mjs` are set for `https://chocolatecircle.in/`.
 
 ### One-time Cloudflare and payment setup
 
