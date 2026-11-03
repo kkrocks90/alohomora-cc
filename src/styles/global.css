@@ -7952,3 +7952,51 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 .admin-flavour-row {
   grid-template-columns: minmax(0, 2fr) auto auto auto;
 }
+
+.admin-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 14px 0 18px;
+  padding: 6px;
+  overflow-x: auto;
+  border: 1px solid #e8ded3;
+  border-radius: 999px;
+  background: #f6efe7;
+  box-shadow: 0 6px 18px rgb(65 44 31 / 6%);
+}
+
+.admin-tabs .admin-tab {
+  flex: none;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #6b5a4f;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.admin-tabs .admin-tab:hover {
+  background: rgb(255 255 255 / 70%);
+  color: #3d2a20;
+}
+
+.admin-tabs .admin-tab[aria-selected="true"] {
+  background: #5f4033;
+  color: #fff;
+  box-shadow: 0 4px 12px rgb(60 30 20 / 28%);
+}
+
+@media (max-width: 620px) {
+  .admin-tabs {
+    border-radius: 16px;
+  }
+
+  .admin-tabs .admin-tab {
+    min-height: 38px;
+    padding: 0 14px;
+  }
+}

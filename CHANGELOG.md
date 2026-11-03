@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.44.1
+
+- Admin: Categories and Flavours now live in their own **Categories & flavours** tab, and the tab bar is redesigned as a pill-style segmented control.
+
 ## 1.44.0
 
 - Flavours admin: edit any names and extra percentages, then press one **Save all changes** button (only changed rows are saved, one storefront rebuild). The per-row Save buttons are gone; Delete remains.

@@ -124,6 +124,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="products"
         >Products</button>
+        <button
+          class="admin-tab"
+          id="admin-catalogue-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-catalogue-panel"
+          tabindex="-1"
+          data-admin-tab="catalogue"
+        >Categories &amp; flavours</button>
       </div>
 
       <section
@@ -331,6 +341,28 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </form>
         </section>
+        <section class="admin-panel" aria-labelledby="admin-product-list-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Your products</p>
+              <h2 id="admin-product-list-title">All products</h2>
+            </div>
+            <button class="button button-secondary" id="admin-product-publish" type="button">Publish to storefront</button>
+          </div>
+          <p class="admin-form-hint" id="admin-product-publish-hint"></p>
+          <div class="admin-product-list" id="admin-product-list"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-catalogue-panel"
+        role="tabpanel"
+        aria-labelledby="admin-catalogue-tab"
+        data-admin-panel="catalogue"
+        tabindex="0"
+        hidden
+      >
         <section class="admin-panel" aria-labelledby="admin-category-title">
           <div class="admin-panel-heading">
             <div>
@@ -362,17 +394,6 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <div class="admin-flavour-savebar">
             <button class="button button-primary" type="button" id="admin-flavour-save-all">Save all changes</button>
           </div>
-        </section>
-        <section class="admin-panel" aria-labelledby="admin-product-list-title">
-          <div class="admin-panel-heading">
-            <div>
-              <p class="eyebrow">Your products</p>
-              <h2 id="admin-product-list-title">All products</h2>
-            </div>
-            <button class="button button-secondary" id="admin-product-publish" type="button">Publish to storefront</button>
-          </div>
-          <p class="admin-form-hint" id="admin-product-publish-hint"></p>
-          <div class="admin-product-list" id="admin-product-list"></div>
         </section>
       </section>
 
