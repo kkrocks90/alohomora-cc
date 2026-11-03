@@ -5,6 +5,7 @@ import { printInvoice } from "./order-view";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
 import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
+import { initFlavoursAdmin, isCatalogueFlavour } from "./admin-flavours";
 import { initFlatDiscountAdmin, isFlatDiscount, type FlatDiscount } from "./admin-flat-discount";
 import type { CustomField } from "./custom-fields";
 
@@ -94,6 +95,8 @@ interface AdminData {
   customProducts: { id: string; name: string }[];
   catalogueProducts: Parameters<ReturnType<typeof initProductsAdmin>["render"]>[0];
   catalogueCategories: Parameters<ReturnType<typeof initCategoriesAdmin>["render"]>[0];
+  catalogueFlavours: Parameters<ReturnType<typeof initFlavoursAdmin>["render"]>[0];
+  flavourExtras: Record<string, number>;
   flatDiscount: FlatDiscount | null;
   rebuildConfigured: boolean;
 }
@@ -222,6 +225,12 @@ function normalizeAdminData(data: AdminData): AdminData {
     catalogueCategories: Array.isArray((data as { catalogueCategories?: unknown }).catalogueCategories)
       ? (data as { catalogueCategories: unknown[] }).catalogueCategories.filter(isCatalogueCategory)
       : [],
+    catalogueFlavours: Array.isArray((data as { catalogueFlavours?: unknown }).catalogueFlavours)
+      ? (data as { catalogueFlavours: unknown[] }).catalogueFlavours.filter(isCatalogueFlavour)
+      : [],
+    flavourExtras: (data as { flavourExtras?: unknown }).flavourExtras && typeof (data as { flavourExtras?: unknown }).flavourExtras === "object"
+      ? (data as { flavourExtras: Record<string, number> }).flavourExtras
+      : {},
     flatDiscount: isFlatDiscount((data as { flatDiscount?: unknown }).flatDiscount)
       ? (data as { flatDiscount: FlatDiscount }).flatDiscount
       : null,
@@ -721,7 +730,14 @@ if (root) {
         flavourSelect.dataset.lineFlavour = "true";
         flavourSelect.required = true;
         flavourSelect.append(new Option("Choose a flavour", ""));
-        selected.flavours.forEach((flavour) => flavourSelect.append(new Option(flavour, flavour)));
+        selected.flavours.forEach((flavour) => {
+          const extra = adminData?.flavourExtras[flavour] ?? 0;
+          flavourSelect.append(new Option(extra > 0 ? `${flavour} (+\u20B9${extra})` : flavour, flavour));
+        });
+        flavourSelect.addEventListener("change", () => {
+          priceInput.value = String(selected.price + (adminData?.flavourExtras[flavourSelect.value] ?? 0));
+          updateOrderTotal();
+        });
         flavourLabel.append(flavourSelect);
         options.insertBefore(flavourLabel, priceLabel);
       }
@@ -1197,7 +1213,12 @@ if (root) {
     renderCustomers();
     renderPromos();
     customFieldsAdmin.render(adminData.customFields);
-    productsAdmin.render(adminData.catalogueProducts, adminData.rebuildConfigured);
+    productsAdmin.render(
+      adminData.catalogueProducts,
+      adminData.rebuildConfigured,
+      adminData.catalogueFlavours.map(({ name, extraPrice }) => ({ name, extraPrice })),
+    );
+    flavoursAdmin.render(adminData.catalogueFlavours);
     categoriesAdmin.render(adminData.catalogueCategories);
     flatDiscountAdmin.render(adminData.flatDiscount);
     syncPromoFormFields();
@@ -1238,6 +1259,13 @@ if (root) {
   });
 
   const flatDiscountAdmin = initFlatDiscountAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    setStatus,
+    reload: () => loadDashboard(),
+  });
+
+  const flavoursAdmin = initFlavoursAdmin({
     root,
     post: (path, body) => post(path, body),
     setStatus,

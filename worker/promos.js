@@ -17,7 +17,7 @@ function validateCode(value) {
 }
 
 export function calculateSubtotal(items) {
-  return items.reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
+  return items.reduce((sum, item) => sum + (item.unitPrice ?? item.product.price) * item.quantity * 100, 0);
 }
 
 export async function quotePromo(database, codeValue, email, items, now = new Date()) {
@@ -34,11 +34,11 @@ export async function quotePromo(database, codeValue, email, items, now = new Da
     if (promo.target_type === "product") {
       eligibleSubtotalPaise = items
         .filter((item) => item.product.id === promo.target_value)
-        .reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
+        .reduce((sum, item) => sum + (item.unitPrice ?? item.product.price) * item.quantity * 100, 0);
     } else if (promo.target_type === "category") {
       eligibleSubtotalPaise = items
         .filter((item) => [item.product.tag, ...(item.product.extraTags ?? [])].includes(promo.target_value))
-        .reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
+        .reduce((sum, item) => sum + (item.unitPrice ?? item.product.price) * item.quantity * 100, 0);
     } else if (promo.target_type !== "all") {
       throw new Error("That promo code has invalid targeting.");
     }

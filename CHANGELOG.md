@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.43.0
+
+- Flavours now have a master list in the admin (new **Flavours** panel) with an extra amount per flavour, which can be 0. "Assorted" is included. Products pick their flavours from this list with checkboxes.
+- A flavour's extra amount is added to the price of any product ordered in it. The product page shows "(+\u20B9N)" on flavour options and updates the price (and flat-discount strike-through) live; the bag, checkout, promo quotes and the Worker all price from base + extra.
+- Requires migration 0019 (`flavours` table).
+
 ## 1.42.2
 
 - Discounted prices are now aligned consistently: price and struck-through price sit on one line, the flavour count sits underneath, and the "N% off" label is a badge on the product photo instead of wrapping beside the price.

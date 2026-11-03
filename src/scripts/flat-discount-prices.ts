@@ -6,6 +6,19 @@ function formatRupees(paise: number) {
   return `₹${Number.isInteger(rupees) ? rupees : rupees.toFixed(2)}`;
 }
 
+let activePercentage = 0;
+
+// The product page changes dataset.priceNow when a flavour is picked, then announces it with "cc:price".
+document.addEventListener("cc:price", (event) => {
+  const target = event.target as HTMLElement | null;
+  if (!activePercentage || !target?.classList.contains("price-now")) return;
+  const originalPaise = Math.round(Number(target.dataset.priceNow) * 100);
+  if (!Number.isFinite(originalPaise) || originalPaise <= 0) return;
+  target.textContent = formatRupees(originalPaise - Math.floor((originalPaise * activePercentage) / 100));
+  const was = target.parentElement?.querySelector(".price-was");
+  if (was) was.textContent = formatRupees(originalPaise);
+});
+
 async function showDiscountedPrices() {
   const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-price-now]"));
   if (!apiUrl || targets.length === 0) return;
@@ -20,6 +33,7 @@ async function showDiscountedPrices() {
     const percentage = payload?.discount?.percentage;
     if (typeof percentage !== "number" || !Number.isInteger(percentage) || percentage < 1 || percentage > 90) return;
 
+    activePercentage = percentage;
     targets.forEach((target) => {
       const price = Number(target.dataset.priceNow);
       if (!Number.isFinite(price) || price <= 0) return;

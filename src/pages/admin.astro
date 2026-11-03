@@ -314,7 +314,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </section>
             <section class="apf-card" aria-labelledby="apf-options-title">
               <h3 id="apf-options-title">Options</h3>
-              <label>Flavours <small>one per line, optional</small><textarea name="flavours" rows="4" placeholder="Dark Chocolate&#10;Almonds"></textarea></label>
+              <fieldset class="apf-flavours">
+                <legend>Flavours <small>tick the ones customers can choose, optional</small></legend>
+                <div class="apf-flavour-list" id="admin-product-flavours"></div>
+              </fieldset>
               <label>Also show in <small>other categories, comma separated</small><input name="extraTags" /></label>
               <div class="apf-toggles">
                 <label class="apf-toggle"><input name="active" type="checkbox" checked /><span><strong>Visible to customers</strong><small>Turn off to hide it from the shop</small></span></label>
@@ -341,6 +344,21 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <button class="button button-primary" type="submit">Add category</button>
           </form>
           <div class="admin-category-list" id="admin-category-list"></div>
+        </section>
+        <section class="admin-panel" aria-labelledby="admin-flavour-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Catalogue</p>
+              <h2 id="admin-flavour-title">Flavours</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">One list for every product. The extra amount (can be 0) is added to the price of any product ordered in that flavour. A flavour can only be deleted when no product uses it.</p>
+          <form class="admin-category-form admin-flavour-form" id="admin-flavour-form">
+            <label>New flavour<input name="name" maxlength="60" required placeholder="Hazelnut" /></label>
+            <label>Extra amount (&#8377;)<input name="extraPrice" type="number" inputmode="numeric" min="0" max="100000" step="1" value="0" required /></label>
+            <button class="button button-primary" type="submit">Add flavour</button>
+          </form>
+          <div class="admin-category-list" id="admin-flavour-list"></div>
         </section>
         <section class="admin-panel" aria-labelledby="admin-product-list-title">
           <div class="admin-panel-heading">

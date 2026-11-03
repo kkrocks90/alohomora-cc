@@ -15,7 +15,7 @@ try {
     signal: AbortSignal.timeout(15_000),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const { products, categories, hiddenCategories } = await response.json();
+  const { products, categories, hiddenCategories, flavours } = await response.json();
   if (!Array.isArray(products) || products.length === 0) throw new Error("empty catalogue");
   if (!products.every((product) => product.id && product.name && Number.isInteger(product.price) && product.image)) {
     throw new Error("invalid product data");
@@ -29,6 +29,9 @@ try {
     new URL("../src/data/hidden-categories.json", import.meta.url),
     `${JSON.stringify(Array.isArray(hiddenCategories) ? hiddenCategories : [], null, 4)}\n`,
   );
+  if (Array.isArray(flavours) && flavours.length > 0) {
+    await writeFile(new URL("../src/data/flavours.json", import.meta.url), `${JSON.stringify(flavours, null, 4)}\n`);
+  }
   console.log(`[catalogue] loaded ${products.length} products from ${apiUrl}`);
 } catch (error) {
   console.warn(`[catalogue] could not load products (${error.message}); using bundled products.json`);

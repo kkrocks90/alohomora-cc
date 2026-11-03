@@ -43,6 +43,7 @@ The site has a base theme and seasonal themes: `diwali` (the default fallback), 
 - Order and enquiry emails go to the shop and to the customer through Resend.
 - The admin workspace at `/admin/` is limited to `ADMIN_EMAIL` in `worker/wrangler.toml`. It manages orders (status, edit and invoices), customers, manual orders (custom items, an optional discount, partial payments and Razorpay payment links), promo codes, custom checkout fields and products.
 - A sitewide flat percentage discount (admin Promos tab) applies automatically at checkout, is advertised on the home page, and pauses promo codes while live.
+- Flavours have a master list in the admin with an optional extra amount each (can be 0, includes "Assorted"); the extra is added to the product price and shown on the product page.
 - Promo codes can be a percentage (all products, a category or a product) or a fixed amount above a minimum, with an optional end date and redemption limit. Fully covered orders skip Razorpay.
 - Invoices are order receipts, not GST tax invoices, and do not include delivery charges. **Do not accept live payments until the shipping fee is shown and included in the amount charged**; payments currently cover the product subtotal only.
 

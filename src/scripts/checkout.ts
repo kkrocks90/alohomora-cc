@@ -8,6 +8,7 @@ import {
   saveCart,
   type CartItem,
 } from "./cart";
+import { unitPrice } from "../lib/flavours";
 import { initializePincodeLookup } from "./pincode-lookup";
 import {
   answersToPayload,
@@ -236,7 +237,7 @@ function setProfileStatus(message: string, error = false) {
 function renderOrder() {
   cart = loadCart();
   orderItems.replaceChildren();
-  const subtotalPaise = cart.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity * 100, 0);
+  const subtotalPaise = cart.reduce((sum, item) => sum + unitPrice(productById.get(item.id)!, item.flavour) * item.quantity * 100, 0);
   orderTotal.textContent = currency.format(subtotalPaise / 100);
   renderPromoSummary(subtotalPaise);
   emptyPanel.hidden = cart.length > 0;
@@ -260,7 +261,7 @@ function renderOrder() {
     ].filter(Boolean).join(" · ");
     details.append(name, options);
     const price = document.createElement("span");
-    price.textContent = currency.format(product.price * item.quantity);
+    price.textContent = currency.format(unitPrice(product, item.flavour) * item.quantity);
     row.append(details, price);
     orderItems.append(row);
   }
@@ -299,7 +300,7 @@ promoForm.addEventListener("submit", async (event) => {
   try {
     const result = await requestApi("/promos/quote", {
       code,
-      items: cart.map(({ id, quantity }) => ({ id, quantity })),
+      items: cart.map(({ id, quantity, flavour }) => ({ id, quantity, flavour })),
     });
     if (
       typeof result.code !== "string" ||
@@ -308,7 +309,7 @@ promoForm.addEventListener("submit", async (event) => {
       !Number.isSafeInteger(result.eligibleSubtotalPaise) ||
       !Number.isSafeInteger(result.discountPaise) ||
       !Number.isSafeInteger(result.payablePaise) ||
-      result.subtotalPaise !== cart.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity * 100, 0) ||
+      result.subtotalPaise !== cart.reduce((sum, item) => sum + unitPrice(productById.get(item.id)!, item.flavour) * item.quantity * 100, 0) ||
       result.discountPaise < 0 ||
       result.discountPaise > result.subtotalPaise ||
       result.payablePaise !== result.subtotalPaise - result.discountPaise

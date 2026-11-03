@@ -4,6 +4,7 @@ import SiteLayout from "../../layouts/SiteLayout.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import products from "../../data/products.json";
 import { productGallery, resolveImage } from "../../lib/product-images";
+import { flavourExtra } from "../../lib/flavours";
 
 
 export function getStaticPaths() {
@@ -124,7 +125,10 @@ const customizable = product.customizable !== false;
               Flavour <span>Required</span>
               <select name="flavour" required>
                 <option value="" disabled selected>Choose a flavour</option>
-                {product.flavours.map((flavour) => <option value={flavour}>{flavour}</option>)}
+                {product.flavours.map((flavour) => {
+                  const extra = flavourExtra(flavour);
+                  return <option value={flavour} data-extra={extra}>{extra > 0 ? `${flavour} (+\u20B9${extra})` : flavour}</option>;
+                })}
               </select>
             </label>
           )}
@@ -163,6 +167,18 @@ const customizable = product.customizable !== false;
 
 <script>
   import "../../scripts/flat-discount-prices";
+  const priceEl = document.querySelector<HTMLElement>("[data-price-now]");
+  const flavourSelect = document.querySelector<HTMLSelectElement>("#product-options-form select[name=flavour]");
+  if (priceEl && flavourSelect) {
+    const basePrice = Number(priceEl.dataset.priceNow);
+    flavourSelect.addEventListener("change", () => {
+      const extra = Number(flavourSelect.selectedOptions[0]?.dataset.extra ?? 0) || 0;
+      const price = basePrice + extra;
+      priceEl.dataset.priceNow = String(price);
+      priceEl.textContent = `\u20B9${price}`;
+      priceEl.dispatchEvent(new CustomEvent("cc:price", { bubbles: true }));
+    });
+  }
   const gallery =  document.querySelector<HTMLElement>("[data-gallery]");
   const track = gallery?.querySelector<HTMLElement>("[data-gallery-track]");
   if (gallery && track) {

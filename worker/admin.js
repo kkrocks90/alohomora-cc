@@ -1,7 +1,8 @@
-import { ensureCatalogue, getProductById, getProducts } from "./catalogue.js";
+import { ensureCatalogue, getProductById, getFlavours, getProducts, unitPriceRupees } from "./catalogue.js";
 import { imageBaseUrl, listAdminProducts } from "./admin-products.js";
 import { getFlatDiscount } from "./flat-discount.js";
 import { listAdminCategories } from "./admin-categories.js";
+import { listAdminFlavours } from "./admin-flavours.js";
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { sendOrderEmails } from "./notify.js";
 import { generateOrderId } from "./order-id.js";
@@ -58,7 +59,7 @@ export async function getAdminData(request, env) {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
     await ensureCatalogue(env, { force: true });
-    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts, catalogueCategories, flatDiscount] = await Promise.all([
+    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts, catalogueCategories, flatDiscount, catalogueFlavours] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
@@ -94,7 +95,8 @@ export async function getAdminData(request, env) {
       listCustomProducts(env.ORDERS_DB),
       listAdminProducts(env),
       listAdminCategories(env),
-    getFlatDiscount(env.ORDERS_DB),
+      getFlatDiscount(env.ORDERS_DB),
+      listAdminFlavours(env).catch(() => []),
     ]);
     return result(200, {
       email: access.email,
@@ -143,7 +145,9 @@ export async function getAdminData(request, env) {
       categories: getPromoCategories(),
       catalogueProducts,
       catalogueCategories,
-    flatDiscount,
+      catalogueFlavours,
+      flavourExtras: Object.fromEntries(getFlavours().map(({ name, extra }) => [name, extra])),
+      flatDiscount,
       imageBaseUrl: imageBaseUrl(env),
       rebuildConfigured: Boolean(env.GITHUB_DISPATCH_TOKEN),
       customFields,
@@ -599,7 +603,7 @@ async function parseManualOrderInput(body, env) {
       const wrapper = typeof item.wrapper === "string" ? item.wrapper.trim() : "";
       if (wrapper.length > 120) throw new Error("Wrapper details must be 120 characters or fewer.");
       const unitPrice = item.unitPriceRupees === undefined
-        ? product.price
+        ? unitPriceRupees(product, flavour)
         : Math.round(Number(item.unitPriceRupees) * 100) / 100;
       if (!Number.isFinite(unitPrice) || unitPrice <= 0 || unitPrice > 1_000_000) {
         throw new Error(`Enter a valid price for ${product.name}.`);

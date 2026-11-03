@@ -7809,3 +7809,93 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 .product-detail-price .price-stack .price-was {
   font-size: 15px;
 }
+
+.apf-flavours {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.apf-flavours legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.apf-flavours legend small {
+  font-weight: 400;
+  color: #6b5a4f;
+}
+
+.apf-flavour-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.apf-flavour-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.apf-flavour-chip:has(input:checked) {
+  border-color: #7b2230;
+  background: #f8e9ea;
+}
+
+.apf-flavour-chip input {
+  width: auto;
+  margin: 0;
+}
+
+.admin-flavour-form {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.admin-flavour-row {
+  grid-template-columns: minmax(0, 2fr) auto auto auto;
+  align-items: center;
+}
+
+.admin-flavour-extra {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.admin-flavour-extra input {
+  width: 84px;
+}
+
+.admin-flavour-meta {
+  color: #6b5a4f;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .admin-flavour-form,
+  .admin-flavour-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-flavour-form button {
+    grid-column: 1 / -1;
+  }
+
+  .admin-flavour-row > input:first-child,
+  .admin-flavour-row .admin-category-actions {
+    grid-column: 1 / -1;
+  }
+}

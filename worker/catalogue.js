@@ -1,5 +1,6 @@
 import bundledProducts from "../src/data/products.json" with { type: "json" };
 import bundledCategories from "../src/data/categories.json" with { type: "json" };
+import bundledFlavours from "../src/data/flavours.json" with { type: "json" };
 
 const CACHE_MS = 30_000;
 
@@ -8,12 +9,14 @@ function withImages(product) {
   return { ...product, image: images[0], images: images.slice(0, 3) };
 }
 
-function buildState(rawProducts, categoryRows, source) {
+function buildState(rawProducts, categoryRows, source, flavourRows = bundledFlavours) {
   const products = rawProducts.map(withImages);
   const active = products.filter((product) => product.active !== false);
   const extraCategories = categoryRows.map((category) => category.name);
   return {
     source,
+    flavours: flavourRows.map(({ name, extra }) => ({ name, extra: Number.isInteger(extra) && extra > 0 ? extra : 0 })),
+    flavourExtras: new Map(flavourRows.map(({ name, extra }) => [name, Number.isInteger(extra) && extra > 0 ? extra : 0])),
     loadedAt: Date.now(),
     products: active,
     byId: new Map(active.map((product) => [product.id, product])),
@@ -35,6 +38,19 @@ export function getProductById(id) {
 
 export function getProductByIdAny(id) {
   return state.byIdAny.get(id);
+}
+
+export function getFlavours() {
+  return state.flavours;
+}
+
+export function flavourExtra(name) {
+  return state.flavourExtras.get(name) ?? 0;
+}
+
+// Whole-rupee price of one unit of a product in the chosen flavour.
+export function unitPriceRupees(product, flavour) {
+  return product.price + flavourExtra(flavour);
 }
 
 export function getCategories() {
@@ -111,7 +127,16 @@ export async function ensureCatalogue(env, { force = false } = {}) {
         extra = bundledCategories.map((name) => ({ name }));
       }
     }
-    state = buildState(rows.map(rowToProduct), extra, "d1");
+    let flavourRows = bundledFlavours;
+    try {
+      const { results } = await env.ORDERS_DB.prepare("SELECT name, extra_price FROM flavours ORDER BY sort_order, name").all();
+      if (Array.isArray(results) && results.length > 0) {
+        flavourRows = results.map((row) => ({ name: row.name, extra: row.extra_price }));
+      }
+    } catch {
+      // Older database without the flavours table: every flavour costs no extra.
+    }
+    state = buildState(rows.map(rowToProduct), extra, "d1", flavourRows);
   } catch (error) {
     // Table missing (migration not applied) or a transient error: keep serving the last known catalogue.
     state.loadedAt = Date.now();
@@ -126,5 +151,6 @@ export function publicCatalogue() {
     products: state.products.map(({ sortOrder, active, ...product }) => product),
     categories: state.categories.filter((name) => !state.hiddenCategories.includes(name)),
     hiddenCategories: state.hiddenCategories,
+    flavours: state.flavours,
   };
 }

@@ -1,3 +1,4 @@
+import { unitPrice } from "../lib/flavours";
 import { CART_STORAGE_KEY, loadCart, productById, saveCart, type CartItem } from "./cart";
 import {
   answersKey,
@@ -59,7 +60,7 @@ function renderCart() {
   cartItems.replaceChildren();
   const entries = cart.filter((item) => productById.has(item.id) && item.quantity > 0);
   const count = entries.reduce((sum, item) => sum + item.quantity, 0);
-  const total = entries.reduce((sum, item) => sum + productById.get(item.id)!.price * item.quantity, 0);
+  const total = entries.reduce((sum, item) => sum + unitPrice(productById.get(item.id)!, item.flavour) * item.quantity, 0);
 
   bagCount.textContent = String(count);
   openCartButton.setAttribute("aria-label", `Your shopping bag, ${count} ${count === 1 ? "item" : "items"}`);
@@ -79,7 +80,7 @@ function renderCart() {
     const name = document.createElement("strong");
     name.textContent = product.name;
     const price = document.createElement("span");
-    price.textContent = `${currency.format(product.price)} each`;
+    price.textContent = `${currency.format(unitPrice(product, item.flavour))} each`;
     copy.append(name);
     if (item.flavour) {
       const flavour = document.createElement("span");

@@ -143,6 +143,12 @@ Add and edit products (name, description, price, pack size, category, flavours, 
 - Delete is blocked while any product, promo code or custom field uses the category; hide it instead.
 - Hidden categories stay selectable for promos and custom fields. Changes trigger a site rebuild when configured. Stored in `catalogue_categories` (`hidden` column, migration 0016).
 
+### 6.9 Flavours
+
+- Admin **Flavours** panel: one master list (`flavours` table, migration 0019) with an `extra_price` in whole rupees (0 allowed). "Assorted" is seeded at 0.
+- Products choose flavours from the list (checkboxes). Unit price = product price + flavour extra, applied in the product page, bag, checkout, promo quotes, orders and manual orders. The Worker recomputes it from D1.
+- Renaming a flavour updates products that use it; deleting is blocked while a product uses it. `GET /products` returns `flavours: [{name, extra}]`, bundled in `src/data/flavours.json`.
+
 ## 7. Payments
 
 - **Storefront payments**: Razorpay Standard Checkout with server-side signature, payment and amount verification.
@@ -162,11 +168,11 @@ Every browser call must come from `ALLOWED_ORIGIN`; the webhook is exempt and is
 | Accounts | `POST /auth/request-code`, `/auth/verify-code`, `/auth/orders`, `/auth/profile/update`, `/auth/logout` |
 | Admin | `/admin/data`, `/admin/promos/create`, `/admin/promos/update`, `/admin/flat-discount/save`, `/admin/custom-fields/create`, `/update`, `/delete`, `/admin/customers/create`, `/update`, `/admin/orders/create`, `/update-status`, `/payment-link`, `/mark-paid` |
 | Webhook | `POST /razorpay/webhook` |
-| Catalogue and corporate | `GET /products`, `POST /corporate/enquiry`, admin `/admin/products/*`, `/admin/categories/create`, `/update`, `/delete` |
+| Catalogue and corporate | `GET /products`, `POST /corporate/enquiry`, admin `/admin/products/*`, `/admin/categories/create`, `/update`, `/delete`, `/admin/flavours/create`, `/update`, `/delete` |
 
 ## 9. Data model (D1)
 
-Products: `products` (incl. `images` JSON array) and `catalogue_categories` (migrations 0013, 0014, 0016). Admin endpoints: `/admin/products/create`, `/update`, `/image` (raw image upload to R2), `/publish`.
+Products: `products` (incl. `images` JSON array) and `catalogue_categories` (migrations 0013, 0014, 0016), `flavours` (migration 0019; 0017/0018 add promo and flat-discount settings). Admin endpoints: `/admin/products/create`, `/update`, `/image` (raw image upload to R2), `/publish`.
 
 Migrations `worker/migrations/0001`-`0015`.
 

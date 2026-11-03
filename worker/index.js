@@ -1,4 +1,4 @@
-import { ensureCatalogue, getProductById, getProducts, publicCatalogue } from "./catalogue.js";
+import { ensureCatalogue, getProductById, getProducts, publicCatalogue, unitPriceRupees } from "./catalogue.js";
 import { parseCorporateEnquiry, sendCorporateEnquiry } from "./notify.js";
 import {
   createAdminPromo,
@@ -20,6 +20,7 @@ import {
   handleAdminFlatDiscount,
 } from "./flat-discount.js";
 import { handleAdminCategory } from "./admin-categories.js";
+import { handleAdminFlavour } from "./admin-flavours.js";
 import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
 import {
   getDistanceKm,
@@ -174,6 +175,7 @@ function validateOrder(body, storeLocation, customFields = []) {
     seen.add(variantKey);
     return {
       product,
+      unitPrice: unitPriceRupees(product, item.flavour),
       quantity: item.quantity,
       flavour: item.flavour,
       wrapper: item.wrapper.trim(),
@@ -182,7 +184,7 @@ function validateOrder(body, storeLocation, customFields = []) {
   });
   const checkoutCustom = collectAnswers(customFields.filter((field) => field.scope === "checkout"), body.customFields);
 
-  const amount = items.reduce((sum, item) => sum + item.product.price * item.quantity * 100, 0);
+  const amount = items.reduce((sum, item) => sum + item.unitPrice * item.quantity * 100, 0);
   if (!Number.isSafeInteger(amount) || amount <= 0) throw new Error("Your order total is invalid.");
   const distanceKm = getDistanceKm(storeLocation, body.deliveryLocation);
   return {
@@ -208,7 +210,8 @@ function validatePromoCart(body) {
     }
     const product = getProductById(item.id);
     if (!product) throw new Error("A product in your bag is no longer available.");
-    return { product, quantity: item.quantity };
+    const flavour = typeof item.flavour === "string" && product.flavours.includes(item.flavour) ? item.flavour : "";
+    return { product, unitPrice: unitPriceRupees(product, flavour), quantity: item.quantity };
   });
   return items;
 }
@@ -348,11 +351,11 @@ async function handleCreateOrder(request, env, origin) {
         state: order.customer.state,
         pincode: order.customer.pincode,
         eventDate: order.customer.eventDate,
-        items: order.items.map(({ product, quantity, flavour, wrapper, custom }) => ({
+        items: order.items.map(({ product, unitPrice, quantity, flavour, wrapper, custom }) => ({
           id: product.id,
           name: product.name,
           quantity,
-          unitPriceRupees: product.price,
+          unitPriceRupees: unitPrice,
           flavour,
           wrapper,
           ...(custom.length > 0 ? { custom } : {}),
@@ -389,10 +392,10 @@ async function handleCreateOrder(request, env, origin) {
     return errorResponse("Secure payments are not configured yet. Please contact the shop.", 503, origin);
   }
 
-  const serializedItems = JSON.stringify(order.items.map(({ product, quantity, flavour, wrapper }) => [
+  const serializedItems = JSON.stringify(order.items.map(({ product, unitPrice, quantity, flavour, wrapper }) => [
     product.id,
     quantity,
-    product.price,
+    unitPrice,
     flavour,
     wrapper,
   ]));
@@ -870,6 +873,10 @@ export default {
     }
     if (path === "/admin/categories/create" || path === "/admin/categories/update" || path === "/admin/categories/delete") {
       const result = await handleAdminCategory(request, env, path.split("/").pop());
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/flavours/create" || path === "/admin/flavours/update" || path === "/admin/flavours/delete") {
+      const result = await handleAdminFlavour(request, env, path.split("/").pop());
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/flat-discount/save") {

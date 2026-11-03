@@ -23,6 +23,11 @@ interface Deps {
   getCategories: () => string[];
 }
 
+interface FlavourOption {
+  name: string;
+  extraPrice: number;
+}
+
 const MAX_IMAGES = 3;
 const MAX_EDGE = 1600;
 
@@ -64,6 +69,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
   const photos = required<HTMLElement>(root, "#admin-product-photos");
   const photoInput = required<HTMLInputElement>(root, "#admin-product-photo-input");
   const categoryList = required<HTMLDataListElement>(root, "#admin-product-categories");
+  const flavourList = required<HTMLElement>(root, "#admin-product-flavours");
   const submit = required<HTMLButtonElement>(root, "#admin-product-submit");
   const cancel = required<HTMLButtonElement>(root, "#admin-product-cancel");
   const list = required<HTMLElement>(root, "#admin-product-list");
@@ -73,9 +79,39 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
   let images: string[] = [];
   let editingId: string | null = null;
   let uploading = false;
+  let flavourOptions: FlavourOption[] = [];
 
   function field<T extends HTMLElement>(name: string) {
     return form.elements.namedItem(name) as unknown as T;
+  }
+
+  function checkedFlavours() {
+    return Array.from(flavourList.querySelectorAll<HTMLInputElement>("input:checked")).map((input) => input.value);
+  }
+
+  function renderFlavours(selected: string[]) {
+    const known = new Set(flavourOptions.map((option) => option.name));
+    const options = [...flavourOptions, ...selected.filter((name) => !known.has(name)).map((name) => ({ name, extraPrice: 0 }))];
+    flavourList.replaceChildren();
+    if (options.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "admin-form-hint";
+      empty.textContent = "No flavours yet. Add them in the Flavours section below.";
+      flavourList.append(empty);
+      return;
+    }
+    for (const option of options) {
+      const label = document.createElement("label");
+      label.className = "apf-flavour-chip";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = option.name;
+      input.checked = selected.includes(option.name);
+      const text = document.createElement("span");
+      text.textContent = option.extraPrice > 0 ? `${option.name} (+\u20B9${option.extraPrice})` : option.name;
+      label.append(input, text);
+      flavourList.append(label);
+    }
   }
 
   function renderPhotos() {
@@ -144,6 +180,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
     editingId = null;
     form.reset();
     images = [];
+    renderFlavours([]);
     field<HTMLInputElement>("active").checked = true;
     field<HTMLInputElement>("customizable").checked = true;
     heading.textContent = "Add a product";
@@ -160,7 +197,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
     field<HTMLInputElement>("packSize").value = product.packSize;
     field<HTMLInputElement>("tag").value = product.tag;
     field<HTMLInputElement>("extraTags").value = (product.extraTags ?? []).join(", ");
-    field<HTMLTextAreaElement>("flavours").value = product.flavours.join("\n");
+    renderFlavours(product.flavours);
     field<HTMLInputElement>("featured").checked = product.featured;
     field<HTMLInputElement>("customizable").checked = product.customizable !== false;
     field<HTMLInputElement>("active").checked = product.active;
@@ -245,7 +282,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
       packSize: String(data.get("packSize") ?? ""),
       tag: String(data.get("tag") ?? ""),
       extraTags: lines(data.get("extraTags"), /,/),
-      flavours: lines(data.get("flavours"), /\r?\n/),
+      flavours: checkedFlavours(),
       images,
       featured: field<HTMLInputElement>("featured").checked,
       customizable: field<HTMLInputElement>("customizable").checked,
@@ -286,8 +323,10 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
   resetForm();
 
   return {
-    render(next: CatalogueProduct[], rebuildConfigured: boolean) {
+    render(next: CatalogueProduct[], rebuildConfigured: boolean, flavours: FlavourOption[] = []) {
       products = next;
+      flavourOptions = flavours;
+      renderFlavours(checkedFlavours());
       categoryList.replaceChildren(...getCategories().map((category) => new Option(category)));
       publishHint.textContent = rebuildConfigured
         ? "Saving a product updates the storefront automatically (about a minute)."

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ensureCatalogue, getCategories, getProductById, getProductByIdAny, getProducts, publicCatalogue } from "./catalogue.js";
+import { ensureCatalogue, getCategories, getProductById, getProductByIdAny, getProducts, publicCatalogue, unitPriceRupees } from "./catalogue.js";
 
 function database(rows, categories = [{ name: "Gifts" }]) {
   return {
@@ -59,4 +59,29 @@ test("keeps the last catalogue when the query fails", async () => {
   const broken = { prepare: () => ({ all: async () => { throw new Error("no such table: products"); } }) };
   await ensureCatalogue({ ORDERS_DB: broken }, { force: true });
   assert.equal(getProductById("p1").price, 123);
+});
+
+test("adds the flavour extra from D1 to the unit price", async () => {
+  const db = {
+    prepare(sql) {
+      return {
+        async all() {
+          if (/FROM products/i.test(sql)) return { results: [row({})] };
+          if (/FROM flavours/i.test(sql)) return { results: [{ name: "A", extra_price: 25 }, { name: "B", extra_price: 0 }] };
+          return { results: [] };
+        },
+      };
+    },
+  };
+  await ensureCatalogue({ ORDERS_DB: db }, { force: true });
+  const product = getProductById("p1");
+  assert.equal(unitPriceRupees(product, "A"), 148);
+  assert.equal(unitPriceRupees(product, "B"), 123);
+  assert.equal(unitPriceRupees(product, ""), 123);
+  assert.deepEqual(publicCatalogue().flavours.find((flavour) => flavour.name === "A"), { name: "A", extra: 25 });
+});
+
+test("bundled flavours include Assorted at no extra cost", async () => {
+  await ensureCatalogue({ ORDERS_DB: database([row({})]) }, { force: true });
+  assert.deepEqual(publicCatalogue().flavours.find((flavour) => flavour.name === "Assorted"), { name: "Assorted", extra: 0 });
 });
