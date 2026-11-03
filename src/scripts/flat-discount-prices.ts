@@ -30,11 +30,21 @@ async function showDiscountedPrices() {
       was.textContent = formatRupees(originalPaise);
       target.textContent = formatRupees(discountedPaise);
       target.classList.add("price-now");
-      target.before(was);
+      const stack = document.createElement("span");
+      stack.className = "price-stack";
+      target.before(stack);
+      stack.append(target, was);
       const badge = document.createElement("span");
-      badge.className = "price-off-badge";
+      const card = target.closest(".product-card");
+      const imageWrap = card?.querySelector(".product-image-wrap");
       badge.textContent = `${percentage}% off`;
-      target.after(badge);
+      if (imageWrap) {
+        badge.className = "price-off-flag";
+        imageWrap.append(badge);
+      } else {
+        badge.className = "price-off-badge";
+        stack.after(badge);
+      }
     });
   } catch (error) {
     console.error("Could not display discounted prices.", error);

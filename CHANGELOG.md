@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.42.2
+
+- Discounted prices are now aligned consistently: price and struck-through price sit on one line, the flavour count sits underneath, and the "N% off" label is a badge on the product photo instead of wrapping beside the price.
+
 ## 1.42.1
 
 - The home page flat-discount banner is now a tappable link to the shop, with a round "N% OFF" badge and a "Shop the sale" button.
