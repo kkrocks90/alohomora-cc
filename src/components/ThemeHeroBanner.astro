@@ -8,35 +8,38 @@ const base = import.meta.env.BASE_URL;
 {
   banner && (
     <section class={`theme-hero-banner theme-hero-banner-${theme.id}`} aria-label={banner.title}>
-      <svg class="theme-hero-lantern theme-hero-lantern-left" viewBox="0 0 60 150" aria-hidden="true">
+      {banner.decor && <span class="theme-hero-lantern theme-hero-lantern-left theme-hero-emoji" aria-hidden="true">{banner.decor.left}</span>}
+      {!banner.decor && <svg class="theme-hero-lantern theme-hero-lantern-left" viewBox="0 0 60 150" aria-hidden="true">
         <line x1="30" y1="0" x2="30" y2="40" stroke="#d9a441" stroke-width="2" />
         <rect x="14" y="40" width="32" height="8" rx="3" fill="#d9a441" />
         <path d="M14 48h32l6 34-6 34H14l-6-34z" fill="#e8742a" stroke="#d9a441" stroke-width="2" />
         <path d="M30 48v68M22 48l-4 34 4 34M38 48l4 34-4 34" stroke="#f6d27a" stroke-width="1.5" fill="none" />
         <rect x="14" y="116" width="32" height="8" rx="3" fill="#d9a441" />
         <path d="M30 124v14M24 138h12" stroke="#d9a441" stroke-width="2" />
-      </svg>
+      </svg>}
       <div class="theme-hero-copy">
         <p class="theme-hero-kicker">{banner.kicker}</p>
         <h2>{banner.title}</h2>
         <p>{banner.text}</p>
         <a class="theme-hero-cta" href={`${base}${banner.href}`}>{banner.cta}</a>
       </div>
-      <svg class="theme-hero-diya" viewBox="0 0 120 90" aria-hidden="true">
+      {banner.decor && <span class="theme-hero-diya theme-hero-emoji" aria-hidden="true">{banner.decor.center}</span>}
+      {!banner.decor && <svg class="theme-hero-diya" viewBox="0 0 120 90" aria-hidden="true">
         <path d="M60 4c9 12 10 22 0 30-10-8-9-18 0-30z" fill="#ffd166" />
         <path d="M60 14c4 6 4 11 0 15-4-4-4-9 0-15z" fill="#e8742a" />
         <path d="M8 44c10 30 30 42 52 42s42-12 52-42c-14 8-32 10-52 10S22 52 8 44z" fill="#c9742a" stroke="#d9a441" stroke-width="2" />
         <ellipse cx="60" cy="44" rx="52" ry="8" fill="#8a3a14" />
         <path d="M30 66q30 14 60 0" stroke="#f6d27a" stroke-width="2" fill="none" />
-      </svg>
-      <svg class="theme-hero-lantern theme-hero-lantern-right" viewBox="0 0 60 150" aria-hidden="true">
+      </svg>}
+      {banner.decor && <span class="theme-hero-lantern theme-hero-lantern-right theme-hero-emoji" aria-hidden="true">{banner.decor.right}</span>}
+      {!banner.decor && <svg class="theme-hero-lantern theme-hero-lantern-right" viewBox="0 0 60 150" aria-hidden="true">
         <line x1="30" y1="0" x2="30" y2="40" stroke="#d9a441" stroke-width="2" />
         <rect x="14" y="40" width="32" height="8" rx="3" fill="#d9a441" />
         <path d="M14 48h32l6 34-6 34H14l-6-34z" fill="#e8742a" stroke="#d9a441" stroke-width="2" />
         <path d="M30 48v68M22 48l-4 34 4 34M38 48l4 34-4 34" stroke="#f6d27a" stroke-width="1.5" fill="none" />
         <rect x="14" y="116" width="32" height="8" rx="3" fill="#d9a441" />
         <path d="M30 124v14M24 138h12" stroke="#d9a441" stroke-width="2" />
-      </svg>
+      </svg>}
     </section>
   )
 }

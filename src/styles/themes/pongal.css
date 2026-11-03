@@ -1,0 +1,251 @@
+/* pongal theme (generated from the shared festive template). Applies only when <html data-theme="pongal">. Customer pages only. */
+html[data-theme="pongal"] {
+  --paper: #fffbe8;
+  --paper-dark: #fbefc2;
+  --ink: #3a2208;
+  --muted: #7a6230;
+  --cocoa: #b8430f;
+  --cocoa-dark: #4a2a08;
+  --rose: #3f8f3a;
+  --line: #efe0a8;
+  --t-maroon: #b8430f;
+  --t-maroon-dark: #7c2d0a;
+  --t-deep: #4a2a08;
+  --t-gold: #f2b705;
+  --t-gold-soft: #fde08a;
+  --t-saffron: #3f8f3a;
+  --t-cream: #fff4cc;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Ribbon above the header */
+html[data-theme="pongal"] .theme-banner {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, var(--t-deep), var(--t-maroon), var(--t-deep));
+  color: var(--t-gold-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+html[data-theme="pongal"] .theme-banner::before,
+html[data-theme="pongal"] .theme-banner::after {
+  content: "\2736";
+  color: var(--t-gold);
+  font-size: 13px;
+}
+
+/* Header with a gold rule and a marigold garland */
+html[data-theme="pongal"] .site-header {
+  border-bottom: 1px solid rgb(242 183 5 / 45%);
+  background: rgb(255 251 232 / 94%);
+}
+
+html[data-theme="pongal"] .site-header::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 18px;
+  background:
+    radial-gradient(circle at 8px 8px, var(--t-saffron) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    radial-gradient(circle at 21px 10px, var(--t-gold) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    linear-gradient(var(--t-gold), var(--t-gold)) 0 0 / 100% 1px no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+html[data-theme="pongal"] .wordmark i {
+  color: #3f8f3a;
+}
+
+/* Dark surfaces become deep maroon */
+html[data-theme="pongal"] .announcement-strip,
+html[data-theme="pongal"] .promise-strip,
+html[data-theme="pongal"] .site-footer {
+  background: var(--t-deep);
+}
+
+html[data-theme="pongal"] .announcement-strip:hover {
+  background: var(--t-maroon);
+}
+
+html[data-theme="pongal"] .promo-banner,
+html[data-theme="pongal"] .button-primary,
+html[data-theme="pongal"] .add-button,
+html[data-theme="pongal"] .bag-button,
+html[data-theme="pongal"] .whatsapp-float,
+html[data-theme="pongal"] .mobile-menu-cta,
+html[data-theme="pongal"] .tab-bag-count,
+html[data-theme="pongal"] .store-chip.is-active,
+html[data-theme="pongal"] .corporate-steps li::before {
+  background: var(--t-maroon);
+  border-color: var(--t-maroon);
+  color: var(--t-cream);
+}
+
+html[data-theme="pongal"] .menu-toggle span {
+  background: var(--t-maroon);
+}
+
+html[data-theme="pongal"] .promo-banner:hover,
+html[data-theme="pongal"] .button-primary:hover,
+html[data-theme="pongal"] .add-button:hover,
+html[data-theme="pongal"] .bag-button:hover,
+html[data-theme="pongal"] .whatsapp-float:hover {
+  background: var(--t-maroon-dark);
+}
+
+html[data-theme="pongal"] .bag-button .bag-count {
+  color: var(--t-maroon-dark);
+}
+
+html[data-theme="pongal"] .button-primary {
+  box-shadow: 0 8px 20px rgb(184 67 15 / 30%);
+}
+
+html[data-theme="pongal"] .closing-banner,
+html[data-theme="pongal"] .corporate-enquiry {
+  background: var(--t-maroon-dark);
+}
+
+html[data-theme="pongal"] .closing-banner h2 em,
+html[data-theme="pongal"] .closing-banner .eyebrow {
+  color: var(--t-gold-soft);
+}
+
+html[data-theme="pongal"] .site-footer > p {
+  color: var(--t-gold-soft);
+}
+
+html[data-theme="pongal"] .tab-bar [aria-current="page"] {
+  color: var(--t-maroon);
+}
+
+/* Warm cream sections */
+html[data-theme="pongal"] .story-section {
+  background: #fbefc2;
+}
+
+html[data-theme="pongal"] .kindness-icon,
+html[data-theme="pongal"] .mobile-menu-links a span:last-child,
+html[data-theme="pongal"] .mobile-menu-cta-light {
+  background: #fbefc2;
+}
+
+html[data-theme="pongal"] .mobile-menu-cta-light {
+  color: var(--t-maroon-dark);
+}
+
+html[data-theme="pongal"] .hero-section {
+  position: relative;
+  background: radial-gradient(ellipse 60% 70% at 78% 45%, #fbefc2 0%, rgb(255 251 232 / 0%) 70%);
+}
+
+/* Twinkling lights behind the hero */
+html[data-theme="pongal"] .hero-section::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 8% 22%, var(--t-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 20% 78%, var(--t-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 12%, var(--t-gold) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 62% 86%, var(--t-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 18%, var(--t-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 70%, var(--t-gold) 0 1.5px, transparent 2.5px);
+  content: "";
+  opacity: 0.8;
+  pointer-events: none;
+  animation: pongal-twinkle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes pongal-twinkle {
+  from { opacity: 0.25; }
+  to { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="pongal"] .hero-section::before { animation: none; }
+}
+
+/* Product cards pick up a gold edge */
+html[data-theme="pongal"] .product-card {
+  border-color: rgb(242 183 5 / 35%);
+}
+
+html[data-theme="pongal"] .product-name-row :is(h2, h3) {
+  color: var(--t-deep);
+}
+
+@media (max-width: 620px) {
+  html[data-theme="pongal"] .theme-banner { min-height: 34px; padding: 6px 12px; font-size: 11px; }
+  html[data-theme="pongal"] .theme-banner::before,
+  html[data-theme="pongal"] .theme-banner::after { display: none; }
+  html[data-theme="pongal"] .site-header::after { height: 14px; background-size: 22px 14px, 22px 14px, 100% 1px; }
+}
+
+/* Hero banner (ThemeHeroBanner.astro) */
+html[data-theme="pongal"] .theme-hero-banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1180px;
+  margin: 1.25rem auto 0;
+  padding: 1.5rem 2rem;
+  border-radius: 24px;
+  border: 2px solid var(--t-gold, #f2b705);
+  color: #fff4cc;
+  text-align: center;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(253, 224, 138, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(63, 143, 58, 0.3), transparent 45%),
+    linear-gradient(135deg, #7c2d0a, #b8430f 55%, #c2560f);
+  overflow: hidden;
+}
+html[data-theme="pongal"] .theme-hero-lantern { width: 44px; height: auto; align-self: start; margin-top: -1.5rem; animation: pongal-sway 4s ease-in-out infinite; transform-origin: top center; }
+html[data-theme="pongal"] .theme-hero-lantern-right { grid-column: 4; animation-delay: -2s; }
+html[data-theme="pongal"] .theme-hero-diya { grid-column: 3; width: 88px; filter: drop-shadow(0 0 14px rgba(253, 224, 138, 0.7)); }
+html[data-theme="pongal"] .theme-hero-copy { grid-column: 2; grid-row: 1; }
+html[data-theme="pongal"] .theme-hero-kicker { margin: 0; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.75rem; color: #fde08a; }
+html[data-theme="pongal"] .theme-hero-copy h2 { margin: 0.2rem 0 0.4rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: #fde08a; }
+html[data-theme="pongal"] .theme-hero-copy p:not(.theme-hero-kicker) { margin: 0 auto 1rem; max-width: 46ch; }
+html[data-theme="pongal"] .theme-hero-cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; background: #fde08a; color: #7c2d0a; font-weight: 700; text-decoration: none; }
+@keyframes pongal-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { html[data-theme="pongal"] .theme-hero-lantern { animation: none; } }
+@media (max-width: 620px) {
+  html[data-theme="pongal"] .theme-hero-banner { grid-template-columns: 1fr; margin: 1rem 1rem 0; padding: 1.5rem 1.25rem; }
+  html[data-theme="pongal"] .theme-hero-lantern { position: absolute; top: 0; width: 30px; margin: 0; }
+  html[data-theme="pongal"] .theme-hero-lantern-left { left: 10px; }
+  html[data-theme="pongal"] .theme-hero-lantern-right { right: 10px; }
+  html[data-theme="pongal"] .theme-hero-diya { display: none; }
+  html[data-theme="pongal"] .theme-hero-copy { grid-column: 1; padding: 0 1.5rem; }
+}
+/* Keep the garland clear of the promo banner */
+html[data-theme="pongal"] .promo-banner { margin-top: 22px; }
+
+/* Footer wordmark on the dark maroon footer */
+html[data-theme="pongal"] .site-footer .wordmark { color: #fff4cc; }
+html[data-theme="pongal"] .site-footer .wordmark i { color: #fde08a; }
+
+/* Store toolbar */
+html[data-theme="pongal"] .store-toolbar .store-search input,
+html[data-theme="pongal"] .store-toolbar .store-sort select { border-color: #efe0a8; background-color: #fffbe8; }
+html[data-theme="pongal"] .store-toolbar .store-search input:focus,
+html[data-theme="pongal"] .store-toolbar .store-sort select:focus { border-color: #f2b705; box-shadow: 0 0 0 3px rgb(242 183 5 / 25%); }
+html[data-theme="pongal"] .store-search-icon { stroke: #b8430f; }
+html[data-theme="pongal"] .store-chip { border-color: #efe0a8; background: #fffbe8; color: #b8430f; }
+html[data-theme="pongal"] .store-chip:hover { border-color: #f2b705; }
+html[data-theme="pongal"] .store-chip.is-active { border-color: #f2b705; background: linear-gradient(135deg, #b8430f, #7c2d0a); color: #fde08a; box-shadow: 0 6px 14px -6px rgb(184 67 15 / 60%); }
+html[data-theme="pongal"] .theme-hero-emoji { width: auto; font-size: 2.6rem; line-height: 1; text-align: center; filter: none; }
+@media (max-width: 620px) {
+  html[data-theme="pongal"] .theme-hero-lantern.theme-hero-emoji { font-size: 1.7rem; }
+}

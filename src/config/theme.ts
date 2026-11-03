@@ -20,6 +20,7 @@ export interface ThemeHeroBanner {
   text: string;
   cta: string;
   href: string;
+  decor?: { left: string; center: string; right: string };
 }
 
 export interface Theme {
@@ -55,6 +56,104 @@ export const THEMES: Record<string, Theme> = {
       text: "Handmade gift boxes and hampers to share the sweetness with family, friends and teams.",
       cta: "Shop Diwali gifts",
       href: "store/",
+    },
+  },
+  monsoon: {
+    id: "monsoon",
+    label: "Monsoon",
+    themeColor: "#14595a",
+    banner: { text: "Monsoon treats! Warm chocolates for rainy evenings.", href: "store/" },
+    heroBanner: {
+      kicker: "Rainy-day cravings",
+      title: "Monsoon Magic",
+      text: "Cosy chocolates and gift boxes for grey skies, made fresh and wrapped with care.",
+      cta: "Shop monsoon treats",
+      href: "store/",
+      decor: { left: "🌧️", center: "☔", right: "🌧️" },
+    },
+  },
+  christmas: {
+    id: "christmas",
+    label: "Christmas",
+    themeColor: "#0f3a27",
+    banner: { text: "Merry Christmas! Gift boxes and hampers for the season.", href: "store/" },
+    heroBanner: {
+      kicker: "Season's greetings",
+      title: "Merry Christmas",
+      text: "Handmade chocolates and hampers to unwrap with the people you love.",
+      cta: "Shop Christmas gifts",
+      href: "store/",
+      decor: { left: "🎄", center: "🎁", right: "🎄" },
+    },
+  },
+  "republic-day": {
+    id: "republic-day",
+    label: "Republic Day",
+    themeColor: "#0b3d91",
+    banner: { text: "Happy Republic Day! Celebrate with something sweet.", href: "store/" },
+    heroBanner: {
+      kicker: "26 January",
+      title: "Happy Republic Day",
+      text: "Handmade chocolates to share with family, friends and teams.",
+      cta: "Shop sweet gifts",
+      href: "store/",
+      decor: { left: "🎖️", center: "⭐", right: "🎖️" },
+    },
+  },
+  pongal: {
+    id: "pongal",
+    label: "Pongal",
+    themeColor: "#7c2d0a",
+    banner: { text: "Happy Pongal! Sweet treats for the harvest festival.", href: "store/" },
+    heroBanner: {
+      kicker: "Harvest festival",
+      title: "Happy Pongal",
+      text: "Sweet handmade treats and gift boxes to share this harvest season.",
+      cta: "Shop Pongal treats",
+      href: "store/",
+      decor: { left: "🌾", center: "🍯", right: "🌾" },
+    },
+  },
+  birthday: {
+    id: "birthday",
+    label: "Birthday",
+    themeColor: "#8a1f63",
+    banner: { text: "Birthday treats! Gift boxes for every celebration.", href: "store/" },
+    heroBanner: {
+      kicker: "Time to celebrate",
+      title: "Make it a sweet birthday",
+      text: "Handmade chocolates and gift boxes for the birthday star in your life.",
+      cta: "Shop birthday gifts",
+      href: "store/",
+      decor: { left: "🎈", center: "🎂", right: "🎈" },
+    },
+  },
+  "independence-day": {
+    id: "independence-day",
+    label: "Independence Day",
+    themeColor: "#0a4a20",
+    banner: { text: "Happy Independence Day! Celebrate with something sweet.", href: "store/" },
+    heroBanner: {
+      kicker: "15 August",
+      title: "Happy Independence Day",
+      text: "Handmade chocolates to share the joy with family, friends and teams.",
+      cta: "Shop sweet gifts",
+      href: "store/",
+      decor: { left: "🪁", center: "🕊️", right: "🪁" },
+    },
+  },
+  "valentines-day": {
+    id: "valentines-day",
+    label: "Valentine's Day",
+    themeColor: "#7d0c2b",
+    banner: { text: "Happy Valentine's Day! Share something sweet with someone special.", href: "store/" },
+    heroBanner: {
+      kicker: "With love",
+      title: "Happy Valentine's Day",
+      text: "Handmade chocolates and gift boxes for the one who makes your day.",
+      cta: "Shop gifts of love",
+      href: "store/",
+      decor: { left: "💝", center: "🍫", right: "💝" },
     },
   },
 };

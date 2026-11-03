@@ -1,0 +1,251 @@
+/* valentines-day theme (generated from the shared festive template). Applies only when <html data-theme="valentines-day">. Customer pages only. */
+html[data-theme="valentines-day"] {
+  --paper: #fff5f6;
+  --paper-dark: #fde1e6;
+  --ink: #3d0f1b;
+  --muted: #8a5360;
+  --cocoa: #b5123f;
+  --cocoa-dark: #4a0719;
+  --rose: #ff5c7a;
+  --line: #f5cfd6;
+  --t-maroon: #b5123f;
+  --t-maroon-dark: #7d0c2b;
+  --t-deep: #4a0719;
+  --t-gold: #f2a7b5;
+  --t-gold-soft: #ffd6de;
+  --t-saffron: #ff5c7a;
+  --t-cream: #ffe9ed;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Ribbon above the header */
+html[data-theme="valentines-day"] .theme-banner {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, var(--t-deep), var(--t-maroon), var(--t-deep));
+  color: var(--t-gold-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+html[data-theme="valentines-day"] .theme-banner::before,
+html[data-theme="valentines-day"] .theme-banner::after {
+  content: "\2736";
+  color: var(--t-gold);
+  font-size: 13px;
+}
+
+/* Header with a gold rule and a marigold garland */
+html[data-theme="valentines-day"] .site-header {
+  border-bottom: 1px solid rgb(242 167 181 / 45%);
+  background: rgb(255 245 246 / 94%);
+}
+
+html[data-theme="valentines-day"] .site-header::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 18px;
+  background:
+    radial-gradient(circle at 8px 8px, var(--t-saffron) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    radial-gradient(circle at 21px 10px, var(--t-gold) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    linear-gradient(var(--t-gold), var(--t-gold)) 0 0 / 100% 1px no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+html[data-theme="valentines-day"] .wordmark i {
+  color: #ff5c7a;
+}
+
+/* Dark surfaces become deep maroon */
+html[data-theme="valentines-day"] .announcement-strip,
+html[data-theme="valentines-day"] .promise-strip,
+html[data-theme="valentines-day"] .site-footer {
+  background: var(--t-deep);
+}
+
+html[data-theme="valentines-day"] .announcement-strip:hover {
+  background: var(--t-maroon);
+}
+
+html[data-theme="valentines-day"] .promo-banner,
+html[data-theme="valentines-day"] .button-primary,
+html[data-theme="valentines-day"] .add-button,
+html[data-theme="valentines-day"] .bag-button,
+html[data-theme="valentines-day"] .whatsapp-float,
+html[data-theme="valentines-day"] .mobile-menu-cta,
+html[data-theme="valentines-day"] .tab-bag-count,
+html[data-theme="valentines-day"] .store-chip.is-active,
+html[data-theme="valentines-day"] .corporate-steps li::before {
+  background: var(--t-maroon);
+  border-color: var(--t-maroon);
+  color: var(--t-cream);
+}
+
+html[data-theme="valentines-day"] .menu-toggle span {
+  background: var(--t-maroon);
+}
+
+html[data-theme="valentines-day"] .promo-banner:hover,
+html[data-theme="valentines-day"] .button-primary:hover,
+html[data-theme="valentines-day"] .add-button:hover,
+html[data-theme="valentines-day"] .bag-button:hover,
+html[data-theme="valentines-day"] .whatsapp-float:hover {
+  background: var(--t-maroon-dark);
+}
+
+html[data-theme="valentines-day"] .bag-button .bag-count {
+  color: var(--t-maroon-dark);
+}
+
+html[data-theme="valentines-day"] .button-primary {
+  box-shadow: 0 8px 20px rgb(181 18 63 / 30%);
+}
+
+html[data-theme="valentines-day"] .closing-banner,
+html[data-theme="valentines-day"] .corporate-enquiry {
+  background: var(--t-maroon-dark);
+}
+
+html[data-theme="valentines-day"] .closing-banner h2 em,
+html[data-theme="valentines-day"] .closing-banner .eyebrow {
+  color: var(--t-gold-soft);
+}
+
+html[data-theme="valentines-day"] .site-footer > p {
+  color: var(--t-gold-soft);
+}
+
+html[data-theme="valentines-day"] .tab-bar [aria-current="page"] {
+  color: var(--t-maroon);
+}
+
+/* Warm cream sections */
+html[data-theme="valentines-day"] .story-section {
+  background: #fde1e6;
+}
+
+html[data-theme="valentines-day"] .kindness-icon,
+html[data-theme="valentines-day"] .mobile-menu-links a span:last-child,
+html[data-theme="valentines-day"] .mobile-menu-cta-light {
+  background: #fde1e6;
+}
+
+html[data-theme="valentines-day"] .mobile-menu-cta-light {
+  color: var(--t-maroon-dark);
+}
+
+html[data-theme="valentines-day"] .hero-section {
+  position: relative;
+  background: radial-gradient(ellipse 60% 70% at 78% 45%, #fde1e6 0%, rgb(255 245 246 / 0%) 70%);
+}
+
+/* Twinkling lights behind the hero */
+html[data-theme="valentines-day"] .hero-section::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 8% 22%, var(--t-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 20% 78%, var(--t-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 12%, var(--t-gold) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 62% 86%, var(--t-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 18%, var(--t-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 70%, var(--t-gold) 0 1.5px, transparent 2.5px);
+  content: "";
+  opacity: 0.8;
+  pointer-events: none;
+  animation: valentines-day-twinkle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes valentines-day-twinkle {
+  from { opacity: 0.25; }
+  to { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="valentines-day"] .hero-section::before { animation: none; }
+}
+
+/* Product cards pick up a gold edge */
+html[data-theme="valentines-day"] .product-card {
+  border-color: rgb(242 167 181 / 35%);
+}
+
+html[data-theme="valentines-day"] .product-name-row :is(h2, h3) {
+  color: var(--t-deep);
+}
+
+@media (max-width: 620px) {
+  html[data-theme="valentines-day"] .theme-banner { min-height: 34px; padding: 6px 12px; font-size: 11px; }
+  html[data-theme="valentines-day"] .theme-banner::before,
+  html[data-theme="valentines-day"] .theme-banner::after { display: none; }
+  html[data-theme="valentines-day"] .site-header::after { height: 14px; background-size: 22px 14px, 22px 14px, 100% 1px; }
+}
+
+/* Hero banner (ThemeHeroBanner.astro) */
+html[data-theme="valentines-day"] .theme-hero-banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1180px;
+  margin: 1.25rem auto 0;
+  padding: 1.5rem 2rem;
+  border-radius: 24px;
+  border: 2px solid var(--t-gold, #f2a7b5);
+  color: #ffe9ed;
+  text-align: center;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 214, 222, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 92, 122, 0.3), transparent 45%),
+    linear-gradient(135deg, #7d0c2b, #b5123f 55%, #d1305a);
+  overflow: hidden;
+}
+html[data-theme="valentines-day"] .theme-hero-lantern { width: 44px; height: auto; align-self: start; margin-top: -1.5rem; animation: valentines-day-sway 4s ease-in-out infinite; transform-origin: top center; }
+html[data-theme="valentines-day"] .theme-hero-lantern-right { grid-column: 4; animation-delay: -2s; }
+html[data-theme="valentines-day"] .theme-hero-diya { grid-column: 3; width: 88px; filter: drop-shadow(0 0 14px rgba(255, 214, 222, 0.7)); }
+html[data-theme="valentines-day"] .theme-hero-copy { grid-column: 2; grid-row: 1; }
+html[data-theme="valentines-day"] .theme-hero-kicker { margin: 0; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.75rem; color: #ffd6de; }
+html[data-theme="valentines-day"] .theme-hero-copy h2 { margin: 0.2rem 0 0.4rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: #ffd6de; }
+html[data-theme="valentines-day"] .theme-hero-copy p:not(.theme-hero-kicker) { margin: 0 auto 1rem; max-width: 46ch; }
+html[data-theme="valentines-day"] .theme-hero-cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; background: #ffd6de; color: #7d0c2b; font-weight: 700; text-decoration: none; }
+@keyframes valentines-day-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { html[data-theme="valentines-day"] .theme-hero-lantern { animation: none; } }
+@media (max-width: 620px) {
+  html[data-theme="valentines-day"] .theme-hero-banner { grid-template-columns: 1fr; margin: 1rem 1rem 0; padding: 1.5rem 1.25rem; }
+  html[data-theme="valentines-day"] .theme-hero-lantern { position: absolute; top: 0; width: 30px; margin: 0; }
+  html[data-theme="valentines-day"] .theme-hero-lantern-left { left: 10px; }
+  html[data-theme="valentines-day"] .theme-hero-lantern-right { right: 10px; }
+  html[data-theme="valentines-day"] .theme-hero-diya { display: none; }
+  html[data-theme="valentines-day"] .theme-hero-copy { grid-column: 1; padding: 0 1.5rem; }
+}
+/* Keep the garland clear of the promo banner */
+html[data-theme="valentines-day"] .promo-banner { margin-top: 22px; }
+
+/* Footer wordmark on the dark maroon footer */
+html[data-theme="valentines-day"] .site-footer .wordmark { color: #ffe9ed; }
+html[data-theme="valentines-day"] .site-footer .wordmark i { color: #ffd6de; }
+
+/* Store toolbar */
+html[data-theme="valentines-day"] .store-toolbar .store-search input,
+html[data-theme="valentines-day"] .store-toolbar .store-sort select { border-color: #f5cfd6; background-color: #fff5f6; }
+html[data-theme="valentines-day"] .store-toolbar .store-search input:focus,
+html[data-theme="valentines-day"] .store-toolbar .store-sort select:focus { border-color: #f2a7b5; box-shadow: 0 0 0 3px rgb(242 167 181 / 25%); }
+html[data-theme="valentines-day"] .store-search-icon { stroke: #b5123f; }
+html[data-theme="valentines-day"] .store-chip { border-color: #f5cfd6; background: #fff5f6; color: #b5123f; }
+html[data-theme="valentines-day"] .store-chip:hover { border-color: #f2a7b5; }
+html[data-theme="valentines-day"] .store-chip.is-active { border-color: #f2a7b5; background: linear-gradient(135deg, #b5123f, #7d0c2b); color: #ffd6de; box-shadow: 0 6px 14px -6px rgb(181 18 63 / 60%); }
+html[data-theme="valentines-day"] .theme-hero-emoji { width: auto; font-size: 2.6rem; line-height: 1; text-align: center; filter: none; }
+@media (max-width: 620px) {
+  html[data-theme="valentines-day"] .theme-hero-lantern.theme-hero-emoji { font-size: 1.7rem; }
+}

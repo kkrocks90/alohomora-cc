@@ -1,0 +1,251 @@
+/* birthday theme (generated from the shared festive template). Applies only when <html data-theme="birthday">. Customer pages only. */
+html[data-theme="birthday"] {
+  --paper: #fff7fb;
+  --paper-dark: #fde4f1;
+  --ink: #3a1236;
+  --muted: #8a5a80;
+  --cocoa: #c2338a;
+  --cocoa-dark: #4b1a5e;
+  --rose: #35b6d6;
+  --line: #f6d3e6;
+  --t-maroon: #c2338a;
+  --t-maroon-dark: #8a1f63;
+  --t-deep: #4b1a5e;
+  --t-gold: #ffcf33;
+  --t-gold-soft: #ffe99a;
+  --t-saffron: #35b6d6;
+  --t-cream: #ffeaf5;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Ribbon above the header */
+html[data-theme="birthday"] .theme-banner {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, var(--t-deep), var(--t-maroon), var(--t-deep));
+  color: var(--t-gold-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+html[data-theme="birthday"] .theme-banner::before,
+html[data-theme="birthday"] .theme-banner::after {
+  content: "\2736";
+  color: var(--t-gold);
+  font-size: 13px;
+}
+
+/* Header with a gold rule and a marigold garland */
+html[data-theme="birthday"] .site-header {
+  border-bottom: 1px solid rgb(255 207 51 / 45%);
+  background: rgb(255 247 251 / 94%);
+}
+
+html[data-theme="birthday"] .site-header::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 18px;
+  background:
+    radial-gradient(circle at 8px 8px, var(--t-saffron) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    radial-gradient(circle at 21px 10px, var(--t-gold) 0 3.5px, transparent 4px) 0 0 / 26px 18px repeat-x,
+    linear-gradient(var(--t-gold), var(--t-gold)) 0 0 / 100% 1px no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+html[data-theme="birthday"] .wordmark i {
+  color: #35b6d6;
+}
+
+/* Dark surfaces become deep maroon */
+html[data-theme="birthday"] .announcement-strip,
+html[data-theme="birthday"] .promise-strip,
+html[data-theme="birthday"] .site-footer {
+  background: var(--t-deep);
+}
+
+html[data-theme="birthday"] .announcement-strip:hover {
+  background: var(--t-maroon);
+}
+
+html[data-theme="birthday"] .promo-banner,
+html[data-theme="birthday"] .button-primary,
+html[data-theme="birthday"] .add-button,
+html[data-theme="birthday"] .bag-button,
+html[data-theme="birthday"] .whatsapp-float,
+html[data-theme="birthday"] .mobile-menu-cta,
+html[data-theme="birthday"] .tab-bag-count,
+html[data-theme="birthday"] .store-chip.is-active,
+html[data-theme="birthday"] .corporate-steps li::before {
+  background: var(--t-maroon);
+  border-color: var(--t-maroon);
+  color: var(--t-cream);
+}
+
+html[data-theme="birthday"] .menu-toggle span {
+  background: var(--t-maroon);
+}
+
+html[data-theme="birthday"] .promo-banner:hover,
+html[data-theme="birthday"] .button-primary:hover,
+html[data-theme="birthday"] .add-button:hover,
+html[data-theme="birthday"] .bag-button:hover,
+html[data-theme="birthday"] .whatsapp-float:hover {
+  background: var(--t-maroon-dark);
+}
+
+html[data-theme="birthday"] .bag-button .bag-count {
+  color: var(--t-maroon-dark);
+}
+
+html[data-theme="birthday"] .button-primary {
+  box-shadow: 0 8px 20px rgb(194 51 138 / 30%);
+}
+
+html[data-theme="birthday"] .closing-banner,
+html[data-theme="birthday"] .corporate-enquiry {
+  background: var(--t-maroon-dark);
+}
+
+html[data-theme="birthday"] .closing-banner h2 em,
+html[data-theme="birthday"] .closing-banner .eyebrow {
+  color: var(--t-gold-soft);
+}
+
+html[data-theme="birthday"] .site-footer > p {
+  color: var(--t-gold-soft);
+}
+
+html[data-theme="birthday"] .tab-bar [aria-current="page"] {
+  color: var(--t-maroon);
+}
+
+/* Warm cream sections */
+html[data-theme="birthday"] .story-section {
+  background: #fde4f1;
+}
+
+html[data-theme="birthday"] .kindness-icon,
+html[data-theme="birthday"] .mobile-menu-links a span:last-child,
+html[data-theme="birthday"] .mobile-menu-cta-light {
+  background: #fde4f1;
+}
+
+html[data-theme="birthday"] .mobile-menu-cta-light {
+  color: var(--t-maroon-dark);
+}
+
+html[data-theme="birthday"] .hero-section {
+  position: relative;
+  background: radial-gradient(ellipse 60% 70% at 78% 45%, #fde4f1 0%, rgb(255 247 251 / 0%) 70%);
+}
+
+/* Twinkling lights behind the hero */
+html[data-theme="birthday"] .hero-section::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 8% 22%, var(--t-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 20% 78%, var(--t-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 12%, var(--t-gold) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 62% 86%, var(--t-gold) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 18%, var(--t-saffron) 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 70%, var(--t-gold) 0 1.5px, transparent 2.5px);
+  content: "";
+  opacity: 0.8;
+  pointer-events: none;
+  animation: birthday-twinkle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes birthday-twinkle {
+  from { opacity: 0.25; }
+  to { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="birthday"] .hero-section::before { animation: none; }
+}
+
+/* Product cards pick up a gold edge */
+html[data-theme="birthday"] .product-card {
+  border-color: rgb(255 207 51 / 35%);
+}
+
+html[data-theme="birthday"] .product-name-row :is(h2, h3) {
+  color: var(--t-deep);
+}
+
+@media (max-width: 620px) {
+  html[data-theme="birthday"] .theme-banner { min-height: 34px; padding: 6px 12px; font-size: 11px; }
+  html[data-theme="birthday"] .theme-banner::before,
+  html[data-theme="birthday"] .theme-banner::after { display: none; }
+  html[data-theme="birthday"] .site-header::after { height: 14px; background-size: 22px 14px, 22px 14px, 100% 1px; }
+}
+
+/* Hero banner (ThemeHeroBanner.astro) */
+html[data-theme="birthday"] .theme-hero-banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1180px;
+  margin: 1.25rem auto 0;
+  padding: 1.5rem 2rem;
+  border-radius: 24px;
+  border: 2px solid var(--t-gold, #ffcf33);
+  color: #ffeaf5;
+  text-align: center;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 233, 154, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(53, 182, 214, 0.3), transparent 45%),
+    linear-gradient(135deg, #8a1f63, #c2338a 55%, #a02a9c);
+  overflow: hidden;
+}
+html[data-theme="birthday"] .theme-hero-lantern { width: 44px; height: auto; align-self: start; margin-top: -1.5rem; animation: birthday-sway 4s ease-in-out infinite; transform-origin: top center; }
+html[data-theme="birthday"] .theme-hero-lantern-right { grid-column: 4; animation-delay: -2s; }
+html[data-theme="birthday"] .theme-hero-diya { grid-column: 3; width: 88px; filter: drop-shadow(0 0 14px rgba(255, 233, 154, 0.7)); }
+html[data-theme="birthday"] .theme-hero-copy { grid-column: 2; grid-row: 1; }
+html[data-theme="birthday"] .theme-hero-kicker { margin: 0; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.75rem; color: #ffe99a; }
+html[data-theme="birthday"] .theme-hero-copy h2 { margin: 0.2rem 0 0.4rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: #ffe99a; }
+html[data-theme="birthday"] .theme-hero-copy p:not(.theme-hero-kicker) { margin: 0 auto 1rem; max-width: 46ch; }
+html[data-theme="birthday"] .theme-hero-cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; background: #ffe99a; color: #8a1f63; font-weight: 700; text-decoration: none; }
+@keyframes birthday-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { html[data-theme="birthday"] .theme-hero-lantern { animation: none; } }
+@media (max-width: 620px) {
+  html[data-theme="birthday"] .theme-hero-banner { grid-template-columns: 1fr; margin: 1rem 1rem 0; padding: 1.5rem 1.25rem; }
+  html[data-theme="birthday"] .theme-hero-lantern { position: absolute; top: 0; width: 30px; margin: 0; }
+  html[data-theme="birthday"] .theme-hero-lantern-left { left: 10px; }
+  html[data-theme="birthday"] .theme-hero-lantern-right { right: 10px; }
+  html[data-theme="birthday"] .theme-hero-diya { display: none; }
+  html[data-theme="birthday"] .theme-hero-copy { grid-column: 1; padding: 0 1.5rem; }
+}
+/* Keep the garland clear of the promo banner */
+html[data-theme="birthday"] .promo-banner { margin-top: 22px; }
+
+/* Footer wordmark on the dark maroon footer */
+html[data-theme="birthday"] .site-footer .wordmark { color: #ffeaf5; }
+html[data-theme="birthday"] .site-footer .wordmark i { color: #ffe99a; }
+
+/* Store toolbar */
+html[data-theme="birthday"] .store-toolbar .store-search input,
+html[data-theme="birthday"] .store-toolbar .store-sort select { border-color: #f6d3e6; background-color: #fff7fb; }
+html[data-theme="birthday"] .store-toolbar .store-search input:focus,
+html[data-theme="birthday"] .store-toolbar .store-sort select:focus { border-color: #ffcf33; box-shadow: 0 0 0 3px rgb(255 207 51 / 25%); }
+html[data-theme="birthday"] .store-search-icon { stroke: #c2338a; }
+html[data-theme="birthday"] .store-chip { border-color: #f6d3e6; background: #fff7fb; color: #c2338a; }
+html[data-theme="birthday"] .store-chip:hover { border-color: #ffcf33; }
+html[data-theme="birthday"] .store-chip.is-active { border-color: #ffcf33; background: linear-gradient(135deg, #c2338a, #8a1f63); color: #ffe99a; box-shadow: 0 6px 14px -6px rgb(194 51 138 / 60%); }
+html[data-theme="birthday"] .theme-hero-emoji { width: auto; font-size: 2.6rem; line-height: 1; text-align: center; filter: none; }
+@media (max-width: 620px) {
+  html[data-theme="birthday"] .theme-hero-lantern.theme-hero-emoji { font-size: 1.7rem; }
+}

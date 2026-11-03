@@ -80,7 +80,7 @@ Enquiries POST to /corporate/enquiry on the Worker, which emails ADMIN_EMAIL via
 
 ### Themes
 
-Seasonal themes are CSS-only overlays on the base theme. `src/config/theme.ts` lists them; each has a stylesheet in `src/styles/themes/` scoped to `html[data-theme="<id>"]`, plus an optional ribbon banner. The active theme is chosen at build time from the GitHub repo variable `SITE_THEME` (empty = the fallback in `theme.ts`, currently `diwali`; `default` = base theme). When running the Pages deploy workflow you can pick the theme from a dropdown (`repo-setting` uses the variable). To revert: set `SITE_THEME` to `default` and run the Pages deploy. To add a theme: add an entry in `theme.ts`, a CSS file, and import it in `SiteLayout.astro`. Admin pages are not themed.
+Seasonal themes are CSS-only overlays on the base theme. `src/config/theme.ts` lists them; each has a stylesheet in `src/styles/themes/` scoped to `html[data-theme="<id>"]`, plus an optional ribbon banner. The active theme is chosen at build time from the GitHub repo variable `SITE_THEME` (empty = the fallback in `theme.ts`, currently `diwali`; `default` = base theme). When running the Pages deploy workflow you can pick the theme from a dropdown (`repo-setting` uses the variable). To revert: set `SITE_THEME` to `default` and run the Pages deploy. To add a theme: add an entry in `theme.ts`, a CSS file, and import it in `SiteLayout.astro`. Available themes: `default`, `diwali`, `monsoon`, `christmas`, `republic-day`, `pongal`, `birthday`, `independence-day`, `valentines-day`. Only Diwali has its own hero illustration and SVG decorations; the others use emoji decorations and the standard hero image. Admin pages are not themed.
 
 ## 4. Accounts
 

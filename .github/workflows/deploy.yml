@@ -11,6 +11,13 @@ on:
           - repo-setting
           - default
           - diwali
+          - monsoon
+          - christmas
+          - republic-day
+          - pongal
+          - birthday
+          - independence-day
+          - valentines-day
 
 permissions:
   contents: read

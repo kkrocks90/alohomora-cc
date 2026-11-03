@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.38.0
+
+- New themes: monsoon, christmas, republic-day, pongal, birthday, independence-day and valentines-day. Each has its own palette, ribbon banner and hero banner. Pick one from the theme dropdown when running the Pages deploy workflow.
+
 ## 1.37.0
 
 - Shop page search, sort and category chips restyled on desktop and mobile: soft shadows, focus ring, custom sort arrow, roomier chips. Diwali theme adds gold borders and a maroon/gold active chip.
