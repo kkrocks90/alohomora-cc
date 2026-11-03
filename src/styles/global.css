@@ -7412,3 +7412,40 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 /* Footer logo is white on the dark footer */
 .footer-wordmark img.wordmark-mark { filter: brightness(0) invert(1); }
 .admin-order-discount { display: grid; gap: 6px; max-width: 240px; margin: 0 0 14px; font-weight: 600; }
+
+/* Store toolbar polish */
+.store-toolbar .store-search input,
+.store-toolbar .store-sort select {
+  border: 1px solid #e3d6c8;
+  background-color: #fffdf9;
+  box-shadow: 0 2px 8px -4px rgb(60 38 28 / 22%);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.store-toolbar .store-search input:focus,
+.store-toolbar .store-sort select:focus {
+  outline: 0;
+  border-color: #9e7460;
+  box-shadow: 0 0 0 3px rgb(158 116 96 / 18%);
+}
+.store-toolbar .store-sort select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236b5549' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.store-chips { gap: 10px; padding-top: 6px; padding-bottom: 18px; }
+.store-chip {
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 13px;
+  box-shadow: 0 2px 6px -3px rgb(60 38 28 / 25%);
+}
+.store-chip:hover { transform: translateY(-1px); }
+.store-chip.is-active { box-shadow: 0 6px 14px -6px rgb(98 66 52 / 55%); }
+@media (max-width: 900px) {
+  .store-toolbar .store-sort select { padding-right: 28px; background-position: right 10px center; }
+  .store-chip { min-height: 38px; padding: 0 15px; font-size: 12.5px; }
+}

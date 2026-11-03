@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.37.0
+
+- Shop page search, sort and category chips restyled on desktop and mobile: soft shadows, focus ring, custom sort arrow, roomier chips. Diwali theme adds gold borders and a maroon/gold active chip.
+
 ## 1.36.1
 
 - Diwali theme: the footer logo text was dark on the maroon footer; it is now cream and gold.

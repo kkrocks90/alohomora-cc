@@ -235,3 +235,13 @@ html[data-theme="diwali"] .promo-banner { margin-top: 22px; }
 /* Footer wordmark on the dark maroon footer */
 html[data-theme="diwali"] .site-footer .wordmark { color: #fff3d6; }
 html[data-theme="diwali"] .site-footer .wordmark i { color: #ffd166; }
+
+/* Store toolbar */
+html[data-theme="diwali"] .store-toolbar .store-search input,
+html[data-theme="diwali"] .store-toolbar .store-sort select { border-color: #e8cf9a; background-color: #fffaf0; }
+html[data-theme="diwali"] .store-toolbar .store-search input:focus,
+html[data-theme="diwali"] .store-toolbar .store-sort select:focus { border-color: #d9a441; box-shadow: 0 0 0 3px rgb(217 164 65 / 25%); }
+html[data-theme="diwali"] .store-search-icon { stroke: #7a1d2c; }
+html[data-theme="diwali"] .store-chip { border-color: #e8cf9a; background: #fffaf0; color: #7a1d2c; }
+html[data-theme="diwali"] .store-chip:hover { border-color: #d9a441; }
+html[data-theme="diwali"] .store-chip.is-active { border-color: #d9a441; background: linear-gradient(135deg, #7a1d2c, #5a1220); color: #ffd166; box-shadow: 0 6px 14px -6px rgb(122 29 44 / 60%); }
