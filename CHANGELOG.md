@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.47.1 - 2026-11-04
+
+- Dimensions example in the admin form is now length x width (no thickness).
+
 ## 1.47.0 - 2026-11-04
 
 - Products have optional **Dimensions** and **Weight** fields in the admin product form (migration 0020). When set, they appear under the description on the product page.
