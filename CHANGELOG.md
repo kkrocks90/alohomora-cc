@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.40.1
+
+- Home: removed the "A celebration coming up?" strip; the event-date tip is now a fourth card in "Good to know".
+
 ## 1.40.0
 
 - Every seasonal theme has a matching category (e.g. "Diwali Special"). The theme banner and hero button now open the shop filtered to it, and its chip always shows while that theme is live.

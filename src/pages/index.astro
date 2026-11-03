@@ -37,11 +37,6 @@ const orgLd = {
 
 <SiteLayout jsonLd={[orgLd]}>
   <main id="storefront" data-checkout-api={checkoutApiUrl}>
-    <a class="announcement-strip" href={`${import.meta.env.BASE_URL}store/`}>
-      <span class="announcement-sparkle" aria-hidden="true">✳</span>
-      <span>A celebration coming up? Add your event date at checkout.</span>
-      <span class="announcement-arrow" aria-hidden="true">↗</span>
-    </a>
     <div class="promo-banner promo-banner-home" data-promo-banner hidden>
       <span class="promo-banner-sparkle" aria-hidden="true">✳</span>
       <span class="promo-banner-copy">
@@ -212,6 +207,11 @@ const orgLd = {
           <span class="kindness-icon" aria-hidden="true">↗</span>
           <h3>A little note on delivery</h3>
           <p>Delivery details and any delivery charge are confirmed with you after checkout.</p>
+        </article>
+        <article class="kindness-card">
+          <span class="kindness-icon" aria-hidden="true">&#10051;</span>
+          <h3>Celebrating something?</h3>
+          <p>Add your event date at checkout and we will plan your order around it.</p>
         </article>
       </div>
     </section>
