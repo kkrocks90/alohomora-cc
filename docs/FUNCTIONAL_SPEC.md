@@ -86,6 +86,7 @@ Seasonal themes are CSS-only overlays on the base theme. `src/config/theme.ts` l
 
 ## 4. Accounts
 
+- Optional **Sign in with Google** on the account, checkout and admin login screens (shown only when `GOOGLE_CLIENT_ID` is set in `worker/wrangler.toml`). The Worker verifies the Google ID token (audience, issuer, verified email, expiry) via Google tokeninfo and issues the same session as the email code; the admin is still only `ADMIN_EMAIL`.
 - Sign-in by emailed one-time code (Resend). Codes expire after 10 minutes; resend is rate-limited to once per 60 s.
 - Session token: kept for the tab, or in local storage when "remember me" is chosen; server sessions last 30 days.
 - Profile: name, phone, email (read-only), default address, PIN, city, state.
@@ -165,7 +166,7 @@ Every browser call must come from `ALLOWED_ORIGIN`; the webhook is exempt and is
 | --- | --- |
 | Public | `GET /flat-discount`, `GET /promos/featured` (no longer used by the site), `GET /custom-fields`, `GET /pincode/<pin>` |
 | Checkout | `POST /orders`, `POST /verify`, `POST /promos/quote`, `POST /promos/release` |
-| Accounts | `POST /auth/request-code`, `/auth/verify-code`, `/auth/orders`, `/auth/profile/update`, `/auth/logout` |
+| Accounts | `POST /auth/request-code`, `/auth/verify-code`, `/auth/google`, `GET /auth/google-config`, `/auth/orders`, `/auth/profile/update`, `/auth/logout` |
 | Admin | `/admin/data`, `/admin/promos/create`, `/admin/promos/update`, `/admin/flat-discount/save`, `/admin/custom-fields/create`, `/update`, `/delete`, `/admin/customers/create`, `/update`, `/admin/orders/create`, `/update-status`, `/payment-link`, `/mark-paid` |
 | Webhook | `POST /razorpay/webhook` |
 | Catalogue and corporate | `GET /products`, `POST /corporate/enquiry`, admin `/admin/products/*`, `/admin/categories/create`, `/update`, `/delete`, `/admin/flavours/create`, `/update`, `/delete` |

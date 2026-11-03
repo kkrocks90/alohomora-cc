@@ -230,6 +230,69 @@ export async function verifyLoginCode(request, env) {
   }
 }
 
+async function startSession(env, email, now) {
+  if (email !== normalizeCustomerEmail(env.ADMIN_EMAIL)) {
+    const nowText = new Date(now).toISOString();
+    await env.ORDERS_DB
+      .prepare(
+        `INSERT INTO customers (
+          customer_id, customer_name, customer_phone, customer_email,
+          default_address, created_at, updated_at
+        ) VALUES (?, '', '', ?, '', ?, ?)
+        ON CONFLICT(customer_email COLLATE NOCASE) WHERE customer_email <> '' DO NOTHING`,
+      )
+      .bind(`cus_${crypto.randomUUID()}`, email, nowText, nowText)
+      .run();
+  }
+  const token = randomHex(32);
+  const expiresAt = now + SESSION_LIFETIME_MS;
+  await env.ORDERS_DB
+    .prepare("INSERT INTO customer_sessions (token_hash, email, expires_at, created_at) VALUES (?, ?, ?, ?)")
+    .bind(await sha256Hex(token), email, expiresAt, now)
+    .run();
+  return { token, expiresAt };
+}
+
+export function googleClientId(env) {
+  const id = typeof env.GOOGLE_CLIENT_ID === "string" ? env.GOOGLE_CLIENT_ID.trim() : "";
+  return /^[\w.-]+\.apps\.googleusercontent\.com$/.test(id) ? id : "";
+}
+
+// Verifies a Google Sign-In ID token (via Google's tokeninfo endpoint) and starts the same session as an email code.
+export async function verifyGoogleLogin(request, env) {
+  let body;
+  try {
+    body = await readJson(request);
+  } catch (error) {
+    return result(400, { error: error.message });
+  }
+  const clientId = googleClientId(env);
+  if (!clientId || !isConfigured(env)) {
+    return result(503, { error: "Google sign-in is not set up yet. Please use an email code." });
+  }
+  const credential = typeof body?.credential === "string" ? body.credential : "";
+  if (!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(credential) || credential.length > 4000) {
+    return result(400, { error: "Google sign-in failed. Please try again." });
+  }
+  try {
+    const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+    if (!response.ok) return result(401, { error: "Google sign-in could not be verified. Please try again." });
+    const info = await response.json();
+    const email = normalizeCustomerEmail(info?.email);
+    const now = Date.now();
+    const valid = email &&
+      info.aud === clientId &&
+      (info.iss === "https://accounts.google.com" || info.iss === "accounts.google.com") &&
+      (info.email_verified === true || info.email_verified === "true") &&
+      Number(info.exp) * 1000 > now;
+    if (!valid) return result(401, { error: "Google sign-in could not be verified. Please try again." });
+    return result(200, await startSession(env, email, now));
+  } catch (error) {
+    console.error("Could not verify a Google sign-in.", error);
+    return result(503, { error: "Google sign-in is temporarily unavailable. Please try again shortly." });
+  }
+}
+
 export async function authenticatedEmail(request, env) {
   const authorization = request.headers.get("Authorization") ?? "";
   const match = /^Bearer ([0-9a-f]{64})$/i.exec(authorization);

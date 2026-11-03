@@ -5,6 +5,7 @@ import { printInvoice } from "./order-view";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
 import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
+import { mountGoogleSignIn } from "./google-signin";
 import { initFlavoursAdmin, isCatalogueFlavour } from "./admin-flavours";
 import { initFlatDiscountAdmin, isFlatDiscount, type FlatDiscount } from "./admin-flat-discount";
 import type { CustomField } from "./custom-fields";
@@ -1285,6 +1286,23 @@ if (root) {
     setStatus,
     reload: () => loadDashboard(),
     getCatalogue: () => ({ products: adminData?.products ?? [], categories: adminData?.categories ?? [] }),
+  });
+
+  void mountGoogleSignIn(document.querySelector<HTMLElement>("#admin-google"), {
+    apiUrl,
+    onSession: async (token) => {
+      saveAdminSessionToken(token);
+      try {
+        await loadDashboard(token);
+        window.dispatchEvent(new Event("customer-session-change"));
+      } catch (error) {
+        clearAdminSessionToken();
+        throw error instanceof AdminApiError && error.status === 403
+          ? new Error("That Google account is not authorized to access order management.")
+          : error;
+      }
+    },
+    onError: (message) => setLoginStatus(message, true),
   });
 
   emailForm.addEventListener("submit", async (event) => {

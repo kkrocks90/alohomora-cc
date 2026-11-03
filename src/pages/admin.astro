@@ -25,6 +25,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
       <p class="eyebrow">Chocolate Circle · private</p>
       <h1 id="admin-title">Order <em>management.</em></h1>
       <p class="admin-intro">Sign in with the shop admin email to manage customers, orders, and invoices.</p>
+      <div class="google-signin" id="admin-google" hidden></div>
       <form class="account-form" id="admin-email-form">
         <label for="admin-email">Admin email address</label>
         <input id="admin-email" name="email" type="email" autocomplete="email" maxlength="120" required />

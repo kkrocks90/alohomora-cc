@@ -1,3 +1,4 @@
+import { mountGoogleSignIn } from "./google-signin";
 import {
   CUSTOMER_SESSION_KEY,
   getAdminSessionToken,
@@ -322,6 +323,19 @@ if (root) {
       setBusy(false);
     }
   }
+
+  void mountGoogleSignIn(document.querySelector<HTMLElement>("#account-google"), {
+    apiUrl,
+    onSession: async (token) => {
+      setBusy(true);
+      try {
+        await loadOrders(token, rememberMeInput.checked);
+      } finally {
+        setBusy(false);
+      }
+    },
+    onError: (message) => setStatus(message, true),
+  });
 
   emailForm.addEventListener("submit", async (event) => {
     event.preventDefault();

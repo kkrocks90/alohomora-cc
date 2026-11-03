@@ -25,6 +25,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         Sign in with your email to view your details, delivery addresses, and order history.
       </p>
 
+      <div class="google-signin" id="account-google" hidden></div>
       <form class="account-form" id="account-email-form">
         <label for="account-email">Email address</label>
         <input

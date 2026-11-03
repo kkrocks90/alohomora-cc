@@ -1,3 +1,4 @@
+import { mountGoogleSignIn } from "./google-signin";
 import {
   CART_STORAGE_KEY,
   clearCustomerSessionToken,
@@ -406,6 +407,25 @@ async function loadSession(token: string) {
   }
   renderOrder();
 }
+
+void mountGoogleSignIn(document.querySelector<HTMLElement>("#checkout-google"), {
+  apiUrl,
+  onSession: async (token) => {
+    try {
+      await loadSession(token);
+      saveCustomerSessionToken(token, rememberMeInput.checked);
+      window.dispatchEvent(new Event("customer-session-change"));
+    } catch (error) {
+      clearCustomerSessionToken();
+      window.dispatchEvent(new Event("customer-session-change"));
+      sessionToken = "";
+      customerEmail = "";
+      showLogin();
+      throw error;
+    }
+  },
+  onError: (message) => setLoginStatus(message, true),
+});
 
 emailForm.addEventListener("submit", async (event) => {
   event.preventDefault();

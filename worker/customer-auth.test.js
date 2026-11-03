@@ -7,6 +7,7 @@ import {
   normalizeCustomerEmail,
   requestLoginCode,
   updateCustomerProfile,
+  verifyGoogleLogin,
   verifyLoginCode,
 } from "./customer-auth.js";
 
@@ -311,4 +312,53 @@ test("one-time email code grants access to paid orders and logout revokes the se
 
   assert.equal((await logoutCustomer(makeRequest("/auth/logout", undefined, verified.body.token), env)).status, 200);
   assert.equal((await getCustomerOrders(makeRequest("/auth/orders", undefined, verified.body.token), env)).status, 401);
+});
+
+const googleId = "123-abc.apps.googleusercontent.com";
+const credential = "aaa.bbb.ccc";
+
+function googleRequest() {
+  return new Request("https://checkout.example.com/auth/google", { method: "POST", body: JSON.stringify({ credential }) });
+}
+
+function sessionDatabase(inserts) {
+  return {
+    prepare(sql) {
+      return {
+        bind(...values) {
+          return { run: async () => { inserts.push({ sql, values }); return { meta: { changes: 1 } }; } };
+        },
+      };
+    },
+  };
+}
+
+test("Google sign-in starts a session for a verified token with the right audience", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({ aud: googleId, iss: "https://accounts.google.com", email: "Buyer@Example.com", email_verified: "true", exp: String(Math.floor(Date.now() / 1000) + 600) });
+  try {
+    const inserts = [];
+    const response = await verifyGoogleLogin(googleRequest(), { ...configuredEnv, GOOGLE_CLIENT_ID: googleId, ORDERS_DB: sessionDatabase(inserts) });
+    assert.equal(response.status, 200);
+    assert.match(response.body.token, /^[0-9a-f]{64}$/);
+    assert.ok(inserts.some((entry) => /customer_sessions/.test(entry.sql) && entry.values[1] === "buyer@example.com"));
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("Google sign-in rejects the wrong audience, unverified email, and missing setup", async () => {
+  const original = globalThis.fetch;
+  const valid = { aud: googleId, iss: "accounts.google.com", email: "buyer@example.com", email_verified: "true", exp: String(Math.floor(Date.now() / 1000) + 600) };
+  try {
+    for (const override of [{ aud: "other.apps.googleusercontent.com" }, { email_verified: "false" }, { exp: "1" }]) {
+      globalThis.fetch = async () => Response.json({ ...valid, ...override });
+      const response = await verifyGoogleLogin(googleRequest(), { ...configuredEnv, GOOGLE_CLIENT_ID: googleId, ORDERS_DB: sessionDatabase([]) });
+      assert.equal(response.status, 401);
+    }
+    const unset = await verifyGoogleLogin(googleRequest(), { ...configuredEnv, ORDERS_DB: sessionDatabase([]) });
+    assert.equal(unset.status, 503);
+  } finally {
+    globalThis.fetch = original;
+  }
 });

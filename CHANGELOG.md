@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.45.0
+
+- Optional **Sign in with Google** for customers (account page and checkout) and the admin. Set the public `GOOGLE_CLIENT_ID` in `worker/wrangler.toml` to enable it; until then the button stays hidden and email codes work as before. The admin is still restricted to `ADMIN_EMAIL`.
+
 ## 1.44.1
 
 - Admin: Categories and Flavours now live in their own **Categories & flavours** tab, and the tab bar is redesigned as a pill-style segmented control.

@@ -55,6 +55,8 @@ import {
   requestLoginCode,
   updateCustomerProfile,
   verifyLoginCode,
+  verifyGoogleLogin,
+  googleClientId,
 } from "./customer-auth.js";
 
 const encoder = new TextEncoder();
@@ -778,6 +780,9 @@ export default {
         return errorResponse("We could not send your enquiry. Please use WhatsApp or email us directly.", 503, configuredOrigin);
       }
     }
+    if (request.method === "GET" && path === "/auth/google-config") {
+      return jsonResponse({ clientId: googleClientId(env) }, 200, configuredOrigin);
+    }
     if (request.method === "GET" && path === "/flat-discount") {
       if (!env.ORDERS_DB) return errorResponse("The discount service is not configured.", 503, configuredOrigin);
       const discount = await getActiveFlatDiscount(env.ORDERS_DB);
@@ -833,6 +838,10 @@ export default {
     if (path === "/promos/release") return handleReleasePromo(request, env, configuredOrigin);
     if (path === "/auth/request-code") {
       const result = await requestLoginCode(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/auth/google") {
+      const result = await verifyGoogleLogin(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/auth/verify-code") {

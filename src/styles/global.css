@@ -8000,3 +8000,35 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
     padding: 0 14px;
   }
 }
+
+.google-signin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 14px;
+}
+
+.google-signin[hidden] {
+  display: none;
+}
+
+.google-signin-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  color: #8a766a;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.google-signin-divider::before,
+.google-signin-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e3d6ca;
+}

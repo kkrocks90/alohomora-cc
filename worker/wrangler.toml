@@ -8,6 +8,8 @@ ALLOWED_ORIGIN = "https://chocolatecircle.in"
 STORE_LATITUDE = "12.9234"
 STORE_LONGITUDE = "80.1873"
 LOGIN_FROM_EMAIL = "Chocolate Circle <login@auth.chocolatecircle.in>"
+# Public Google OAuth client ID (ends in .apps.googleusercontent.com). Leave empty to hide Google sign-in.
+GOOGLE_CLIENT_ID = ""
 ADMIN_EMAIL = "alohomora.chocolatecircle@gmail.com"
 
 [[d1_databases]]
