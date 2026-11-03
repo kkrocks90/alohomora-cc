@@ -1,4 +1,9 @@
-import { getCustomerSessionToken } from "./cart";
+import {
+  clearAdminSessionToken,
+  clearCustomerSessionToken,
+  getAdminSessionToken,
+  getCustomerSessionToken,
+} from "./cart";
 
 function requireMenuElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -8,12 +13,36 @@ function requireMenuElement<T extends Element>(selector: string): T {
 
 const accountLabels = document.querySelectorAll<HTMLElement>("[data-account-label]");
 
+const signOutButtons = document.querySelectorAll<HTMLButtonElement>("[data-sign-out]");
+
 function updateAccountLabels() {
+  const signedIn = Boolean(getCustomerSessionToken() || getAdminSessionToken());
+  signOutButtons.forEach((button) => {
+    button.hidden = !signedIn;
+  });
   const label = getCustomerSessionToken() ? "My profile" : "Login";
   accountLabels.forEach((element) => {
     element.textContent = label;
   });
 }
+
+const signOutApi = (document.querySelector<HTMLElement>("[data-sign-out][data-checkout-api]")?.dataset.checkoutApi ?? "").replace(/\/+$/, "");
+
+signOutButtons.forEach((button) => {
+  button.addEventListener("click", async () => {
+    const tokens = [getCustomerSessionToken(), getAdminSessionToken()].filter(Boolean);
+    clearCustomerSessionToken();
+    clearAdminSessionToken();
+    window.dispatchEvent(new Event("customer-session-change"));
+    if (signOutApi) {
+      await Promise.all(tokens.map((token) => fetch(`${signOutApi}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      }).catch(() => undefined)));
+    }
+    if (/\/(account|admin|checkout|order)\/?$/.test(window.location.pathname)) window.location.reload();
+  });
+});
 
 updateAccountLabels();
 window.addEventListener("customer-session-change", updateAccountLabels);

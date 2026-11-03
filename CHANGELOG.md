@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.46.0 - 2026-11-04
+
+- Added a Sign out button to the desktop header and the mobile side menu, shown only while signed in (customer or admin).
+
 ## 1.45.1 - 2026-11-04
 
 - Beautified the profile page: wider two-column desktop layout (details and addresses beside order history), card-style sections, tidier details list, rounded order cards and a cleaner stacked mobile layout.
