@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.44.0
+
+- Flavours admin: edit any names and extra percentages, then press one **Save all changes** button (only changed rows are saved, one storefront rebuild). The per-row Save buttons are gone; Delete remains.
+
 ## 1.43.2
 
 - Admin flavour checkboxes are now tidy pill chips (checkbox beside the name, filled when selected), and the extra-percentage field in the Flavours list is styled as a proper input.

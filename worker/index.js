@@ -875,7 +875,7 @@ export default {
       const result = await handleAdminCategory(request, env, path.split("/").pop());
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
-    if (path === "/admin/flavours/create" || path === "/admin/flavours/update" || path === "/admin/flavours/delete") {
+    if (path === "/admin/flavours/create" || path === "/admin/flavours/update" || path === "/admin/flavours/delete" || path === "/admin/flavours/save-all") {
       const result = await handleAdminFlavour(request, env, path.split("/").pop());
       return jsonResponse(result.body, result.status, configuredOrigin);
     }

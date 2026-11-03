@@ -3,7 +3,7 @@ import { ensureCatalogue, loadAllProductRows } from "./catalogue.js";
 import { triggerSiteRebuild } from "./admin-products.js";
 
 const INPUT_ERROR = /^(Enter|That|Remove|Request|Extra)/;
-const MAX_EXTRA_PERCENT = 100_000;
+const MAX_EXTRA_PERCENT = 500;
 
 function result(status, body) {
   return { status, body };
@@ -68,7 +68,7 @@ export async function registerFlavours(database, names) {
 
 async function readBody(request) {
   const body = await request.text();
-  if (new TextEncoder().encode(body).byteLength > 2_000) throw new Error("Request is too large.");
+  if (new TextEncoder().encode(body).byteLength > 20_000) throw new Error("Request is too large.");
   try {
     return JSON.parse(body);
   } catch {
@@ -77,6 +77,11 @@ async function readBody(request) {
 }
 
 async function applyAction(database, action, body) {
+  if (action === "save-all") {
+    const items = Array.isArray(body?.items) ? body.items.slice(0, 100) : [];
+    for (const item of items) await applyAction(database, "update", item);
+    return;
+  }
   const existing = await listAdminFlavours({ ORDERS_DB: database });
   if (action === "create") {
     const name = cleanName(body?.name);
@@ -127,7 +132,7 @@ async function applyAction(database, action, body) {
   await database.batch(statements);
 }
 
-// action is "create", "update" or "delete"
+// action is "create", "update", "delete" or "save-all"
 export async function handleAdminFlavour(request, env, action) {
   let body;
   try {

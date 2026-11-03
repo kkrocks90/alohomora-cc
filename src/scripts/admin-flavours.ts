@@ -27,6 +27,7 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
   const form = required<HTMLFormElement>(root, "#admin-flavour-form");
   const list = required<HTMLElement>(root, "#admin-flavour-list");
   const nameInput = required<HTMLInputElement>(form, "input[name='name']");
+  const saveAll = required<HTMLButtonElement>(root, "#admin-flavour-save-all");
   const extraInput = required<HTMLInputElement>(form, "input[name='extraPercent']");
 
   async function save(path: string, body: unknown, success: string) {
@@ -68,17 +69,6 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
 
     const actions = document.createElement("div");
     actions.className = "admin-category-actions";
-    const saveButton = document.createElement("button");
-    saveButton.type = "button";
-    saveButton.className = "button button-primary admin-category-action";
-    saveButton.textContent = "Save";
-    saveButton.addEventListener("click", () =>
-      void save(
-        "/admin/flavours/update",
-        { name: flavour.name, newName: nameField.value, extraPercent: Number(extraField.value || 0) },
-        "Flavour saved.",
-      ),
-    );
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "button button-secondary admin-category-action";
@@ -88,10 +78,46 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
         void save("/admin/flavours/delete", { name: flavour.name }, "Flavour deleted.");
       }
     });
-    actions.append(saveButton, deleteButton);
+    actions.append(deleteButton);
+    row.dataset.original = flavour.name;
+    row.dataset.savedName = flavour.name;
+    row.dataset.savedExtra = String(flavour.extraPercent);
     row.append(nameField, extraWrap, meta, actions);
     return row;
   }
+
+  function changedItems() {
+    return Array.from(list.querySelectorAll<HTMLElement>(".admin-flavour-row"))
+      .map((row) => {
+        const [nameField, extraField] = Array.from(row.querySelectorAll<HTMLInputElement>("input"));
+        return {
+          name: row.dataset.original ?? "",
+          newName: nameField.value,
+          extraPercent: Number(extraField.value || 0),
+          changed: nameField.value !== row.dataset.savedName || String(Number(extraField.value || 0)) !== row.dataset.savedExtra,
+        };
+      })
+      .filter((item) => item.changed)
+      .map(({ name, newName, extraPercent }) => ({ name, newName, extraPercent }));
+  }
+
+  saveAll.addEventListener("click", async () => {
+    const items = changedItems();
+    if (items.length === 0) {
+      setStatus("No flavour changes to save.");
+      return;
+    }
+    saveAll.disabled = true;
+    try {
+      await post("/admin/flavours/save-all", { items });
+      setStatus(`Saved ${items.length} flavour${items.length === 1 ? "" : "s"}. The storefront updates after the next publish.`);
+      await reload();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The flavours could not be saved.", true);
+    } finally {
+      saveAll.disabled = false;
+    }
+  });
 
   function render(flavours: CatalogueFlavour[]) {
     list.replaceChildren(...flavours.map(renderRow));
