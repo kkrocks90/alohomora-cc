@@ -2150,8 +2150,13 @@ h2 em {
 }
 
 .kindness-icon {
-  display: block;
-  margin-bottom: 10px;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 10px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f1e3d4;
   color: #af7b63;
   font-size: 20px;
 }
@@ -4997,6 +5002,10 @@ h2 em {
 
   .kindness-card {
     text-align: left;
+  }
+
+  .kindness-icon {
+    margin-left: 0;
   }
 }
 

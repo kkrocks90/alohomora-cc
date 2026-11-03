@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.40.2
+
+- Home: "Good to know" icons are now round badges on mobile and tablet instead of a full-width bar.
+
 ## 1.40.1
 
 - Home: removed the "A celebration coming up?" strip; the event-date tip is now a fourth card in "Good to know".
