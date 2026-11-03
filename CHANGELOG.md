@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.36.1
+
+- Diwali theme: the footer logo text was dark on the maroon footer; it is now cream and gold.
+
 ## 1.36.0
 
 - Admin manual orders can now have a discount (INR amount). It reduces the order total, shows in the invoice, order details, customer account and order emails, and is included when editing an order.

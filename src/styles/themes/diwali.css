@@ -231,3 +231,7 @@ html[data-theme="diwali"] .theme-hero-cta { display: inline-block; padding: 0.7r
 }
 /* Keep the garland clear of the promo banner */
 html[data-theme="diwali"] .promo-banner { margin-top: 22px; }
+
+/* Footer wordmark on the dark maroon footer */
+html[data-theme="diwali"] .site-footer .wordmark { color: #fff3d6; }
+html[data-theme="diwali"] .site-footer .wordmark i { color: #ffd166; }
