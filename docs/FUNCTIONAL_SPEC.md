@@ -1,6 +1,6 @@
 # Chocolate Circle - Functional Specification
 
-Status: reflects release **v1.21.1** (October 2026). Source of truth for behaviour is the code and `CHANGELOG.md`; this document describes what the system does and the rules it enforces.
+Status: reflects release **v1.38.1** (November 2026). Source of truth for behaviour is the code and `CHANGELOG.md`; this document describes what the system does and the rules it enforces.
 
 ## 1. Overview
 
@@ -9,11 +9,11 @@ Chocolate Circle is a low-cost online shop for handmade chocolates (chocolatecir
 | Layer | Technology | Role |
 | --- | --- | --- |
 | Storefront | Astro + Tailwind CSS, static HTML | Product catalogue, cart, checkout UI, account, admin UI |
-| Hosting | GitHub Pages, deployed by a manual GitHub Actions workflow (`deploy.yml`) | Serves the static site |
-| API | Cloudflare Worker (`worker/`) | Checkout, payments, accounts, promos, admin, custom fields, webhook |
+| Hosting | GitHub Pages on the custom domain, deployed by a manual GitHub Actions workflow (`deploy.yml`, with a theme dropdown) | Serves the static site |
+| API | Cloudflare Worker (`worker/`), deployed by the manual `deploy-worker.yml` workflow or `npm run worker:deploy` | Checkout, payments, accounts, promos, admin, custom fields, catalogue, corporate enquiries, webhook |
 | Database | Cloudflare D1 (`cocoa-kind-orders`) | Orders, customers, sessions, promos, custom fields, custom products |
 | Payments | Razorpay | Checkout payments, admin payment links, webhook |
-| Email | Resend | Login-code emails |
+| Email | Resend | Login codes, order emails, corporate enquiry emails |
 | Location | India Post PIN data + OpenStreetMap Nominatim | PIN -> city/state/approximate location |
 
 Catalogue data lives in `src/data/products.json` and `src/data/categories.json` (to move to D1 - see roadmap).
@@ -27,7 +27,7 @@ Catalogue data lives in `src/data/products.json` and `src/data/categories.json` 
 ## 3. Storefront
 
 ### 3.1 Pages
-Home, Store, Product (`/product/<id>`), Checkout, Thank-you, Account/Profile, Order detail (`/order/?id=`), About, Privacy policy, Shipping policy, Terms and conditions, Admin, branded 404, `sitemap.xml`.
+Home, Store, Product (`/product/<id>`), Corporate, Checkout, Thank-you, Account/Profile, Order detail (`/order/?id=`), About, Privacy policy, Shipping policy, Terms and conditions, Admin, branded 404, `sitemap.xml`.
 
 ### 3.2 Catalogue
 - Products live in D1 (`products`, `catalogue_categories`), managed from the admin Products tab and seeded from `products.json`. The storefront is static: `npm run build` runs `scripts/fetch-catalogue.mjs`, which pulls `GET /products` from the Worker (falling back to the bundled JSON). Saving a product triggers the Pages workflow when the `GITHUB_DISPATCH_TOKEN` Worker secret is set.
@@ -35,7 +35,7 @@ Home, Store, Product (`/product/<id>`), Checkout, Thank-you, Account/Profile, Or
 - Photos are stored in the R2 bucket `chocolate-circle-images` (public `IMAGE_BASE_URL`) and optimised to WebP at build time. The first image is the main photo.
 - Optional `extraTags` lets a product appear in more than one category. Optional `customizable: false` hides wrapper customisation.
 - Categories include Chocolate treats, Hampers, Kids B'Day Special, Elite Gifting and Bulk Specials (`categories.json`). Categories with no products are hidden on the home page but remain store filters and promo targets.
-- Store: category chips, search, sort, result count, clear-filters, sticky filter bar.
+- Store: category chips, search, sort, result count, clear-filters, sticky filter bar. The toolbar is styled for desktop and mobile (shadowed search field, custom select arrow, larger chips) and picks up the active theme's colours.
 - Home: promo banner (active featured promo), promise pills, category cards, featured slider.
 - Product page: photo gallery (swipe, arrows and dots when a product has more than one photo; shop and home cards show only the main photo), price, pack size, quantity, flavour select (when the product has flavours), custom fields scoped to the product, trust badges, preparation-time note, related products, sticky Add-to-bag on mobile.
 
@@ -71,7 +71,7 @@ Customer-facing number `CC-YYMMDD-XXXXX`. The Razorpay order ID is stored separa
 
 ### 3.7 Thank-you and order detail
 - Thank-you page: confirmation, progress tracker, estimated ready date, WhatsApp share (no address or phone in the share text).
-- Order detail (`/order/?id=`): items, totals, delivery, progress tracker, invoice download (print to PDF). The admin also sees payment references and can change status here.
+- Order detail (`/order/?id=`): items, totals (a Discount line appears for promo and manual discounts), delivery, progress tracker, invoice download (print to PDF). The admin also sees payment references and can change status here.
 - Order statuses: received, confirmed, preparing, ready, out for delivery, delivered, cancelled.
 
 ### 3.x Corporate orders (/corporate)
@@ -80,7 +80,7 @@ Enquiries POST to /corporate/enquiry on the Worker, which emails ADMIN_EMAIL via
 
 ### Themes
 
-Seasonal themes are CSS-only overlays on the base theme. `src/config/theme.ts` lists them; each has a stylesheet in `src/styles/themes/` scoped to `html[data-theme="<id>"]`, plus an optional ribbon banner. The active theme is chosen at build time from the GitHub repo variable `SITE_THEME` (empty = the fallback in `theme.ts`, currently `diwali`; `default` = base theme). When running the Pages deploy workflow you can pick the theme from a dropdown (`repo-setting` uses the variable). To revert: set `SITE_THEME` to `default` and run the Pages deploy. To add a theme: add an entry in `theme.ts`, a CSS file, and import it in `SiteLayout.astro`. Available themes: `default`, `diwali`, `monsoon`, `christmas`, `republic-day`, `pongal`, `birthday`, `independence-day`, `valentines-day`. Only Diwali has its own hero illustration and SVG decorations; the others use emoji decorations and the standard hero image. Admin pages are not themed.
+Seasonal themes are CSS-only overlays on the base theme. `src/config/theme.ts` lists them; each has a stylesheet in `src/styles/themes/` scoped to `html[data-theme="<id>"]`, plus a ribbon banner and a hero banner on the home page. A theme restyles the palette, header garland (marigold for Diwali, bulbs, tricolour dots, raindrops, confetti, hearts and grain for the others), dark surfaces, footer, store toolbar and hero banner. The active theme is chosen at build time from the GitHub repo variable `SITE_THEME` (empty = the fallback in `theme.ts`, currently `diwali`; `default` = base theme). When running the Pages deploy workflow you can pick the theme from a dropdown (`repo-setting` uses the variable). To revert: set `SITE_THEME` to `default` and run the Pages deploy. To add a theme: add an entry in `theme.ts`, a CSS file, and import it in `SiteLayout.astro`. Available themes: `default`, `diwali`, `monsoon`, `christmas`, `republic-day`, `pongal`, `birthday`, `independence-day`, `valentines-day`. Only Diwali has its own hero illustration and SVG decorations; the others use emoji decorations and the standard hero image. Admin pages are not themed.
 
 ## 4. Accounts
 
@@ -117,6 +117,7 @@ Create and edit customers (email is the identity and cannot change), search, pag
 ### 6.3 Create manual order
 - Pick customer (prefills address), address, PIN, city, state, delivery method, event date.
 - Items: catalogue products (flavour, qty, wrapper note) and **custom items** (name, price, qty).
+- **Discount**: an optional rupee discount (`discountRupees`) can be applied to the order. It must be above 0 and below the item subtotal; the total is subtotal minus discount. It is stored in `discount_paise` (subtotal in `product_subtotal_paise`) and shown as a Discount line on the invoice, order detail, thank-you page, account page, admin list and order emails.
 - Order has payment method `manual`. A *Payment* section sets **Unpaid** (default), **Partially paid** (with the amount received; must be more than 0 and less than the total) or **Paid in full**. The same section appears when editing. Partial payments are stored in `orders.amount_received_paise` (migration 0015) while `payment_status` stays `unpaid`; the card shows "Partially paid", the amount received and the balance due. Payment links are created for the balance due, and *Mark as paid* settles the whole order.
 - **Custom products**: names are typed freely, saved separately in `custom_products` (case-insensitive unique), suggested on later orders, and never shown in the storefront. They have no image or other details. Price is entered per order line.
 
@@ -148,12 +149,13 @@ Every browser call must come from `ALLOWED_ORIGIN`; the webhook is exempt and is
 | Accounts | `POST /auth/request-code`, `/auth/verify-code`, `/auth/orders`, `/auth/profile/update`, `/auth/logout` |
 | Admin | `/admin/data`, `/admin/promos/create`, `/admin/promos/update`, `/admin/custom-fields/create`, `/update`, `/delete`, `/admin/customers/create`, `/update`, `/admin/orders/create`, `/update-status`, `/payment-link`, `/mark-paid` |
 | Webhook | `POST /razorpay/webhook` |
+| Catalogue and corporate | `GET /products`, `POST /corporate/enquiry`, admin `/admin/products/*` |
 
 ## 9. Data model (D1)
 
 Products: `products` (incl. `images` JSON array) and `catalogue_categories` (migrations 0013, 0014). Admin endpoints: `/admin/products/create`, `/update`, `/image` (raw image upload to R2), `/publish`.
 
-Migrations `worker/migrations/0001`-`0012`.
+Migrations `worker/migrations/0001`-`0015`.
 
 | Table | Purpose |
 | --- | --- |
@@ -183,21 +185,24 @@ Distance from the shop (haversine) to the PIN centroid. Up to 30 km: Porter (man
 
 - Releases: every change gets a CHANGELOG entry, a version bump, a `vX.Y.Z` tag and a GitHub release.
 - Deploy only on request: (1) `wrangler d1 migrations apply cocoa-kind-orders --remote`, (2) `npm run worker:deploy`, (3) run the Pages workflow. Apply migrations before the Worker.
-- Worker secrets: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `AUTH_TOKEN_SECRET`, `RESEND_API_KEY`.
+- Worker secrets: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `AUTH_TOKEN_SECRET`, `RESEND_API_KEY`, optional `GITHUB_DISPATCH_TOKEN`.
+- GitHub Actions: secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` let the manual **Deploy Worker** workflow publish the Worker (optionally applying D1 migrations first). Variables `PUBLIC_CHECKOUT_API_URL` and `SITE_THEME` configure the Pages build.
 - Tests: `npm test` (Worker unit tests, Node test runner).
 
 ## 13. Known gaps and roadmap
 
 | Item | Status |
 | --- | --- |
-| Move products to D1, admin-managed catalogue | Issue #3, priority 1 |
+| Move products to D1, admin-managed catalogue | Done (v1.2x) |
 | Order stages kanban board | Issue #1, priority 2 |
-| Corporate orders section | Issue #2, priority 3 |
+| Corporate orders section | Done (`/corporate`) |
 | Migrate hosting from GitHub Pages to Cloudflare | Low priority (priority-4) |
 | Manual orders do not yet support custom fields | Open |
 | New products are not auto-added to the Customisation field's targeting | Open |
 | Customer account page does not show custom answers | Open |
 | Live Razorpay keys and webhook end-to-end test | Pending owner confirmation |
+| Deploy Worker workflow not yet run with the Cloudflare secrets | Open |
+| Seasonal themes other than Diwali have no custom hero illustration | Open |
 
 
 > Admin sessions are stored in localStorage (persistent). An admin session visiting `/account/` redirects to `/admin/`.

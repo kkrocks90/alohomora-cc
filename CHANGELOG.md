@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.38.2
+
+- Docs: README rewritten and the functional specification brought up to date (themes, discount on manual orders, Worker deploy workflow, catalogue, status and roadmap).
+
 ## 1.38.1
 
 - Header garland now follows the theme: Christmas red and green bulbs, tricolour dots for Republic and Independence Day, raindrops for Monsoon, confetti for Birthday, hearts for Valentine's Day and grain and turmeric for Pongal.

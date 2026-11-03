@@ -1,147 +1,107 @@
 # Chocolate Circle chocolate shop
 
-A fast, static Astro storefront for Chocolate Circle. Product names, listed prices, photographs, and Choco Cubes flavour choices come from the shop's [Jotform order form](https://form.jotform.com/253120957812456). The concise descriptions and browse categories are site copy based on those product names and pack sizes. Product details live in one JSON file, with locally stored photographs optimized by Astro at build time.
+A fast, static Astro storefront for Chocolate Circle (https://chocolatecircle.in), backed by a Cloudflare Worker with D1 and R2 for checkout, accounts, admin, promos, payment links and the product catalogue. For behaviour and rules, see [docs/FUNCTIONAL_SPEC.md](docs/FUNCTIONAL_SPEC.md); for release history, see [CHANGELOG.md](CHANGELOG.md).
 
-## Run and edit the shop
+| Part | Technology |
+| --- | --- |
+| Site | Astro + Tailwind CSS, static HTML |
+| Hosting | GitHub Pages on the custom domain, deployed manually by GitHub Actions |
+| API | Cloudflare Worker (`worker/`) |
+| Database and images | Cloudflare D1 (`cocoa-kind-orders`) and R2 (`chocolate-circle-images`) |
+| Payments | Razorpay (checkout and admin payment links) |
+| Email | Resend (sign-in codes, order emails, corporate enquiries) |
 
-Install Node.js 22 or newer, then run:
+## Run locally
+
+Install Node.js 22 or newer, then:
 
 ```sh
 npm ci
-npm run dev
+npm run dev      # local site
+npm test         # Worker unit tests
+npm run build    # production build
 ```
 
-Edit `src/data/products.json` to add or change products. Prices are whole Indian rupees. Set `"featured": true` to highlight a product on the home page; every product appears in the `/store/` catalog, which supports search, tag filtering, sorting, and infinite scroll with a load-more button. Product flavours are controlled per product by its `flavours` array: list only the flavours available for that product, or use an empty array (`[]`) to hide flavour selection. Chocolate treats currently use Choco Cubes’ Jotform flavour choices; remove unavailable choices from any individual product’s array. Product detail pages also let customers select a quantity from 1 to 20 before adding to the bag. Customers describe their wrapper design (3–120 characters) before adding any product to the bag. Add each product photograph under `src/assets/products/`, keep product IDs unique, and set the matching image file name in the JSON `image` field. Astro generates responsive, optimized WebP images from the local photos at build time.
+## Products and catalogue
 
-Before launch, verify all extracted names and prices against the current order form, add accurate ingredient/allergen, product-weight, storage, delivery, contact, and applicable food-license details, and complete the customer policies.
+Products and categories are managed in the admin **Products** tab (`/admin/`) and stored in D1, with up to 3 photos per product in R2. `npm run build` runs `scripts/fetch-catalogue.mjs`, which pulls the live catalogue from the Worker (`GET /products`) and falls back to the bundled `src/data/products.json` and `src/data/categories.json`. Prices are whole Indian rupees. Saving a product triggers a Pages rebuild when the `GITHUB_DISPATCH_TOKEN` Worker secret is set; otherwise use **Publish to storefront** or run the Pages workflow. Order prices always come from D1 immediately.
 
-Draft policy pages are available at `/terms-and-conditions/`, `/privacy-policy/`, and `/shipping-policy/`. They are linked in the footer and at checkout. Checkout requires customers to accept the linked policies, and records that acceptance in the Razorpay order notes. Before accepting real payments, replace every bracketed prompt with accurate business, privacy, cancellation/refund, and delivery details; review the drafts for applicable law. **Do not accept live payments until the shipping fee is shown and included in the amount charged.** The current payment integration charges the product subtotal only and does not calculate shipping.
+Before launch, verify names, prices, ingredient and allergen details, storage, delivery, contact and food-licence details, and complete the policy pages (`/terms-and-conditions/`, `/privacy-policy/`, `/shipping-policy/`).
 
-## Delivery address and distance estimate
+## Themes
 
-Checkout asks for an Indian six-digit PIN code, address, city and state. Entering a PIN code fills the city and state through the Worker (`GET /pincode/<pin>`), which uses India Post PIN directory data and OpenStreetMap Nominatim (no API key needed; results are cached for 30 days). At order time the Worker looks up the PIN code's approximate location itself, calculates straight-line distance against the configured shop coordinates, and marks orders within 15 km for Porter and beyond 15 km for a courier. These are manual fulfillment labels only: the Worker does not book either service. Coordinates are not stored in D1 or included in Razorpay order notes.
+The site has a base theme and seasonal themes: `diwali` (the default fallback), `monsoon`, `christmas`, `republic-day`, `pongal`, `birthday`, `independence-day` and `valentines-day`. A theme changes colours, header garland, ribbon banner, hero banner, footer and store toolbar. Themes live in `src/config/theme.ts` and `src/styles/themes/`.
 
-Before deploying the Worker, replace `STORE_LATITUDE` and `STORE_LONGITUDE` in `worker/wrangler.toml` with the shop's actual decimal GPS coordinates (for example, `12.345678`); checkout safely reports that distance checking is not configured until these are set.
+- Pick a theme when you run the **Deploy to GitHub Pages** workflow (the `theme` dropdown). `repo-setting` uses the `SITE_THEME` repository variable.
+- To go back to the base theme, deploy with `theme=default` or set `SITE_THEME` to `default`.
+- To add a theme, add an entry in `theme.ts`, a stylesheet scoped to `html[data-theme="<id>"]`, and import it in `src/layouts/SiteLayout.astro`. Add the id to the workflow's `theme` options.
 
-## Free paid-order storage and reports
+## Accounts, orders and admin
 
-Paid orders are saved to a Cloudflare D1 database through the existing checkout Worker; a customer's browser is never used to write order data. A row is created only after the Worker verifies Razorpay's signature, confirms a captured payment, checks the amount against the product catalog, verifies the delivery-method notes, and confirms the order email matches the signed-in account. Safe verification retries do not create duplicate orders. If the database is not set up, the Worker refuses to start payment. The database stores customer contact and delivery details, itemized products, paid amount, payment and order IDs, estimated delivery distance and method, and the customer's policy acknowledgement. It does not store payment-card information or delivery coordinates.
+- Customers sign in with a one-time email code before checkout. Codes expire after 10 minutes and sessions after 30 days. Profile details prefill checkout, and **My orders** lists recent orders.
+- Checkout validates a six-digit PIN code (city and state autofill from India Post data and OpenStreetMap Nominatim) and labels delivery as Porter within 30 km or courier beyond. Both are booked manually. The Worker verifies the Razorpay signature, payment status and amount before saving an order in D1, and prices always come from the catalogue.
+- Order and enquiry emails go to the shop and to the customer through Resend.
+- The admin workspace at `/admin/` is limited to `ADMIN_EMAIL` in `worker/wrangler.toml`. It manages orders (status, edit and invoices), customers, manual orders (custom items, an optional discount, partial payments and Razorpay payment links), promo codes, custom checkout fields and products.
+- Promo codes can be a percentage (all products, a category or a product) or a fixed amount above a minimum, with an optional end date and redemption limit. Fully covered orders skip Razorpay.
+- Invoices are order receipts, not GST tax invoices, and do not include delivery charges. **Do not accept live payments until the shipping fee is shown and included in the amount charged**; payments currently cover the product subtotal only.
 
-Customers must sign in with a one-time email code before the checkout form is shown; the Worker also requires a valid signed-in session to create or verify payments. New customers save their name, mobile number, street address, city, state, and PIN code after sign-in. Those details prefill checkout but can be edited for each order; event dates remain specific to an order. Customers can visit **My orders** to see up to 50 recent orders associated with their email. Codes expire after 10 minutes, are limited to five attempts, and can be requested once per minute per email; sessions expire after 30 days and are stored as hashes. The site is static, so the checkout page itself cannot be private; payment and order APIs enforce the sign-in requirement server-side.
+## Deploying
 
-## Admin order management
+Deploy only when you intend to publish. The order is: apply migrations, deploy the Worker, run the Pages workflow.
 
-The private admin workspace is available at `/admin/`. Admin sign-in uses the same email-code flow, and the Worker authorizes management APIs only for `ADMIN_EMAIL` in `worker/wrangler.toml` (currently `alohomora.chocolatecircle@gmail.com`). A successful admin sign-in from the profile page opens the admin workspace. Orders and customers have searchable, paginated lists; order status can be updated, customer name, phone, street address, city, state, and PIN code can be edited, and manual unpaid orders can be created with the same address fields. The dashboard also provides a print-to-PDF invoice/receipt. Non-admin customers are added to the saved customer list when they sign in and their record is enriched with contact details when they order. Customers are identified by email: creating a manual customer with an existing email updates that customer instead of creating a duplicate. A customer signed in with that email can see both paid and manual orders placed under it in their profile. Manual order totals are calculated against the product catalog by the Worker; no payment is initiated. Printed documents are order invoices/receipts, not GST tax invoices, and do not include delivery charges.
-
-The **Promo codes** tab creates a named promo and generates its customer-facing code. Percentage discounts can target one product, one category, or all products. Fixed-amount discounts apply to the product subtotal only when it is strictly greater than the configured minimum; the discount cannot exceed that subtotal. Promo codes can have an optional end date and redemption limit. For a limited code, each signed-in customer may redeem it once, and the limit counts distinct customers. One randomly selected, active, unexpired, and not-exhausted promo is displayed on the home page and store listing; customers still apply the code at checkout while signed in. A promo that covers the full product subtotal creates a confirmed, no-payment order; other discounted orders use Razorpay for the remaining amount. Delivery is not included in promo calculations or the amount charged.
-
-Before deploying admin or promo changes, apply all pending D1 migrations with `npx wrangler d1 migrations apply cocoa-kind-orders --remote --config worker/wrangler.toml`, then deploy the Worker with `npm run worker:deploy`. Keep `ADMIN_EMAIL` restricted to the owner’s mailbox.
-
-Cloudflare Workers Free currently includes D1 allowances of 5 million rows read per day, 100,000 rows written per day, and 5 GB of total storage; see [Cloudflare D1 pricing and limits](https://developers.cloudflare.com/d1/platform/pricing/) before relying on a free-plan limit. Check database usage in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Metrics**. Restrict access to the Cloudflare account to trusted shop operators. Establish and follow an appropriate order-data retention period; delete records you no longer need, consistent with legal recordkeeping requirements.
-
-To create the free order database before deploying the Worker:
-
-1. From the repository root, create it in the Cloudflare account connected to Wrangler:
-
-   ```sh
-   npx wrangler d1 create cocoa-kind-orders
-   ```
-
-2. Copy the `database_id` returned by Wrangler into `database_id` in `worker/wrangler.toml`. Replace both store-coordinate placeholders there with the shop's real decimal latitude and longitude.
-3. Create the order and customer sign-in tables in the remote D1 database by applying all pending migrations:
+1. Apply D1 migrations:
 
    ```sh
    npx wrangler d1 migrations apply cocoa-kind-orders --remote --config worker/wrangler.toml
    ```
 
-4. Deploy the Worker and finish the Razorpay and email setup below. Once payment and D1 are configured, test an order end to end and confirm its `paid` row appears in **Cloudflare Dashboard → Workers & Pages → D1 → cocoa-kind-orders → Console**. If this is the GitHub Pages `main` repository, set `ALLOWED_ORIGIN` to `https://kkrocks90.github.io`. For local testing, use a localhost origin temporarily and restore the live origin before deploying to production.
+2. Deploy the Worker with `npm run worker:deploy`, or run the **Deploy Worker** workflow in GitHub Actions. The workflow needs the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` and can apply pending migrations first.
+3. Run the **Deploy to GitHub Pages** workflow and choose a theme. In **Settings > Pages**, the source must be **GitHub Actions**. `site` and `base` in `astro.config.mjs` are set for `https://chocolatecircle.in/`.
 
-To generate reports, run SQL in the D1 Console. For example:
+### One-time Cloudflare and payment setup
+
+1. Create the database: `npx wrangler d1 create cocoa-kind-orders`, then copy its `database_id` into `worker/wrangler.toml`. Set `STORE_LATITUDE` and `STORE_LONGITUDE` there to the shop's coordinates. Create the R2 bucket `chocolate-circle-images` and set `IMAGE_BASE_URL`.
+2. Set `ALLOWED_ORIGIN` in `worker/wrangler.toml` to the site origin (currently `https://chocolatecircle.in`, without a path). For local testing use a localhost origin temporarily and restore it before deploying.
+3. Add Worker secrets with Wrangler, which prompts for each value. Never paste secrets into the repository, GitHub variables or website code:
+
+   ```sh
+   npx wrangler secret put RAZORPAY_KEY_ID --config worker/wrangler.toml
+   npx wrangler secret put RAZORPAY_KEY_SECRET --config worker/wrangler.toml
+   npx wrangler secret put RAZORPAY_WEBHOOK_SECRET --config worker/wrangler.toml
+   npx wrangler secret put RESEND_API_KEY --config worker/wrangler.toml
+   npx wrangler secret put AUTH_TOKEN_SECRET --config worker/wrangler.toml
+   npx wrangler secret put GITHUB_DISPATCH_TOKEN --config worker/wrangler.toml
+   ```
+
+   `AUTH_TOKEN_SECRET` must be a random string of at least 32 characters. `GITHUB_DISPATCH_TOKEN` is optional and enables the automatic rebuild after catalogue changes.
+4. Verify a domain in Resend and set `LOGIN_FROM_EMAIL` in `worker/wrangler.toml` to a sender on that domain.
+5. In Razorpay, add a webhook to `<worker-url>/razorpay/webhook` for `payment_link.paid`, using the same secret as `RAZORPAY_WEBHOOK_SECRET`. Start with test keys, test a full payment, then switch to live keys.
+6. Add the Worker URL as the GitHub Actions variable `PUBLIC_CHECKOUT_API_URL` (for example `https://cocoa-kind-checkout.<subdomain>.workers.dev`). It is public. Optionally set `SITE_THEME`.
+
+Payment processing is not free: Razorpay charges its transaction fees. GitHub Pages and Cloudflare Workers have free plans with usage limits; check [Cloudflare D1 pricing and limits](https://developers.cloudflare.com/d1/platform/pricing/) before relying on them. Restrict Cloudflare account access to trusted operators.
+
+## Reports and backups
+
+Run SQL in **Cloudflare Dashboard > Workers & Pages > D1 > cocoa-kind-orders > Console**. For example:
 
 ```sql
-SELECT
-  substr(created_at, 1, 7) AS month,
-  count(*) AS paid_orders,
-  sum(amount_paise) / 100.0 AS sales_inr
+SELECT substr(created_at, 1, 7) AS month, count(*) AS orders, sum(amount_paise) / 100.0 AS sales_inr
 FROM orders
+WHERE payment_status = 'paid'
 GROUP BY month
 ORDER BY month DESC;
 ```
 
-```sql
-SELECT
-  delivery_method,
-  count(*) AS paid_orders,
-  sum(amount_paise) / 100.0 AS sales_inr
-FROM orders
-GROUP BY delivery_method
-ORDER BY delivery_method;
-```
-
-```sql
-SELECT created_at, order_id, customer_name, customer_phone, customer_email,
-       delivery_address, items_json, amount_paise / 100.0 AS total_inr,
-       delivery_method, distance_km
-FROM orders
-ORDER BY created_at DESC;
-```
-
-For an independent backup, export the D1 database periodically using Wrangler:
+Export a backup periodically and keep it protected, because it contains customer personal information:
 
 ```sh
 npx wrangler d1 export cocoa-kind-orders --remote --output=cocoa-kind-orders-backup.sql --config worker/wrangler.toml
 ```
 
-Keep exports protected because they include customer personal information.
-
-## Free hosting
-
-The GitHub Actions workflow builds the site and publishes it to GitHub Pages whenever `main` is updated. On GitHub Free, the repository must be public to use Pages. In the repository's **Settings → Pages**, select **GitHub Actions** as the build and deployment source. The workflow is configured for `https://kkrocks90.github.io/alohomora-cc/`; change `site` and `base` in `astro.config.mjs` if you use another GitHub account, repository name, or custom domain.
-
-## Razorpay checkout
-
-GitHub Pages serves static files only. The `worker/` Cloudflare Worker creates Razorpay orders using server-side secrets, verifies payment signatures, and checks payment capture status. Once an order is paid and verified, the Worker also saves it in Cloudflare D1 for shop reports and follow-up. Razorpay order notes provide the Worker with the verified order details; product prices are checked against `src/data/products.json` on the server, not accepted from the browser. Resend sends customer sign-in codes; order confirmation and delivery-notification emails are not configured.
-
-1. Create a Cloudflare account, the [D1 database](#free-paid-order-storage-and-reports), and a Razorpay account. Start with Razorpay test keys.
-2. Set `ALLOWED_ORIGIN` in `worker/wrangler.toml` to the website's origin (for example, `https://kkrocks90.github.io`; do not include the repository path). The shop coordinates and D1 `database_id` must also be configured before checkout is enabled.
-3. From the repository root, deploy the Worker:
-
-   ```sh
-   npm ci
-   npm run worker:deploy
-   ```
-
-4. Add the Razorpay test credentials as Worker secrets; Wrangler prompts for the values:
-
-   ```sh
-   npx wrangler secret put RAZORPAY_KEY_ID --config worker/wrangler.toml
-   npx wrangler secret put RAZORPAY_KEY_SECRET --config worker/wrangler.toml
-   ```
-
-5. Create a [Resend](https://resend.com/) account, verify a domain you control for sending email, and choose a sender address on that verified domain. Replace the `LOGIN_FROM_EMAIL` example in `worker/wrangler.toml` with that sender. Add the Resend API key and a randomly generated secret (at least 32 characters) as Worker secrets:
-
-   ```sh
-   npx wrangler secret put RESEND_API_KEY --config worker/wrangler.toml
-   npx wrangler secret put AUTH_TOKEN_SECRET --config worker/wrangler.toml
-   ```
-
-   Wrangler prompts for each value. Do not paste credentials into this repository, GitHub Actions variables, or customer-facing website code. Resend's free plan and domain-verification requirements may change; check its current limits before relying on it.
-
-6. Copy the deployed Worker URL and add it to the repository under **Settings → Secrets and variables → Actions → Variables** as `PUBLIC_CHECKOUT_API_URL` (for example, `https://cocoa-kind-checkout.<your-subdomain>.workers.dev`). The URL is public; never put a Razorpay or Resend secret in a GitHub variable, site file, or browser code.
-7. Redeploy the Pages workflow. Test PIN code lookup with a valid PIN code, then test a complete payment with Razorpay test mode before switching the Worker secrets to live keys, and test customer sign-in with an email address that can receive mail from the verified sender domain.
-
-Payment processing is not free: Razorpay charges its applicable transaction fees. GitHub Pages and Cloudflare Workers have free plans, each with their own usage limits. Until the Worker URL and Razorpay keys are configured, the storefront remains viewable but checkout clearly reports that it is not ready.
+Set and follow an order-data retention period that meets your legal recordkeeping requirements.
 
 ## Social sharing and Meta ads
 
-Public pages include canonical URLs and Open Graph/Twitter sharing metadata. The default share image is `public/social-share.jpg` (1200 × 630); account, checkout, admin, and thank-you pages are marked `noindex`.
+Public pages include canonical URLs and Open Graph and Twitter metadata, with the default share image at `public/social-share.jpg`. Account, checkout, admin and thank-you pages are `noindex`. The sitemap is `https://chocolatecircle.in/sitemap.xml`; submit it in Google Search Console after deploying.
 
-The generated `sitemap.xml` lists the public shop, policy, About, and product pages, and `robots.txt` points crawlers to it. After deployment, add `https://chocolatecircle.in/` as a property in Google Search Console and submit `https://chocolatecircle.in/sitemap.xml` to request discovery. Search Console does not guarantee indexing or rankings.
-
-For a Meta Ads Manager campaign or an Instagram boosted post, use the relevant shop page as the destination and add consistent UTM tags, for example:
-
-```text
-https://chocolatecircle.in/store/?utm_source=instagram&utm_medium=paid_social&utm_campaign=campaign_name&utm_content=ad_or_post_name
-```
-
-Replace the campaign and content values with short, consistent names for each campaign and creative. The site does not currently install Meta Pixel or another analytics service, so it does not record website purchases or report UTM-attributed conversions. Add a Meta Pixel only after choosing the Pixel ID and how visitor consent should work; update the Privacy Policy at the same time.
+For Meta Ads or boosted posts, link to a shop page with UTM tags, for example `https://chocolatecircle.in/store/?utm_source=instagram&utm_medium=paid_social&utm_campaign=campaign_name`. The site does not install Meta Pixel or analytics. Add one only after deciding how visitor consent works, and update the Privacy Policy at the same time.
