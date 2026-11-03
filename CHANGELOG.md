@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.39.0
+
+- Admin: new Categories manager (Products tab) to add, rename, hide/show and delete categories.
+- Renaming cascades to products, promo codes and custom fields; delete is blocked while a category is in use.
+- Hidden categories are removed from shop filters and home category cards.
+- Migration 0016 adds `catalogue_categories.hidden` and backfills product categories. Apply it before deploying the Worker.
+
 ## 1.38.2
 
 - Docs: README rewritten and the functional specification brought up to date (themes, discount on manual orders, Worker deploy workflow, catalogue, status and roadmap).

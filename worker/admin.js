@@ -1,5 +1,6 @@
 import { ensureCatalogue, getProductById, getProducts } from "./catalogue.js";
 import { imageBaseUrl, listAdminProducts } from "./admin-products.js";
+import { listAdminCategories } from "./admin-categories.js";
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { sendOrderEmails } from "./notify.js";
 import { generateOrderId } from "./order-id.js";
@@ -56,7 +57,7 @@ export async function getAdminData(request, env) {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
     await ensureCatalogue(env, { force: true });
-    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts] = await Promise.all([
+    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts, catalogueCategories] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
@@ -91,6 +92,7 @@ export async function getAdminData(request, env) {
       listCustomFields(env.ORDERS_DB),
       listCustomProducts(env.ORDERS_DB),
       listAdminProducts(env),
+      listAdminCategories(env),
     ]);
     return result(200, {
       email: access.email,
@@ -138,6 +140,7 @@ export async function getAdminData(request, env) {
       products: getProducts().map(({ id, name, price, flavours }) => ({ id, name, price, flavours })),
       categories: getPromoCategories(),
       catalogueProducts,
+      catalogueCategories,
       imageBaseUrl: imageBaseUrl(env),
       rebuildConfigured: Boolean(env.GITHUB_DISPATCH_TOKEN),
       customFields,

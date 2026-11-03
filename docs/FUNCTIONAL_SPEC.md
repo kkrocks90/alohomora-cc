@@ -1,6 +1,6 @@
 # Chocolate Circle - Functional Specification
 
-Status: reflects release **v1.38.1** (November 2026). Source of truth for behaviour is the code and `CHANGELOG.md`; this document describes what the system does and the rules it enforces.
+Status: reflects release **v1.39.0** (November 2026). Source of truth for behaviour is the code and `CHANGELOG.md`; this document describes what the system does and the rules it enforces.
 
 ## 1. Overview
 
@@ -30,6 +30,7 @@ Catalogue data lives in `src/data/products.json` and `src/data/categories.json` 
 Home, Store, Product (`/product/<id>`), Corporate, Checkout, Thank-you, Account/Profile, Order detail (`/order/?id=`), About, Privacy policy, Shipping policy, Terms and conditions, Admin, branded 404, `sitemap.xml`.
 
 ### 3.2 Catalogue
+- Categories marked hidden in the admin are removed from the shop filter chips and the home category cards; their products stay visible under "All".
 - Products live in D1 (`products`, `catalogue_categories`), managed from the admin Products tab and seeded from `products.json`. The storefront is static: `npm run build` runs `scripts/fetch-catalogue.mjs`, which pulls `GET /products` from the Worker (falling back to the bundled JSON). Saving a product triggers the Pages workflow when the `GITHUB_DISPATCH_TOKEN` Worker secret is set.
 - Fields: id, name, description, price, images (up to 3), tag (category), pack size, flavour options, featured flag, visible flag.
 - Photos are stored in the R2 bucket `chocolate-circle-images` (public `IMAGE_BASE_URL`) and optimised to WebP at build time. The first image is the main photo.
@@ -130,6 +131,12 @@ Create, edit, enable/disable, delete fields (section 3.4).
 ### 6.6 Products
 Add and edit products (name, description, price, pack size, category, flavours, flags), hide/show a product, and upload up to 3 photos each (resized in the browser, stored in R2, reorderable with "Make main"). "Publish to storefront" re-runs the site build. Order prices always come from D1 immediately; the static pages update after the rebuild.
 
+### 6.7 Categories
+- Admin Products tab: add, rename, hide/show and delete categories. Each row shows its product count.
+- Rename cascades to products (tag and extra tags), promo codes targeting the category and custom fields limited to it.
+- Delete is blocked while any product, promo code or custom field uses the category; hide it instead.
+- Hidden categories stay selectable for promos and custom fields. Changes trigger a site rebuild when configured. Stored in `catalogue_categories` (`hidden` column, migration 0016).
+
 ## 7. Payments
 
 - **Storefront payments**: Razorpay Standard Checkout with server-side signature, payment and amount verification.
@@ -149,11 +156,11 @@ Every browser call must come from `ALLOWED_ORIGIN`; the webhook is exempt and is
 | Accounts | `POST /auth/request-code`, `/auth/verify-code`, `/auth/orders`, `/auth/profile/update`, `/auth/logout` |
 | Admin | `/admin/data`, `/admin/promos/create`, `/admin/promos/update`, `/admin/custom-fields/create`, `/update`, `/delete`, `/admin/customers/create`, `/update`, `/admin/orders/create`, `/update-status`, `/payment-link`, `/mark-paid` |
 | Webhook | `POST /razorpay/webhook` |
-| Catalogue and corporate | `GET /products`, `POST /corporate/enquiry`, admin `/admin/products/*` |
+| Catalogue and corporate | `GET /products`, `POST /corporate/enquiry`, admin `/admin/products/*`, `/admin/categories/create`, `/update`, `/delete` |
 
 ## 9. Data model (D1)
 
-Products: `products` (incl. `images` JSON array) and `catalogue_categories` (migrations 0013, 0014). Admin endpoints: `/admin/products/create`, `/update`, `/image` (raw image upload to R2), `/publish`.
+Products: `products` (incl. `images` JSON array) and `catalogue_categories` (migrations 0013, 0014, 0016). Admin endpoints: `/admin/products/create`, `/update`, `/image` (raw image upload to R2), `/publish`.
 
 Migrations `worker/migrations/0001`-`0015`.
 

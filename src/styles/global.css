@@ -7449,3 +7449,63 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
   .store-toolbar .store-sort select { padding-right: 28px; background-position: right 10px center; }
   .store-chip { min-height: 38px; padding: 0 15px; font-size: 12.5px; }
 }
+/* Admin category manager */
+.admin-category-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-category-form label {
+  flex: 1 1 220px;
+}
+
+.admin-category-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-category-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line, #e3d6c8);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.admin-category-row.is-hidden .admin-category-info {
+  opacity: 0.6;
+}
+
+.admin-category-row > input {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.admin-category-info {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.admin-category-info span {
+  color: #6f5a4a;
+  font-size: 13px;
+}
+
+.admin-category-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-category-action {
+  min-height: 36px;
+  padding: 6px 14px;
+}

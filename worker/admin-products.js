@@ -1,4 +1,5 @@
 import { requireAdmin } from "./admin.js";
+import { registerCategories } from "./admin-categories.js";
 import { ensureCatalogue, loadAllProductRows, rowToProduct } from "./catalogue.js";
 
 export const MAX_PRODUCT_IMAGES = 3;
@@ -139,6 +140,7 @@ export async function createAdminProduct(request, env) {
       )
       .bind(...productBindings(product), productId, (last?.max_sort ?? 0) + 1, new Date().toISOString())
       .run();
+    await registerCategories(env.ORDERS_DB, [product.tag, ...product.extraTags]);
     const products = await listAdminProducts(env);
     const rebuildTriggered = await triggerSiteRebuild(env);
     return result(201, { productId, products, rebuildTriggered });
@@ -170,6 +172,7 @@ export async function updateAdminProduct(request, env) {
       .bind(...productBindings(product), new Date().toISOString(), productId)
       .run();
     if (updated.meta?.changes === 0) return result(404, { error: "That product could not be found." });
+    await registerCategories(env.ORDERS_DB, [product.tag, ...product.extraTags]);
     const products = await listAdminProducts(env);
     const rebuildTriggered = await triggerSiteRebuild(env);
     return result(200, { productId, products, rebuildTriggered });

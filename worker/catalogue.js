@@ -8,9 +8,10 @@ function withImages(product) {
   return { ...product, image: images[0], images: images.slice(0, 3) };
 }
 
-function buildState(rawProducts, extraCategories, source) {
+function buildState(rawProducts, categoryRows, source) {
   const products = rawProducts.map(withImages);
   const active = products.filter((product) => product.active !== false);
+  const extraCategories = categoryRows.map((category) => category.name);
   return {
     source,
     loadedAt: Date.now(),
@@ -18,10 +19,11 @@ function buildState(rawProducts, extraCategories, source) {
     byId: new Map(active.map((product) => [product.id, product])),
     byIdAny: new Map(products.map((product) => [product.id, product])),
     categories: [...new Set([...active.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories])],
+    hiddenCategories: categoryRows.filter((category) => category.hidden).map((category) => category.name),
   };
 }
 
-let state = { ...buildState(bundledProducts, bundledCategories, "bundled"), loadedAt: 0 };
+let state = { ...buildState(bundledProducts, bundledCategories.map((name) => ({ name })), "bundled"), loadedAt: 0 };
 
 export function getProducts() {
   return state.products;
@@ -37,6 +39,10 @@ export function getProductByIdAny(id) {
 
 export function getCategories() {
   return state.categories;
+}
+
+export function getHiddenCategories() {
+  return state.hiddenCategories;
 }
 
 export function rowToProduct(row) {
@@ -88,14 +94,22 @@ export async function ensureCatalogue(env, { force = false } = {}) {
       state.loadedAt = Date.now();
       return;
     }
-    let extra = [];
+    let extra;
     try {
       const { results } = await env.ORDERS_DB
-        .prepare("SELECT name FROM catalogue_categories ORDER BY sort_order, name")
+        .prepare("SELECT name, hidden FROM catalogue_categories ORDER BY sort_order, name")
         .all();
-      extra = (results ?? []).map((row) => row.name);
+      extra = (results ?? []).map((row) => ({ name: row.name, hidden: row.hidden === 1 }));
     } catch {
-      extra = bundledCategories;
+      // Older database without the hidden column: fall back to names only.
+      try {
+        const { results } = await env.ORDERS_DB
+          .prepare("SELECT name FROM catalogue_categories ORDER BY sort_order, name")
+          .all();
+        extra = (results ?? []).map((row) => ({ name: row.name }));
+      } catch {
+        extra = bundledCategories.map((name) => ({ name }));
+      }
     }
     state = buildState(rows.map(rowToProduct), extra, "d1");
   } catch (error) {
@@ -110,6 +124,7 @@ export async function ensureCatalogue(env, { force = false } = {}) {
 export function publicCatalogue() {
   return {
     products: state.products.map(({ sortOrder, active, ...product }) => product),
-    categories: state.categories,
+    categories: state.categories.filter((name) => !state.hiddenCategories.includes(name)),
+    hiddenCategories: state.hiddenCategories,
   };
 }

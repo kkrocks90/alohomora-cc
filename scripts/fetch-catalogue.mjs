@@ -15,7 +15,7 @@ try {
     signal: AbortSignal.timeout(15_000),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const { products, categories } = await response.json();
+  const { products, categories, hiddenCategories } = await response.json();
   if (!Array.isArray(products) || products.length === 0) throw new Error("empty catalogue");
   if (!products.every((product) => product.id && product.name && Number.isInteger(product.price) && product.image)) {
     throw new Error("invalid product data");
@@ -24,6 +24,10 @@ try {
   await writeFile(
     new URL("../src/data/categories.json", import.meta.url),
     `${JSON.stringify(Array.isArray(categories) ? categories : [], null, 4)}\n`,
+  );
+  await writeFile(
+    new URL("../src/data/hidden-categories.json", import.meta.url),
+    `${JSON.stringify(Array.isArray(hiddenCategories) ? hiddenCategories : [], null, 4)}\n`,
   );
   console.log(`[catalogue] loaded ${products.length} products from ${apiUrl}`);
 } catch (error) {

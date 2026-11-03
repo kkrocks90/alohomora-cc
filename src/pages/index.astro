@@ -5,12 +5,14 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 import ThemeHeroBanner from "../components/ThemeHeroBanner.astro";
 import heroImage from "../assets/hero-chocolates.svg";
 import products from "../data/products.json";
+import hiddenCategories from "../data/hidden-categories.json";
 import { theme } from "../config/theme";
 import { resolveImage } from "../lib/product-images";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 const highlightedProducts = products.filter((product) => product.featured);
 const categoryCards = [...new Set(products.map((product) => product.tag))]
+  .filter((tag) => !(hiddenCategories as string[]).includes(tag))
   .sort((first, second) => first.localeCompare(second))
   .map((tag) => {
     const product = products.find((item) => item.tag === tag);

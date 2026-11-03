@@ -13,6 +13,7 @@ import {
   updateAdminOrderStatus,
   updateAdminPromo,
 } from "./admin.js";
+import { handleAdminCategory } from "./admin-categories.js";
 import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
 import {
   getDistanceKm,
@@ -832,6 +833,10 @@ export default {
     }
     if (path === "/admin/products/publish") {
       const result = await rebuildSite(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/categories/create" || path === "/admin/categories/update" || path === "/admin/categories/delete") {
+      const result = await handleAdminCategory(request, env, path.split("/").pop());
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/promos/create") {

@@ -4,6 +4,7 @@ import { normalizeState } from "../data/indian-states";
 import { printInvoice } from "./order-view";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
 import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
+import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
 import type { CustomField } from "./custom-fields";
 
 interface AdminCustomer {
@@ -91,6 +92,7 @@ interface AdminData {
   customFields: CustomField[];
   customProducts: { id: string; name: string }[];
   catalogueProducts: Parameters<ReturnType<typeof initProductsAdmin>["render"]>[0];
+  catalogueCategories: Parameters<ReturnType<typeof initCategoriesAdmin>["render"]>[0];
   rebuildConfigured: boolean;
 }
 
@@ -215,6 +217,9 @@ function normalizeAdminData(data: AdminData): AdminData {
     customFields: Array.isArray(root.customFields) ? root.customFields : [],
     customProducts: Array.isArray((data as { customProducts?: unknown }).customProducts) ? data.customProducts : [],
     catalogueProducts: Array.isArray(data.catalogueProducts) ? data.catalogueProducts.filter(isCatalogueProduct) : [],
+    catalogueCategories: Array.isArray((data as { catalogueCategories?: unknown }).catalogueCategories)
+      ? (data as { catalogueCategories: unknown[] }).catalogueCategories.filter(isCatalogueCategory)
+      : [],
     rebuildConfigured: data.rebuildConfigured === true,
     orders: data.orders.map((order) => ({
       ...order,
@@ -1166,6 +1171,7 @@ if (root) {
     renderPromos();
     customFieldsAdmin.render(adminData.customFields);
     productsAdmin.render(adminData.catalogueProducts, adminData.rebuildConfigured);
+    categoriesAdmin.render(adminData.catalogueCategories);
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     if (!editingOrderId) {
@@ -1201,6 +1207,13 @@ if (root) {
     setStatus,
     reload: () => loadDashboard(),
     getCategories: () => adminData?.categories ?? [],
+  });
+
+  const categoriesAdmin = initCategoriesAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    setStatus,
+    reload: () => loadDashboard(),
   });
 
   const customFieldsAdmin = initCustomFieldsAdmin({

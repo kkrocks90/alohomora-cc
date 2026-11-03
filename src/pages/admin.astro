@@ -311,6 +311,20 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </form>
         </section>
+        <section class="admin-panel" aria-labelledby="admin-category-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Catalogue</p>
+              <h2 id="admin-category-title">Categories</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Hidden categories disappear from the shop filters and home page, but their products stay in the shop. A category can only be deleted when no product uses it.</p>
+          <form class="admin-category-form" id="admin-category-form">
+            <label>New category<input name="name" maxlength="60" required placeholder="Festive specials" /></label>
+            <button class="button button-primary" type="submit">Add category</button>
+          </form>
+          <div class="admin-category-list" id="admin-category-list"></div>
+        </section>
         <section class="admin-panel" aria-labelledby="admin-product-list-title">
           <div class="admin-panel-heading">
             <div>
