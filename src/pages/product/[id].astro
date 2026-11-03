@@ -102,7 +102,7 @@ const customizable = product.customizable !== false;
         <h1>{product.name}</h1>
         <p class="product-detail-description">{product.description}</p>
         <div class="product-detail-price">
-          <strong>₹{product.price}</strong>
+          <strong data-price-now={product.price}>₹{product.price}</strong>
           <span>{product.packSize}</span>
         </div>
         <p class="product-option-note">
@@ -162,7 +162,8 @@ const customizable = product.customizable !== false;
 </SiteLayout>
 
 <script>
-  const gallery = document.querySelector<HTMLElement>("[data-gallery]");
+  import "../../scripts/flat-discount-prices";
+  const gallery =  document.querySelector<HTMLElement>("[data-gallery]");
   const track = gallery?.querySelector<HTMLElement>("[data-gallery-track]");
   if (gallery && track) {
     const slides = Array.from(track.querySelectorAll<HTMLElement>("[data-gallery-slide]"));

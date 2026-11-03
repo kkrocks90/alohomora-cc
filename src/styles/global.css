@@ -7669,3 +7669,28 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
   min-height: 46px;
   gap: 10px;
 }
+
+.price-was {
+  color: #98877a;
+  font-size: 0.8em;
+  font-weight: 400;
+  text-decoration: line-through;
+  margin-right: 6px;
+}
+
+.product-card-price > .price-was,
+.product-detail-price > .price-was {
+  font-family: var(--sans, inherit);
+}
+
+.product-card-price > .price-off-badge,
+.product-detail-price > .price-off-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e8f3e6;
+  color: #2f6b3a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}

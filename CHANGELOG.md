@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.42.0
+
+- While a flat discount is live, product cards (home, shop) and the product page show the original price struck through, the discounted price and an "N% off" badge.
+
 ## 1.41.0
 
 - New flat discount: a sitewide, percentage-only discount set in the admin Promos tab (name, percentage, optional end date, on/off). Applied automatically at checkout, enforced by the Worker, and shown on the order.
