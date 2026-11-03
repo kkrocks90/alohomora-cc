@@ -7694,3 +7694,61 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
   font-weight: 700;
   letter-spacing: 0.02em;
 }
+
+.promo-banner-percent {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #e2bb8a;
+  color: #4a3026;
+  line-height: 1;
+}
+
+.promo-banner-percent strong {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.promo-banner-percent span {
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.promo-banner-cta {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #fff8ee;
+  color: #4a3026;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .promo-banner-home {
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+
+  .promo-banner-home .promo-banner-percent {
+    width: 52px;
+    height: 52px;
+  }
+
+  .promo-banner-home .promo-banner-copy {
+    flex: 1 1 0;
+  }
+
+  .promo-banner-home .promo-banner-cta {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+}

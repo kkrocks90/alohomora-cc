@@ -37,14 +37,15 @@ const orgLd = {
 
 <SiteLayout jsonLd={[orgLd]}>
   <main id="storefront" data-checkout-api={checkoutApiUrl}>
-    <div class="promo-banner promo-banner-home" data-promo-banner hidden>
-      <span class="promo-banner-sparkle" aria-hidden="true">✳</span>
+    <a class="promo-banner promo-banner-home" data-promo-banner href={`${import.meta.env.BASE_URL}store/`} hidden>
+      <span class="promo-banner-percent" aria-hidden="true"><strong data-promo-percent></strong><span>OFF</span></span>
       <span class="promo-banner-copy">
         <span class="promo-banner-kicker">Limited-time offer</span>
         <strong data-promo-name></strong>
         <span data-promo-offer></span>
       </span>
-    </div>
+      <span class="promo-banner-cta">Shop the sale <span aria-hidden="true">&rarr;</span></span>
+    </a>
     <ThemeHeroBanner />
     <section class="hero-section" id="top">
       <div class="hero-copy">
