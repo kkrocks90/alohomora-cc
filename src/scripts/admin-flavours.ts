@@ -1,6 +1,6 @@
 interface CatalogueFlavour {
   name: string;
-  extraPrice: number;
+  extraPercent: number;
   productCount: number;
 }
 
@@ -20,14 +20,14 @@ function required<T extends HTMLElement>(root: HTMLElement, selector: string): T
 export function isCatalogueFlavour(value: unknown): value is CatalogueFlavour {
   if (!value || typeof value !== "object") return false;
   const flavour = value as Record<string, unknown>;
-  return typeof flavour.name === "string" && typeof flavour.extraPrice === "number" && typeof flavour.productCount === "number";
+  return typeof flavour.name === "string" && typeof flavour.extraPercent === "number" && typeof flavour.productCount === "number";
 }
 
 export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
   const form = required<HTMLFormElement>(root, "#admin-flavour-form");
   const list = required<HTMLElement>(root, "#admin-flavour-list");
   const nameInput = required<HTMLInputElement>(form, "input[name='name']");
-  const extraInput = required<HTMLInputElement>(form, "input[name='extraPrice']");
+  const extraInput = required<HTMLInputElement>(form, "input[name='extraPercent']");
 
   async function save(path: string, body: unknown, success: string) {
     try {
@@ -51,15 +51,15 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
     const extraWrap = document.createElement("label");
     extraWrap.className = "admin-flavour-extra";
     const extraText = document.createElement("span");
-    extraText.textContent = "Extra \u20B9";
+    extraText.textContent = "Extra %";
     const extraField = document.createElement("input");
     extraField.type = "number";
     extraField.min = "0";
-    extraField.max = "100000";
+    extraField.max = "500";
     extraField.step = "1";
     extraField.inputMode = "numeric";
-    extraField.value = String(flavour.extraPrice);
-    extraField.setAttribute("aria-label", `Extra amount for ${flavour.name}`);
+    extraField.value = String(flavour.extraPercent);
+    extraField.setAttribute("aria-label", `Extra percentage for ${flavour.name}`);
     extraWrap.append(extraText, extraField);
 
     const meta = document.createElement("span");
@@ -75,7 +75,7 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
     saveButton.addEventListener("click", () =>
       void save(
         "/admin/flavours/update",
-        { name: flavour.name, newName: nameField.value, extraPrice: Number(extraField.value || 0) },
+        { name: flavour.name, newName: nameField.value, extraPercent: Number(extraField.value || 0) },
         "Flavour saved.",
       ),
     );
@@ -108,7 +108,7 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
     const name = nameInput.value.trim();
     if (!name) return;
     try {
-      await post("/admin/flavours/create", { name, extraPrice: Number(extraInput.value || 0) });
+      await post("/admin/flavours/create", { name, extraPercent: Number(extraInput.value || 0) });
       setStatus("Flavour added. Tick it on a product to offer it.");
       form.reset();
       await reload();

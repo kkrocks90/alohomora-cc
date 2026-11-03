@@ -50,7 +50,7 @@ export function flavourExtra(name) {
 
 // Whole-rupee price of one unit of a product in the chosen flavour.
 export function unitPriceRupees(product, flavour) {
-  return product.price + flavourExtra(flavour);
+  return Math.round((product.price * (100 + flavourExtra(flavour))) / 100);
 }
 
 export function getCategories() {
@@ -129,9 +129,9 @@ export async function ensureCatalogue(env, { force = false } = {}) {
     }
     let flavourRows = bundledFlavours;
     try {
-      const { results } = await env.ORDERS_DB.prepare("SELECT name, extra_price FROM flavours ORDER BY sort_order, name").all();
+      const { results } = await env.ORDERS_DB.prepare("SELECT name, extra_percent FROM flavours ORDER BY sort_order, name").all();
       if (Array.isArray(results) && results.length > 0) {
-        flavourRows = results.map((row) => ({ name: row.name, extra: row.extra_price }));
+        flavourRows = results.map((row) => ({ name: row.name, extra: row.extra_percent }));
       }
     } catch {
       // Older database without the flavours table: every flavour costs no extra.

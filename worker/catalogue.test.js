@@ -67,7 +67,7 @@ test("adds the flavour extra from D1 to the unit price", async () => {
       return {
         async all() {
           if (/FROM products/i.test(sql)) return { results: [row({})] };
-          if (/FROM flavours/i.test(sql)) return { results: [{ name: "A", extra_price: 25 }, { name: "B", extra_price: 0 }] };
+          if (/FROM flavours/i.test(sql)) return { results: [{ name: "A", extra_percent: 20 }, { name: "B", extra_percent: 0 }] };
           return { results: [] };
         },
       };
@@ -78,7 +78,7 @@ test("adds the flavour extra from D1 to the unit price", async () => {
   assert.equal(unitPriceRupees(product, "A"), 148);
   assert.equal(unitPriceRupees(product, "B"), 123);
   assert.equal(unitPriceRupees(product, ""), 123);
-  assert.deepEqual(publicCatalogue().flavours.find((flavour) => flavour.name === "A"), { name: "A", extra: 25 });
+  assert.deepEqual(publicCatalogue().flavours.find((flavour) => flavour.name === "A"), { name: "A", extra: 20 });
 });
 
 test("bundled flavours include Assorted at no extra cost", async () => {

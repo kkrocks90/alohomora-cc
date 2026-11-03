@@ -25,7 +25,7 @@ interface Deps {
 
 interface FlavourOption {
   name: string;
-  extraPrice: number;
+  extraPercent: number;
 }
 
 const MAX_IMAGES = 3;
@@ -91,7 +91,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
 
   function renderFlavours(selected: string[]) {
     const known = new Set(flavourOptions.map((option) => option.name));
-    const options = [...flavourOptions, ...selected.filter((name) => !known.has(name)).map((name) => ({ name, extraPrice: 0 }))];
+    const options = [...flavourOptions, ...selected.filter((name) => !known.has(name)).map((name) => ({ name, extraPercent: 0 }))];
     flavourList.replaceChildren();
     if (options.length === 0) {
       const empty = document.createElement("p");
@@ -108,7 +108,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
       input.value = option.name;
       input.checked = selected.includes(option.name);
       const text = document.createElement("span");
-      text.textContent = option.extraPrice > 0 ? `${option.name} (+\u20B9${option.extraPrice})` : option.name;
+      text.textContent = option.extraPercent > 0 ? `${option.name} (+${option.extraPercent}%)` : option.name;
       label.append(input, text);
       flavourList.append(label);
     }

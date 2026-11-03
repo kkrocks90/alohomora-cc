@@ -732,10 +732,10 @@ if (root) {
         flavourSelect.append(new Option("Choose a flavour", ""));
         selected.flavours.forEach((flavour) => {
           const extra = adminData?.flavourExtras[flavour] ?? 0;
-          flavourSelect.append(new Option(extra > 0 ? `${flavour} (+\u20B9${extra})` : flavour, flavour));
+          flavourSelect.append(new Option(extra > 0 ? `${flavour} (+${extra}%)` : flavour, flavour));
         });
         flavourSelect.addEventListener("change", () => {
-          priceInput.value = String(selected.price + (adminData?.flavourExtras[flavourSelect.value] ?? 0));
+          priceInput.value = String(Math.round((selected.price * (100 + (adminData?.flavourExtras[flavourSelect.value] ?? 0))) / 100));
           updateOrderTotal();
         });
         flavourLabel.append(flavourSelect);
@@ -1216,7 +1216,7 @@ if (root) {
     productsAdmin.render(
       adminData.catalogueProducts,
       adminData.rebuildConfigured,
-      adminData.catalogueFlavours.map(({ name, extraPrice }) => ({ name, extraPrice })),
+      adminData.catalogueFlavours.map(({ name, extraPercent }) => ({ name, extraPercent })),
     );
     flavoursAdmin.render(adminData.catalogueFlavours);
     categoriesAdmin.render(adminData.catalogueCategories);

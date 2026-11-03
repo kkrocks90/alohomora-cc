@@ -127,7 +127,7 @@ const customizable = product.customizable !== false;
                 <option value="" disabled selected>Choose a flavour</option>
                 {product.flavours.map((flavour) => {
                   const extra = flavourExtra(flavour);
-                  return <option value={flavour} data-extra={extra}>{extra > 0 ? `${flavour} (+\u20B9${extra})` : flavour}</option>;
+                  return <option value={flavour} data-extra={extra}>{extra > 0 ? `${flavour} (+${extra}%)` : flavour}</option>;
                 })}
               </select>
             </label>
@@ -173,7 +173,7 @@ const customizable = product.customizable !== false;
     const basePrice = Number(priceEl.dataset.priceNow);
     flavourSelect.addEventListener("change", () => {
       const extra = Number(flavourSelect.selectedOptions[0]?.dataset.extra ?? 0) || 0;
-      const price = basePrice + extra;
+      const price = Math.round((basePrice * (100 + extra)) / 100);
       priceEl.dataset.priceNow = String(price);
       priceEl.textContent = `\u20B9${price}`;
       priceEl.dispatchEvent(new CustomEvent("cc:price", { bubbles: true }));

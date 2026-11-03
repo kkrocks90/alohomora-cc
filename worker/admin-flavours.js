@@ -3,7 +3,7 @@ import { ensureCatalogue, loadAllProductRows } from "./catalogue.js";
 import { triggerSiteRebuild } from "./admin-products.js";
 
 const INPUT_ERROR = /^(Enter|That|Remove|Request|Extra)/;
-const MAX_EXTRA_RUPEES = 100_000;
+const MAX_EXTRA_PERCENT = 100_000;
 
 function result(status, body) {
   return { status, body };
@@ -18,8 +18,8 @@ function cleanName(value) {
 
 function cleanExtra(value) {
   const extra = value === undefined || value === "" ? 0 : Number(value);
-  if (!Number.isInteger(extra) || extra < 0 || extra > MAX_EXTRA_RUPEES) {
-    throw new Error("Extra amount must be a whole number of rupees from 0 to 100000.");
+  if (!Number.isInteger(extra) || extra < 0 || extra > MAX_EXTRA_PERCENT) {
+    throw new Error("Extra percentage must be a whole number from 0 to 500.");
   }
   return extra;
 }
@@ -41,12 +41,12 @@ function sameName(first, second) {
 export async function listAdminFlavours(env) {
   const rows = await loadAllProductRows(env.ORDERS_DB);
   const { results } = await env.ORDERS_DB
-    .prepare("SELECT name, extra_price FROM flavours ORDER BY sort_order, name")
+    .prepare("SELECT name, extra_percent FROM flavours ORDER BY sort_order, name")
     .all();
-  const flavours = new Map((results ?? []).map((row) => [row.name, { name: row.name, extraPrice: row.extra_price, productCount: 0 }]));
+  const flavours = new Map((results ?? []).map((row) => [row.name, { name: row.name, extraPercent: row.extra_percent, productCount: 0 }]));
   for (const row of rows) {
     for (const name of new Set(parseList(row.flavours))) {
-      if (!flavours.has(name)) flavours.set(name, { name, extraPrice: 0, productCount: 0 });
+      if (!flavours.has(name)) flavours.set(name, { name, extraPercent: 0, productCount: 0 });
       flavours.get(name).productCount += 1;
     }
   }
@@ -61,7 +61,7 @@ export async function registerFlavours(database, names) {
   const start = (last?.max_sort ?? 0) + 1;
   await database.batch(
     unique.map((name, index) =>
-      database.prepare("INSERT OR IGNORE INTO flavours (name, extra_price, sort_order) VALUES (?, 0, ?)").bind(name, start + index),
+      database.prepare("INSERT OR IGNORE INTO flavours (name, extra_percent, sort_order) VALUES (?, 0, ?)").bind(name, start + index),
     ),
   );
 }
@@ -80,11 +80,11 @@ async function applyAction(database, action, body) {
   const existing = await listAdminFlavours({ ORDERS_DB: database });
   if (action === "create") {
     const name = cleanName(body?.name);
-    const extra = cleanExtra(body?.extraPrice);
+    const extra = cleanExtra(body?.extraPercent);
     if (existing.some((flavour) => sameName(flavour.name, name))) throw new Error("That flavour already exists.");
     const last = await database.prepare("SELECT COALESCE(MAX(sort_order), 0) AS max_sort FROM flavours").first();
     await database
-      .prepare("INSERT INTO flavours (name, extra_price, sort_order) VALUES (?, ?, ?)")
+      .prepare("INSERT INTO flavours (name, extra_percent, sort_order) VALUES (?, ?, ?)")
       .bind(name, extra, (last?.max_sort ?? 0) + 1)
       .run();
     return;
@@ -102,16 +102,16 @@ async function applyAction(database, action, body) {
     return;
   }
   const nextName = body?.newName === undefined ? current : cleanName(body.newName);
-  const extra = body?.extraPrice === undefined ? found.extraPrice : cleanExtra(body.extraPrice);
+  const extra = body?.extraPercent === undefined ? found.extraPercent : cleanExtra(body.extraPercent);
   if (nextName !== current && existing.some((flavour) => flavour.name !== current && sameName(flavour.name, nextName))) {
     throw new Error("That flavour already exists.");
   }
   const last = await database.prepare("SELECT COALESCE(MAX(sort_order), 0) AS max_sort FROM flavours").first();
   const statements = [
     database
-      .prepare("INSERT OR IGNORE INTO flavours (name, extra_price, sort_order) VALUES (?, 0, ?)")
+      .prepare("INSERT OR IGNORE INTO flavours (name, extra_percent, sort_order) VALUES (?, 0, ?)")
       .bind(current, (last?.max_sort ?? 0) + 1),
-    database.prepare("UPDATE flavours SET name = ?, extra_price = ? WHERE name = ?").bind(nextName, extra, current),
+    database.prepare("UPDATE flavours SET name = ?, extra_percent = ? WHERE name = ?").bind(nextName, extra, current),
   ];
   if (nextName !== current) {
     const { results: productRows } = await database

@@ -145,8 +145,8 @@ Add and edit products (name, description, price, pack size, category, flavours, 
 
 ### 6.9 Flavours
 
-- Admin **Flavours** panel: one master list (`flavours` table, migration 0019) with an `extra_price` in whole rupees (0 allowed). "Assorted" is seeded at 0.
-- Products choose flavours from the list (checkboxes). Unit price = product price + flavour extra, applied in the product page, bag, checkout, promo quotes, orders and manual orders. The Worker recomputes it from D1.
+- Admin **Flavours** panel: one master list (`flavours` table, migration 0019) with an `extra_percent` (whole percent, 0 allowed). "Assorted" is seeded at 0.
+- Products choose flavours from the list (checkboxes). Unit price = round(product price x (100 + extra%) / 100), applied in the product page, bag, checkout, promo quotes, orders and manual orders. The Worker recomputes it from D1.
 - Renaming a flavour updates products that use it; deleting is blocked while a product uses it. `GET /products` returns `flavours: [{name, extra}]`, bundled in `src/data/flavours.json`.
 
 ## 7. Payments

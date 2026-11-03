@@ -7,5 +7,5 @@ export function flavourExtra(name: string): number {
 }
 
 export function unitPrice(product: { price: number }, flavour: string): number {
-  return product.price + flavourExtra(flavour);
+  return Math.round((product.price * (100 + flavourExtra(flavour))) / 100);
 }

@@ -352,10 +352,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <h2 id="admin-flavour-title">Flavours</h2>
             </div>
           </div>
-          <p class="admin-form-hint">One list for every product. The extra amount (can be 0) is added to the price of any product ordered in that flavour. A flavour can only be deleted when no product uses it.</p>
+          <p class="admin-form-hint">One list for every product. The extra percentage (can be 0) is added to the price of any product ordered in that flavour. A flavour can only be deleted when no product uses it.</p>
           <form class="admin-category-form admin-flavour-form" id="admin-flavour-form">
             <label>New flavour<input name="name" maxlength="60" required placeholder="Hazelnut" /></label>
-            <label>Extra amount (&#8377;)<input name="extraPrice" type="number" inputmode="numeric" min="0" max="100000" step="1" value="0" required /></label>
+            <label>Extra (%)<input name="extraPercent" type="number" inputmode="numeric" min="0" max="500" step="1" value="0" required /></label>
             <button class="button button-primary" type="submit">Add flavour</button>
           </form>
           <div class="admin-category-list" id="admin-flavour-list"></div>
