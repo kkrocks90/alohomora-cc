@@ -8093,3 +8093,17 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 .account-group .signout-link:not([hidden])::before { content: ""; display: inline-block; width: 1px; height: 14px; margin-right: 10px; background: #d9c6b3; vertical-align: middle; }
 @media (max-width: 620px) { .account-group, .signout-link { display: none; } }
 .mobile-menu-signout { display: block; width: 100%; padding: 14px 0; border: 0; border-top: 1px solid #eadfd3; background: transparent; color: #a43c31; font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
+
+/* Mobile menu: keep footer buttons inside the panel on short screens */
+.mobile-menu { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+.mobile-menu-heading, .mobile-menu-links, .mobile-menu-footer { flex: 0 0 auto; }
+.mobile-menu-signout { padding: 12px 0; font-size: 14px; }
+.mobile-menu-footer { gap: 10px; padding-top: 16px; }
+.mobile-menu-actions { min-width: 0; }
+.mobile-menu-cta { min-width: 0; min-height: 44px; padding: 0 8px; }
+@media (max-height: 820px) {
+  .mobile-menu { padding-top: 22px; }
+  .mobile-menu-heading { padding-bottom: 12px; }
+  .mobile-menu-links a { padding: 12px 10px; font-size: 19px; }
+  .mobile-menu-links a span:last-child { width: 26px; height: 26px; }
+}

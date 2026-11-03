@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.46.2 - 2026-11-04
+
+- Fixed the mobile side menu so the WhatsApp and Instagram buttons stay inside the panel: the menu scrolls if needed and spacing tightens on shorter screens.
+
 ## 1.46.1 - 2026-11-04
 
 - Header: the profile link and Sign out now sit together on desktop.
