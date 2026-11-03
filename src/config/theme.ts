@@ -27,6 +27,7 @@ export interface Theme {
   id: string;
   label: string;
   themeColor: string;
+  category?: string;
   banner?: ThemeBanner;
   heroBanner?: ThemeHeroBanner;
   heroImage?: { src: ImageMetadata; alt: string };
@@ -161,5 +162,28 @@ export const THEMES: Record<string, Theme> = {
 const FALLBACK_THEME = "diwali";
 
 const requested = (import.meta.env.PUBLIC_SITE_THEME ?? "").trim().toLowerCase();
+
+// Every seasonal theme has a matching category; its banner and hero button open the shop filtered to it.
+const THEME_CATEGORIES: Record<string, string> = {
+  diwali: "Diwali Special",
+  monsoon: "Monsoon Special",
+  christmas: "Christmas Special",
+  "republic-day": "Republic Day Special",
+  pongal: "Pongal Special",
+  birthday: "Birthday Special",
+  "independence-day": "Independence Day Special",
+  "valentines-day": "Valentine's Day Special",
+};
+
+export const THEME_CATEGORY_NAMES = Object.values(THEME_CATEGORIES);
+
+for (const [id, category] of Object.entries(THEME_CATEGORIES)) {
+  const entry = THEMES[id];
+  if (!entry) continue;
+  const href = `store/?category=${encodeURIComponent(category)}`;
+  entry.category = category;
+  if (entry.banner) entry.banner.href = href;
+  if (entry.heroBanner) entry.heroBanner.href = href;
+}
 
 export const theme: Theme = THEMES[requested] ?? THEMES[requested === "" ? FALLBACK_THEME : "default"];

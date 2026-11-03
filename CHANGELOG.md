@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.40.0
+
+- Every seasonal theme has a matching category (e.g. "Diwali Special"). The theme banner and hero button now open the shop filtered to it, and its chip always shows while that theme is live.
+- Migration 0017 seeds the eight seasonal categories (hidden by default) so products can be assigned to them in the admin.
+
 ## 1.39.1
 
 - Admin: success and error messages now appear as a popup toast (auto-dismiss, closable) instead of a line at the top.

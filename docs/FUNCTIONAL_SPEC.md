@@ -1,6 +1,6 @@
 # Chocolate Circle - Functional Specification
 
-Status: reflects release **v1.39.0** (November 2026). Source of truth for behaviour is the code and `CHANGELOG.md`; this document describes what the system does and the rules it enforces.
+Status: reflects release **v1.40.0** (November 2026). Source of truth for behaviour is the code and `CHANGELOG.md`; this document describes what the system does and the rules it enforces.
 
 ## 1. Overview
 
@@ -30,6 +30,7 @@ Catalogue data lives in `src/data/products.json` and `src/data/categories.json` 
 Home, Store, Product (`/product/<id>`), Corporate, Checkout, Thank-you, Account/Profile, Order detail (`/order/?id=`), About, Privacy policy, Shipping policy, Terms and conditions, Admin, branded 404, `sitemap.xml`.
 
 ### 3.2 Catalogue
+- Each seasonal theme has a category ("Diwali Special", "Monsoon Special", ...; migration 0017, hidden by default). The theme banner and hero button link to `store/?category=<name>`, and the live theme's category chip is always shown.
 - Categories marked hidden in the admin are removed from the shop filter chips and the home category cards; their products stay visible under "All".
 - Products live in D1 (`products`, `catalogue_categories`), managed from the admin Products tab and seeded from `products.json`. The storefront is static: `npm run build` runs `scripts/fetch-catalogue.mjs`, which pulls `GET /products` from the Worker (falling back to the bundled JSON). Saving a product triggers the Pages workflow when the `GITHUB_DISPATCH_TOKEN` Worker secret is set.
 - Fields: id, name, description, price, images (up to 3), tag (category), pack size, flavour options, featured flag, visible flag.

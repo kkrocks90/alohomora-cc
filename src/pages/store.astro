@@ -4,10 +4,11 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 import products from "../data/products.json";
 import extraCategories from "../data/categories.json";
 import hiddenCategories from "../data/hidden-categories.json";
+import { theme } from "../config/theme";
 import { resolveImage } from "../lib/product-images";
 
-const tags = [...new Set([...products.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories])]
-  .filter((tag) => !(hiddenCategories as string[]).includes(tag))
+const tags = [...new Set([...products.flatMap((product) => [product.tag, ...(product.extraTags ?? [])]), ...extraCategories, ...(theme.category ? [theme.category] : [])])]
+  .filter((tag) => tag === theme.category || !(hiddenCategories as string[]).includes(tag))
   .sort((a, b) => a.localeCompare(b));
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 ---
