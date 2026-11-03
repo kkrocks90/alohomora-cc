@@ -105,6 +105,7 @@ if (root) {
     if (!apiUrl) throw new Error("Customer sign-in is not configured yet. Please contact the shop.");
     const response = await fetch(`${apiUrl}${path}`, {
       method: "POST",
+      signal: AbortSignal.timeout(20000),
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),

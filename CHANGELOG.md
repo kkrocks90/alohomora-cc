@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.46.1 - 2026-11-04
+
+- Header: the profile link and Sign out now sit together on desktop.
+- Profile: requests to the order service time out after 20 seconds, so the page shows an error and the sign-in form instead of loading forever.
+
 ## 1.46.0 - 2026-11-04
 
 - Added a Sign out button to the desktop header and the mobile side menu, shown only while signed in (customer or admin).

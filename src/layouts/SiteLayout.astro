@@ -78,6 +78,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <a href={`${base}#kindness`}>Good to know</a>
       </nav>
       <a class="shop-link" href={`${base}store/`}>Shop</a>
+      <div class="account-group">
       <a class="account-link" href={`${base}account/`}>
         <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="12" cy="8" r="3.5"></circle>
@@ -86,6 +87,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <span data-account-label>Login</span>
       </a>
       <button class="signout-link" type="button" data-sign-out data-checkout-api={import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? ""} hidden>Sign out</button>
+      </div>
       <button
         class="menu-toggle"
         id="open-mobile-menu"

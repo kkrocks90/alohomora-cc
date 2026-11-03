@@ -8088,5 +8088,8 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 .signout-link { padding: 8px 14px; border: 1px solid #d9c6b3; border-radius: 999px; background: transparent; color: #68574e; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
 .signout-link:hover { background: #f1e7dc; color: #4a3027; }
 .signout-link[hidden], .mobile-menu-signout[hidden] { display: none; }
-@media (max-width: 620px) { .signout-link { display: none; } }
+.account-group { display: inline-flex; align-items: center; gap: 2px; }
+.account-group .signout-link { padding: 6px 10px; border: 0; font-size: 12px; color: #8a766a; }
+.account-group .signout-link:not([hidden])::before { content: ""; display: inline-block; width: 1px; height: 14px; margin-right: 10px; background: #d9c6b3; vertical-align: middle; }
+@media (max-width: 620px) { .account-group, .signout-link { display: none; } }
 .mobile-menu-signout { display: block; width: 100%; padding: 14px 0; border: 0; border-top: 1px solid #eadfd3; background: transparent; color: #a43c31; font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
