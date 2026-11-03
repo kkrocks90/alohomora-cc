@@ -8032,3 +8032,54 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
   height: 1px;
   background: #e3d6ca;
 }
+
+/* ---- Profile page polish (v1.45.1) ---- */
+.account-page { background: linear-gradient(180deg, #faf4ec 0%, #fffdf9 60%); }
+.account-panel { border-radius: 18px; box-shadow: 0 18px 55px rgb(65 44 31 / 8%); }
+.account-form input, .account-form textarea, .account-form select { border-radius: 10px; }
+.account-form .button { border-radius: 999px; }
+.account-panel:has(#account-profile:not([hidden])),
+.account-panel:has(#account-orders:not([hidden])) {
+  width: min(100%, 1040px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 32px;
+  align-items: start;
+}
+.account-panel:has(#account-profile:not([hidden])) > * { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .account-panel:has(#account-profile:not([hidden])) { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+  .account-panel:has(#account-profile:not([hidden])) > .account-profile { grid-column: 1; }
+  .account-panel:has(#account-profile:not([hidden])) > .account-orders { grid-column: 2; }
+}
+.account-panel:has(#account-profile:not([hidden])) > .eyebrow,
+.account-panel:has(#account-profile:not([hidden])) > h1 { text-align: left; }
+.account-profile, .account-orders { margin-top: 24px; padding: 24px 22px; border: 1px solid #eadfd3; border-radius: 16px; background: #fff; box-shadow: 0 6px 24px rgb(65 44 31 / 5%); }
+.account-profile { border-top: 4px solid #805744; }
+.account-orders { border-top: 4px solid #c9a27d; }
+.profile-details { margin: 14px 0 22px; padding: 6px 16px; border-radius: 12px; background: #faf5ee; gap: 0 16px; }
+.profile-details dt, .profile-details dd { padding: 11px 0; border-bottom: 1px solid #eee2d4; }
+.profile-details dt:nth-last-of-type(1), .profile-details dd:last-of-type { border-bottom: 0; }
+.profile-details dt { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.profile-signup-form { padding: 18px 16px; border: 1px dashed #d9c6b3; border-radius: 12px; background: #fffaf3; margin-bottom: 22px; }
+.profile-signup-form h3 { margin: 0; color: #493027; font-family: var(--serif); font-size: 21px; font-weight: 400; }
+.profile-signup-form p { margin: 0 0 4px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.profile-signup-form textarea { padding: 9px 11px; border: 1px solid #ded2c5; border-radius: 10px; font: inherit; font-size: 15px; resize: vertical; width: 100%; }
+.profile-address-card { border-radius: 12px; border-left: 4px solid #c9a27d; }
+.order-card { border-radius: 14px; border-left: 4px solid #805744; transition: box-shadow .2s, transform .2s; }
+.order-card:hover { box-shadow: 0 10px 26px rgb(65 44 31 / 10%); transform: translateY(-1px); }
+.order-card-heading strong { font-size: 14px; }
+.order-paid { padding: 3px 10px; border-radius: 999px; background: #e6f0e3; letter-spacing: .04em; }
+.order-card-link { display: inline-block; margin-top: 12px; }
+.account-orders-heading { align-items: center; }
+.account-orders-heading .account-text-button { padding: 8px 16px; border: 1px solid #d9c6b3; border-radius: 999px; text-decoration: none; }
+@media (max-width: 640px) {
+  .account-page { padding: 28px 12px 60px; }
+  .account-panel { padding: 22px 16px; border-radius: 14px; }
+  .account-profile, .account-orders { padding: 18px 14px; margin-top: 18px; }
+  .profile-details { grid-template-columns: 1fr; padding: 4px 14px; }
+  .profile-details dt { padding: 10px 0 0; border-bottom: 0; }
+  .profile-details dd { padding: 2px 0 10px; }
+  .profile-details dd:last-of-type { border-bottom: 0; }
+  .order-card-heading { flex-direction: column; align-items: flex-start; }
+}
