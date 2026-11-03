@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.41.0
+
+- New flat discount: a sitewide, percentage-only discount set in the admin Promos tab (name, percentage, optional end date, on/off). Applied automatically at checkout, enforced by the Worker, and shown on the order.
+- While a flat discount is live, promo codes are blocked and the checkout code box is hidden.
+- The home page now advertises only the flat discount. Coupon codes are no longer shown on the home or shop pages.
+- Migration 0018 adds `flat_discount`. Apply it before deploying the Worker.
+
 ## 1.40.2
 
 - Home: "Good to know" icons are now round badges on mobile and tablet instead of a full-width bar.

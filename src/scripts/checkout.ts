@@ -101,6 +101,7 @@ const orderTotal = requireElement<HTMLElement>("#checkout-total");
 const payableTotal = requireElement<HTMLElement>("#checkout-payable");
 const discountRow = requireElement<HTMLElement>("#checkout-discount-row");
 const discountTotal = requireElement<HTMLElement>("#checkout-discount");
+const discountLabel = requireElement<HTMLElement>("#checkout-discount-label");
 const promoForm = requireElement<HTMLFormElement>("#checkout-promo-form");
 const promoInput = requireElement<HTMLInputElement>("#checkout-promo-code");
 const promoApplyButton = requireElement<HTMLButtonElement>("#checkout-promo-apply");
@@ -117,6 +118,7 @@ let customerEmail = "";
 let sessionToken = "";
 let profileComplete = false;
 let appliedPromo: AppliedPromo | null = null;
+let flatDiscount: { name: string; percentage: number } | null = null;
 
 function initializeFormPincodeLookup(form: HTMLFormElement) {
   const city = form.elements.namedItem("city");
@@ -155,6 +157,19 @@ function getCartSignature() {
 }
 
 function renderPromoSummary(subtotalPaise: number) {
+  if (flatDiscount) {
+    const discountPaise = Math.floor((subtotalPaise * flatDiscount.percentage) / 100);
+    appliedPromo = null;
+    promoForm.hidden = true;
+    promoRemoveButton.hidden = true;
+    discountLabel.textContent = `${flatDiscount.name} (${flatDiscount.percentage}% off)`;
+    discountRow.hidden = discountPaise === 0;
+    discountTotal.textContent = `\u2212${currency.format(discountPaise / 100)}`;
+    payableTotal.textContent = currency.format((subtotalPaise - discountPaise) / 100);
+    return;
+  }
+  promoForm.hidden = false;
+  discountLabel.textContent = "Promo discount";
   const validPromo = appliedPromo && appliedPromo.cartSignature === getCartSignature() &&
     appliedPromo.subtotalPaise === subtotalPaise;
   if (appliedPromo && !validPromo) {
@@ -250,6 +265,24 @@ function renderOrder() {
     orderItems.append(row);
   }
 }
+
+async function loadFlatDiscount() {
+  if (!apiUrl) return;
+  try {
+    const response = await fetch(`${apiUrl}/flat-discount`, { headers: { Accept: "application/json" }, credentials: "omit" });
+    if (!response.ok) return;
+    const payload: unknown = await response.json();
+    const discount = (payload as { discount?: { name?: unknown; percentage?: unknown } | null })?.discount;
+    if (discount && typeof discount.name === "string" && Number.isInteger(discount.percentage)) {
+      flatDiscount = { name: discount.name, percentage: discount.percentage as number };
+      renderOrder();
+    }
+  } catch (error) {
+    console.error("Could not load the flat discount.", error);
+  }
+}
+
+void loadFlatDiscount();
 
 promoForm.addEventListener("submit", async (event) => {
   event.preventDefault();

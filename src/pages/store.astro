@@ -20,15 +20,6 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
       <h1>Find your <em>sweet spot.</em></h1>
       <p>Handmade chocolates, candies, and gifts, ready to make someone’s day.</p>
     </section>
-    <div class="promo-banner promo-banner-ribbon" data-promo-banner hidden>
-      <span class="promo-banner-sparkle" aria-hidden="true">✳</span>
-      <span class="promo-banner-copy">
-        <span class="promo-banner-kicker">Today’s sweet deal</span>
-        <strong data-promo-name></strong>
-        <span data-promo-offer></span>
-      </span>
-      <button class="promo-banner-code" type="button" data-promo-copy>Use code <strong data-promo-code></strong></button>
-    </div>
 
     <section class="store-results" id="store-catalog" aria-label="Shop products">
       <div class="store-toolbar-wrap">
@@ -87,6 +78,5 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
   </main>
   <script>
     import "../scripts/catalog";
-    import "../scripts/promos";
-  </script>
+      </script>
 </SiteLayout>

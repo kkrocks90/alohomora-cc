@@ -193,6 +193,24 @@ export function parsePaidOrderNotes(orderId, paymentId, notes, amountPaise, pend
     promoCode = promo.code;
     discountPaise = promo.discount_paise;
   }
+  if (notes?.flat !== undefined) {
+    let flat;
+    try {
+      flat = JSON.parse(notes.flat);
+    } catch {
+      throw new Error("The paid order discount details could not be read.");
+    }
+    if (
+      promoCode ||
+      flat.subtotal_paise !== productSubtotalPaise ||
+      !Number.isSafeInteger(flat.discount_paise) ||
+      flat.discount_paise <= 0 ||
+      flat.discount_paise >= productSubtotalPaise
+    ) {
+      throw new Error("The paid order discount details are invalid.");
+    }
+    discountPaise = flat.discount_paise;
+  }
   if (productSubtotalPaise - discountPaise !== amountPaise || (amountPaise === 0 && !promoCode)) {
     throw new Error("The paid order amount does not match its product subtotal and discount.");
   }

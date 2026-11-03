@@ -160,6 +160,23 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         tabindex="0"
         hidden
       >
+        <section class="admin-panel" aria-labelledby="admin-flat-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Sitewide offer</p>
+              <h2 id="admin-flat-title">Flat discount</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">A percentage taken off every order automatically, and shown on the home page. While it is live, promo codes cannot be used.</p>
+          <p class="admin-flat-summary" id="admin-flat-summary" role="status"></p>
+          <form class="admin-flat-form" id="admin-flat-form">
+            <label>Name<input name="name" maxlength="60" required placeholder="Diwali sale" /></label>
+            <label>Percentage off<input name="percentage" type="number" min="1" max="90" step="1" required placeholder="10" inputmode="numeric" /></label>
+            <label>Ends on (optional)<input name="endDate" type="date" /></label>
+            <label class="admin-flat-toggle"><input name="active" type="checkbox" /> Turn on</label>
+            <button class="button button-primary" type="submit">Save flat discount</button>
+          </form>
+        </section>
         <section class="admin-panel" aria-labelledby="admin-promos-title">
           <div class="admin-panel-heading">
             <div>

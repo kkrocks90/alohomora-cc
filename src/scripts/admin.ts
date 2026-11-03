@@ -5,6 +5,7 @@ import { printInvoice } from "./order-view";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
 import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
+import { initFlatDiscountAdmin, isFlatDiscount, type FlatDiscount } from "./admin-flat-discount";
 import type { CustomField } from "./custom-fields";
 
 interface AdminCustomer {
@@ -93,6 +94,7 @@ interface AdminData {
   customProducts: { id: string; name: string }[];
   catalogueProducts: Parameters<ReturnType<typeof initProductsAdmin>["render"]>[0];
   catalogueCategories: Parameters<ReturnType<typeof initCategoriesAdmin>["render"]>[0];
+  flatDiscount: FlatDiscount | null;
   rebuildConfigured: boolean;
 }
 
@@ -220,6 +222,9 @@ function normalizeAdminData(data: AdminData): AdminData {
     catalogueCategories: Array.isArray((data as { catalogueCategories?: unknown }).catalogueCategories)
       ? (data as { catalogueCategories: unknown[] }).catalogueCategories.filter(isCatalogueCategory)
       : [],
+    flatDiscount: isFlatDiscount((data as { flatDiscount?: unknown }).flatDiscount)
+      ? (data as { flatDiscount: FlatDiscount }).flatDiscount
+      : null,
     rebuildConfigured: data.rebuildConfigured === true,
     orders: data.orders.map((order) => ({
       ...order,
@@ -1194,6 +1199,7 @@ if (root) {
     customFieldsAdmin.render(adminData.customFields);
     productsAdmin.render(adminData.catalogueProducts, adminData.rebuildConfigured);
     categoriesAdmin.render(adminData.catalogueCategories);
+    flatDiscountAdmin.render(adminData.flatDiscount);
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     if (!editingOrderId) {
@@ -1229,6 +1235,13 @@ if (root) {
     setStatus,
     reload: () => loadDashboard(),
     getCategories: () => adminData?.categories ?? [],
+  });
+
+  const flatDiscountAdmin = initFlatDiscountAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    setStatus,
+    reload: () => loadDashboard(),
   });
 
   const categoriesAdmin = initCategoriesAdmin({

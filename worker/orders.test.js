@@ -119,6 +119,18 @@ test("reconstructs verified order details from Razorpay order notes", () => {
   assert.deepEqual(order.items, paidOrder.items);
 });
 
+test("reconciles a paid order that used the flat discount", () => {
+  const subtotal = paidOrder.amountPaise;
+  const flat = JSON.stringify({ pct: 10, subtotal_paise: subtotal, discount_paise: subtotal / 10 });
+  const order = parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({ flat }), subtotal - subtotal / 10);
+  assert.equal(order.discountPaise, subtotal / 10);
+  assert.equal(order.promoCode, "");
+  assert.throws(
+    () => parsePaidOrderNotes(paidOrder.orderId, paidOrder.paymentId, createPaidNotes({ flat }), subtotal),
+    /amount does not match/,
+  );
+});
+
 test("reconstructs address components from delivery notes", () => {
   const order = parsePaidOrderNotes(
     paidOrder.orderId,

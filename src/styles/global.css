@@ -7614,3 +7614,58 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Admin flat discount */
+.admin-flat-summary {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f4ece3;
+  color: #6f5a4a;
+  font-weight: 600;
+}
+
+.admin-flat-summary[data-state="on"] {
+  background: #e3f3e6;
+  color: #1f6b35;
+}
+
+.admin-flat-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+  gap: 12px;
+}
+
+.admin-flat-form label {
+  display: grid;
+  gap: 6px;
+  color: #6f5a4a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-flat-form input:not([type="checkbox"]) {
+  min-height: 46px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #dccdbd;
+  border-radius: 12px;
+  background: #fffaf4;
+  color: #3a2a20;
+  font: inherit;
+  font-weight: 500;
+}
+
+.admin-flat-form input:focus {
+  border-color: var(--accent, #7a3e1d);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(122, 62, 29, 0.15);
+}
+
+.admin-flat-form .admin-flat-toggle {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  gap: 10px;
+}

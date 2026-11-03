@@ -13,6 +13,12 @@ import {
   updateAdminOrderStatus,
   updateAdminPromo,
 } from "./admin.js";
+import {
+  FLAT_DISCOUNT_BLOCKS_COUPONS_MESSAGE,
+  calculateFlatDiscountPaise,
+  getActiveFlatDiscount,
+  handleAdminFlatDiscount,
+} from "./flat-discount.js";
 import { handleAdminCategory } from "./admin-categories.js";
 import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
 import {
@@ -222,6 +228,7 @@ async function handlePromoQuote(request, env, origin) {
   try {
     body = await readBody(request);
     const items = validatePromoCart(body);
+    if (await getActiveFlatDiscount(env.ORDERS_DB)) throw new Error(FLAT_DISCOUNT_BLOCKS_COUPONS_MESSAGE);
     const quote = await quotePromo(env.ORDERS_DB, body.code, customerEmail, items);
     return jsonResponse({
       code: quote.code,
@@ -283,6 +290,8 @@ async function handleCreateOrder(request, env, origin) {
   let order;
   let body;
   let promoQuote = null;
+  let flatDiscount = null;
+  let flatDiscountPaise = 0;
   try {
     body = await readBody(request);
     const submittedEmail = normalizeCustomerEmail(body?.customer?.email);
@@ -300,6 +309,12 @@ async function handleCreateOrder(request, env, origin) {
     if (body.promoCode !== undefined && body.promoCode !== null && body.promoCode !== "") {
       promoQuote = await quotePromo(env.ORDERS_DB, body.promoCode, customerEmail, order.items);
       order.amount = promoQuote.payablePaise;
+    }
+    flatDiscount = await getActiveFlatDiscount(env.ORDERS_DB);
+    if (flatDiscount) {
+      if (promoQuote) throw new Error(FLAT_DISCOUNT_BLOCKS_COUPONS_MESSAGE);
+      flatDiscountPaise = calculateFlatDiscountPaise(order.subtotalPaise, flatDiscount);
+      order.amount = order.subtotalPaise - flatDiscountPaise;
     }
   } catch (error) {
     const status = error instanceof PincodeLookupError ? error.status : 400;
@@ -415,6 +430,13 @@ async function handleCreateOrder(request, env, origin) {
       discount_paise: promoQuote.discountPaise,
     });
   }
+  if (flatDiscount && flatDiscountPaise > 0) {
+    notes.flat = JSON.stringify({
+      pct: flatDiscount.percentage,
+      subtotal_paise: order.subtotalPaise,
+      discount_paise: flatDiscountPaise,
+    });
+  }
   const appOrderId = generateOrderId();
   const payload = {
     amount: order.amount,
@@ -488,7 +510,7 @@ async function handleCreateOrder(request, env, origin) {
     fulfillmentMethod: order.fulfillmentMethod,
     distanceKm: Number(order.distanceKm.toFixed(2)),
     productSubtotalPaise: promoQuote?.subtotalPaise ?? order.subtotalPaise,
-    discountPaise: promoQuote?.discountPaise ?? 0,
+    discountPaise: promoQuote?.discountPaise ?? flatDiscountPaise,
     promoCode: promoQuote?.code ?? "",
     promoReservationId: reservation?.reservationId ?? "",
   }, 201, origin);
@@ -753,6 +775,17 @@ export default {
         return errorResponse("We could not send your enquiry. Please use WhatsApp or email us directly.", 503, configuredOrigin);
       }
     }
+    if (request.method === "GET" && path === "/flat-discount") {
+      if (!env.ORDERS_DB) return errorResponse("The discount service is not configured.", 503, configuredOrigin);
+      const discount = await getActiveFlatDiscount(env.ORDERS_DB);
+      const response = jsonResponse(
+        { discount: discount ? { name: discount.name, percentage: discount.percentage, endDate: discount.endDate } : null },
+        200,
+        configuredOrigin,
+      );
+      response.headers.set("Cache-Control", "public, max-age=60, s-maxage=60");
+      return response;
+    }
     if (request.method === "GET" && path === "/promos/featured") {
       if (!env.ORDERS_DB) return errorResponse("The promo service is not configured.", 503, configuredOrigin);
       try {
@@ -837,6 +870,10 @@ export default {
     }
     if (path === "/admin/categories/create" || path === "/admin/categories/update" || path === "/admin/categories/delete") {
       const result = await handleAdminCategory(request, env, path.split("/").pop());
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/flat-discount/save") {
+      const result = await handleAdminFlatDiscount(request, env);
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/promos/create") {
