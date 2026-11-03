@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.39.1
+
+- Admin: success and error messages now appear as a popup toast (auto-dismiss, closable) instead of a line at the top.
+- Admin: nicer category text field (stacked label, rounded input, focus ring).
+
 ## 1.39.0
 
 - Admin: new Categories manager (Products tab) to add, rename, hide/show and delete categories.

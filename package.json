@@ -1,7 +1,7 @@
 {
   "name": "handmade-chocolate-shop",
   "type": "module",
-  "version": "1.39.0",
+  "version": "1.39.1",
   "scripts": {
     "dev": "astro dev",
     "build": "node scripts/fetch-catalogue.mjs && astro build",

@@ -368,9 +368,31 @@ if (root) {
     loginStatus.dataset.state = error ? "error" : "success";
   }
 
+  let toastTimer = 0;
   function setStatus(message: string, error = false) {
-    status.textContent = message;
-    status.dataset.state = error ? "error" : "success";
+    status.textContent = "";
+    status.dataset.state = "";
+    document.querySelector(".admin-toast")?.remove();
+    window.clearTimeout(toastTimer);
+    if (!message) return;
+    const toast = document.createElement("div");
+    toast.className = "admin-toast";
+    toast.dataset.state = error ? "error" : "success";
+    toast.setAttribute("role", error ? "alert" : "status");
+    const icon = document.createElement("span");
+    icon.className = "admin-toast-icon";
+    icon.textContent = error ? "!" : "\u2713";
+    const text = document.createElement("p");
+    text.textContent = message;
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "admin-toast-close";
+    close.setAttribute("aria-label", "Dismiss");
+    close.textContent = "\u00d7";
+    close.addEventListener("click", () => toast.remove());
+    toast.append(icon, text, close);
+    document.body.append(toast);
+    toastTimer = window.setTimeout(() => toast.remove(), error ? 8000 : 4500);
   }
 
   function setBusy(form: HTMLFormElement, busy: boolean) {
