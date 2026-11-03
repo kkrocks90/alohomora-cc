@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.43.2
+
+- Admin flavour checkboxes are now tidy pill chips (checkbox beside the name, filled when selected), and the extra-percentage field in the Flavours list is styled as a proper input.
+
 ## 1.43.1
 
 - Flavour extras are now a percentage of the product price instead of a rupee amount (rounded to the nearest rupee). The flavour table column is `extra_percent` (migration 0019, not yet applied anywhere).

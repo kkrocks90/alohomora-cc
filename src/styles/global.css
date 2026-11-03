@@ -7834,26 +7834,46 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
   gap: 8px;
 }
 
-.apf-flavour-chip {
+.apf-flavours .apf-flavour-chip {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: 7px;
-  padding: 7px 12px;
+  gap: 8px;
+  width: auto;
+  padding: 8px 14px 8px 11px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #fff;
+  color: #4a3a30;
   font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.apf-flavour-chip:has(input:checked) {
+.apf-flavours .apf-flavour-chip:hover {
+  border-color: #b9858c;
+}
+
+.apf-flavours .apf-flavour-chip:has(input:checked) {
   border-color: #7b2230;
-  background: #f8e9ea;
+  background: #7b2230;
+  color: #fff;
 }
 
-.apf-flavour-chip input {
-  width: auto;
+.apf-flavours .apf-flavour-chip input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
   margin: 0;
+  padding: 0;
+  accent-color: #fff;
+  flex: none;
+}
+
+.apf-flavours .apf-flavour-chip:has(input:checked) input {
+  accent-color: #7b2230;
 }
 
 .admin-flavour-form {
@@ -7868,14 +7888,31 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 
 .admin-flavour-extra {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  color: #6b5a4f;
   font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .admin-flavour-extra input {
-  width: 84px;
+  width: 76px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: #2d1f18;
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+}
+
+.admin-flavour-extra input:focus {
+  outline: 2px solid #7b2230;
+  outline-offset: 1px;
 }
 
 .admin-flavour-meta {
