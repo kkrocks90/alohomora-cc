@@ -249,3 +249,14 @@ html[data-theme="republic-day"] .theme-hero-emoji { width: auto; font-size: 2.6r
 @media (max-width: 620px) {
   html[data-theme="republic-day"] .theme-hero-lantern.theme-hero-emoji { font-size: 1.7rem; }
 }
+
+/* Themed garland */
+html[data-theme="republic-day"] .site-header::after {
+  background:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'26'%20height%3D'18'%3E%3Ccircle%20cx%3D'5'%20cy%3D'8'%20r%3D'3.5'%20fill%3D'%23ff9933'%2F%3E%3Ccircle%20cx%3D'13'%20cy%3D'10'%20r%3D'3.5'%20fill%3D'%23ffffff'%20stroke%3D'%230b3d91'%20stroke-width%3D'.8'%2F%3E%3Ccircle%20cx%3D'21'%20cy%3D'8'%20r%3D'3.5'%20fill%3D'%23138808'%2F%3E%3C%2Fsvg%3E") 0 0 / 26px 18px repeat-x,
+    linear-gradient(var(--t-gold), var(--t-gold)) 0 0 / 100% 1px no-repeat;
+}
+
+@media (max-width: 620px) {
+  html[data-theme="republic-day"] .site-header::after { background-size: 22px 14px, 100% 1px; }
+}
