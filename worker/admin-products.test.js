@@ -33,3 +33,13 @@ test("parseProductInput rejects images from other hosts and bad prices", () => {
   assert.throws(() => parseProductInput({ ...base, price: 0 }, env), /price/);
   assert.throws(() => parseProductInput({ ...base, price: 10.5 }, env), /price/);
 });
+
+test("dimensions and weight are optional and trimmed", () => {
+  const without = parseProductInput(base, env);
+  assert.equal(without.dimensions, "");
+  assert.equal(without.weight, "");
+  const withBoth = parseProductInput({ ...base, dimensions: " 12 x 8 x 3 cm ", weight: " 250 g " }, env);
+  assert.equal(withBoth.dimensions, "12 x 8 x 3 cm");
+  assert.equal(withBoth.weight, "250 g");
+  assert.throws(() => parseProductInput({ ...base, weight: "x".repeat(41) }, env), /weight/);
+});

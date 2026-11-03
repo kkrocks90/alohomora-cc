@@ -10,6 +10,8 @@ export interface Product {
   tag: string;
   extraTags?: string[];
   packSize: string;
+  dimensions?: string;
+  weight?: string;
   flavours: string[];
   featured?: boolean;
   customizable?: boolean;

@@ -86,6 +86,8 @@ export function rowToProduct(row) {
   };
   const extraTags = parse(row.extra_tags);
   if (extraTags.length) product.extraTags = extraTags;
+  if (row.dimensions) product.dimensions = row.dimensions;
+  if (row.weight) product.weight = row.weight;
   if (row.customizable === 0) product.customizable = false;
   return withImages(product);
 }
@@ -93,7 +95,7 @@ export function rowToProduct(row) {
 export async function loadAllProductRows(database) {
   const { results } = await database
     .prepare(
-      `SELECT product_id, name, description, price, image, images, tag, extra_tags, pack_size, flavours,
+      `SELECT product_id, name, description, price, image, images, tag, extra_tags, pack_size, dimensions, weight, flavours,
               featured, customizable, active, sort_order
        FROM products ORDER BY sort_order, rowid`,
     )

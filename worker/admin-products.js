@@ -19,6 +19,10 @@ function text(value, maximum, label, { required = true } = {}) {
   return trimmed;
 }
 
+function optionalText(value, maximum, label) {
+  return text(value, maximum, label, { required: false });
+}
+
 function textList(value, maximumItems, maximumLength, label) {
   if (value === undefined || value === null) return [];
   if (!Array.isArray(value) || value.length > maximumItems) throw new Error(`Enter a valid list of ${label}.`);
@@ -49,6 +53,8 @@ export function parseProductInput(body, env) {
     description: text(body?.description, 500, "description"),
     price,
     packSize: text(body?.packSize, 60, "pack size"),
+    dimensions: optionalText(body?.dimensions, 60, "dimensions"),
+    weight: optionalText(body?.weight, 40, "weight"),
     tag,
     extraTags: textList(body?.extraTags, 10, 60, "extra categories").filter((extra) => extra !== tag),
     flavours: textList(body?.flavours, 40, 60, "flavours"),
@@ -108,6 +114,8 @@ function productBindings(product) {
     product.tag,
     JSON.stringify(product.extraTags),
     product.packSize,
+    product.dimensions,
+    product.weight,
     JSON.stringify(product.flavours),
     product.featured ? 1 : 0,
     product.customizable ? 1 : 0,
@@ -136,8 +144,9 @@ export async function createAdminProduct(request, env) {
     await env.ORDERS_DB
       .prepare(
         `INSERT INTO products (name, description, price, image, images, tag, extra_tags, pack_size,
-                               flavours, featured, customizable, active, product_id, sort_order, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                               dimensions, weight, flavours, featured, customizable, active,
+                               product_id, sort_order, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(...productBindings(product), productId, (last?.max_sort ?? 0) + 1, new Date().toISOString())
       .run();
@@ -168,7 +177,7 @@ export async function updateAdminProduct(request, env) {
     const updated = await env.ORDERS_DB
       .prepare(
         `UPDATE products SET name = ?, description = ?, price = ?, image = ?, images = ?, tag = ?, extra_tags = ?,
-                pack_size = ?, flavours = ?, featured = ?, customizable = ?, active = ?, updated_at = ?
+                pack_size = ?, dimensions = ?, weight = ?, flavours = ?, featured = ?, customizable = ?, active = ?, updated_at = ?
          WHERE product_id = ?`,
       )
       .bind(...productBindings(product), new Date().toISOString(), productId)

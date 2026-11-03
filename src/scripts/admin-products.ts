@@ -8,6 +8,8 @@ interface CatalogueProduct {
   tag: string;
   extraTags?: string[];
   packSize: string;
+  dimensions?: string;
+  weight?: string;
   flavours: string[];
   featured: boolean;
   customizable?: boolean;
@@ -195,6 +197,8 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
     field<HTMLTextAreaElement>("description").value = product.description;
     field<HTMLInputElement>("price").value = String(product.price);
     field<HTMLInputElement>("packSize").value = product.packSize;
+    field<HTMLInputElement>("dimensions").value = product.dimensions ?? "";
+    field<HTMLInputElement>("weight").value = product.weight ?? "";
     field<HTMLInputElement>("tag").value = product.tag;
     field<HTMLInputElement>("extraTags").value = (product.extraTags ?? []).join(", ");
     renderFlavours(product.flavours);
@@ -280,6 +284,8 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
       description: String(data.get("description") ?? ""),
       price: Number(data.get("price")),
       packSize: String(data.get("packSize") ?? ""),
+      dimensions: String(data.get("dimensions") ?? ""),
+      weight: String(data.get("weight") ?? ""),
       tag: String(data.get("tag") ?? ""),
       extraTags: lines(data.get("extraTags"), /,/),
       flavours: checkedFlavours(),

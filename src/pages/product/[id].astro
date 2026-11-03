@@ -102,6 +102,12 @@ const customizable = product.customizable !== false;
         <p class="eyebrow">Handmade in small batches</p>
         <h1>{product.name}</h1>
         <p class="product-detail-description">{product.description}</p>
+        {(product.dimensions || product.weight) && (
+          <dl class="product-specs">
+            {product.dimensions && <div><dt>Dimensions</dt><dd>{product.dimensions}</dd></div>}
+            {product.weight && <div><dt>Weight</dt><dd>{product.weight}</dd></div>}
+          </dl>
+        )}
         <div class="product-detail-price">
           <strong data-price-now={product.price}>₹{product.price}</strong>
           <span>{product.packSize}</span>

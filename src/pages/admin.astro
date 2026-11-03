@@ -320,6 +320,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
                 <label>Price<span class="apf-money"><span aria-hidden="true">&#8377;</span><input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" required /></span></label>
                 <label>Pack size<input name="packSize" maxlength="60" placeholder="Box of 9" required /></label>
               </div>
+              <div class="apf-row">
+                <label>Dimensions <span class="apf-optional">Optional</span><input name="dimensions" maxlength="60" placeholder="12 x 8 x 3 cm" /></label>
+                <label>Weight <span class="apf-optional">Optional</span><input name="weight" maxlength="40" placeholder="250 g" /></label>
+              </div>
               <label>Category<input name="tag" maxlength="60" list="admin-product-categories" required placeholder="Choose or type a new one" /></label>
               <datalist id="admin-product-categories"></datalist>
             </section>
