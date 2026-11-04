@@ -914,7 +914,7 @@ if (root) {
     renderStats();
     orderList.replaceChildren();
     if (!selectedStatuses) {
-      selectedStatuses = new Set(adminData.orderStatuses.filter((value) => value !== "delivered"));
+      selectedStatuses = new Set(adminData.orderStatuses.filter((value) => value !== "delivered" && value !== "cancelled"));
       orderStatusChecks.replaceChildren();
       adminData.orderStatuses.forEach((value) => {
         const label = document.createElement("label");

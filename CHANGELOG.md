@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.49.1 - 2026-11-04
+
+- Order book hides Cancelled orders by default too, and the status checkboxes are a larger two-column grid on phones.
+
 ## 1.49.0 - 2026-11-04
 
 - **Admin order book:** the status dropdown is now styled checkbox chips. Delivered orders are hidden by default; tick Delivered to see them.
