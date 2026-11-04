@@ -990,20 +990,8 @@ if (root) {
         : order.paymentStatus === "paid" ? "Paid" : partialPaise > 0 ? "Partially paid" : "Unpaid";
       const payBadge = appendText(details, "span", `${paymentStatusLabel} · ${paymentLabel}`, "admin-payment-badge");
       payBadge.dataset.pay = order.paymentMethod === "promo" ? "none" : order.paymentStatus === "unpaid" && partialPaise > 0 ? "partial" : order.paymentStatus;
-      if (order.paymentStatus === "unpaid" && partialPaise > 0 && order.paymentMethod !== "promo") {
-        appendText(details, "span", `Received ${currency.format(partialPaise / 100)}, balance due ${currency.format(amountDue(order) / 100)}`, "admin-order-balance");
-      }
-      if (order.discountPaise > 0) {
-        appendText(details, "span", `${order.promoCode ? `Promo ${order.promoCode}` : "Discount"} · saved ${currency.format(order.discountPaise / 100)}`);
-      }
-      if (order.razorpayOrderId) appendText(details, "span", `Razorpay order: ${order.razorpayOrderId}`);
-      if (order.paymentId) appendText(details, "span", `Razorpay payment: ${order.paymentId}`);
       appendText(details, "span", order.customerPhone);
       if (order.customerEmail) appendText(details, "span", order.customerEmail);
-      appendText(details, "span", formatDeliveryAddress(order), "admin-order-address");
-      appendText(details, "span", order.deliveryMethod, "admin-order-delivery");
-      if (order.eventDate) appendText(details, "span", `Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
-      for (const answer of order.customFields ?? []) appendText(details, "span", `${answer.label}: ${answer.value}`);
       const items = document.createElement("ul");
       items.className = "admin-order-items-list";
       items.dataset.count = String(order.items.length);

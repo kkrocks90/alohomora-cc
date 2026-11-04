@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.49.2 - 2026-11-04
+
+- Admin order cards are compact: order no, status, payment status, items, and customer name, email and phone. Address, delivery, promo and Razorpay details are on View details.
+
 ## 1.49.1 - 2026-11-04
 
 - Order book hides Cancelled orders by default too, and the status checkboxes are a larger two-column grid on phones.
