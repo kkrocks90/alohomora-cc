@@ -8114,3 +8114,37 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 .product-specs dt { color: #89786d; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 .product-specs dd { margin: 0; color: #493027; font-size: 14px; }
 .apf-optional { margin-left: 4px; color: #a39385; font-size: 11px; font-weight: 400; }
+
+/* Wishlist, share and subtle motion (transform/opacity only; works with every theme) */
+.product-card { position: relative; }
+.wish-button { position: absolute; top: 10px; right: 10px; z-index: 2; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--cocoa, #5b3a29); box-shadow: 0 2px 8px rgba(0, 0, 0, .15); cursor: pointer; transition: transform .18s ease, background-color .18s ease; }
+.wish-button svg, .product-action svg, .wish-link svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: fill .18s ease; }
+.wish-button.is-on svg, .product-action.is-on svg, .wish-link.has-items svg { fill: currentColor; }
+.wish-button.is-on, .product-action.is-on { color: var(--rose, #c2415a); }
+.wish-button.is-pop svg, .product-action.is-pop svg { animation: cc-pop .35s ease; }
+@keyframes cc-pop { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.wish-link { position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; color: inherit; transition: transform .18s ease; }
+.wish-count { position: absolute; top: 0; right: 0; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--rose, #c2415a); color: #fff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; }
+.wish-count[hidden] { display: none; }
+.product-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 14px; }
+.product-action { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line, #e5d6c6); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 14px; cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
+.product-action:hover { border-color: currentColor; }
+.wishlist-page .store-empty a { display: inline-block; margin-top: 12px; }
+@media (max-width: 620px) { .wish-link { display: none; } }
+
+@keyframes cc-fade { from { opacity: 0; } to { opacity: 1; } }
+main { animation: cc-fade .4s ease both; }
+.button, .add-button, .bag-button, .store-chip, .product-action, .wish-button { -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) {
+  .product-image { transition: transform .5s ease; }
+  .product-card:hover .product-image { transform: scale(1.04); }
+  .button:hover, .add-button:hover, .bag-button:hover { transform: translateY(-1px); }
+  .wish-button:hover, .wish-link:hover { transform: scale(1.1); }
+}
+.button, .add-button, .bag-button { transition: transform .18s ease; }
+.button:active, .add-button:active, .bag-button:active, .store-chip:active, .product-action:active, .wish-button:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) {
+  main, .product-card, .wish-button svg, .product-action svg { animation: none !important; }
+  .product-image, .button, .add-button, .bag-button, .wish-button, .wish-link, .product-action { transition: none !important; }
+  .product-card:hover .product-image, .button:hover, .add-button:hover, .bag-button:hover, .wish-button:hover, .wish-link:hover { transform: none !important; }
+}

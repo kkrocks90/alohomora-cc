@@ -112,6 +112,16 @@ const customizable = product.customizable !== false;
           <strong data-price-now={product.price}>₹{product.price}</strong>
           <span>{product.packSize}</span>
         </div>
+        <div class="product-actions">
+          <button class="product-action" type="button" data-wish={product.id} data-wish-name={product.name} aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20.5s-7.5-4.6-7.5-10A4.5 4.5 0 0 1 12 7.8a4.5 4.5 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"></path></svg>
+            <span>Wishlist</span>
+          </button>
+          <button class="product-action" type="button" data-share data-share-title={product.name} data-share-text={`${product.name} by Chocolate Circle, from \u20B9${product.price}`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="12" r="2.5"></circle><circle cx="17" cy="6" r="2.5"></circle><circle cx="17" cy="18" r="2.5"></circle><path d="m8.2 10.8 6.6-3.6M8.2 13.2l6.6 3.6"></path></svg>
+            <span data-share-label>Share</span>
+          </button>
+        </div>
         <p class="product-option-note">
           {customizable
             ? <>Choose your quantity{product.flavours.length > 0 && ", flavour"} and any personalisation options.</>

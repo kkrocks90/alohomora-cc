@@ -1,0 +1,46 @@
+---
+import ProductCard from "../components/ProductCard.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import products from "../data/products.json";
+import { resolveImage } from "../lib/product-images";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<SiteLayout title="My wishlist — Chocolate Circle" description="Your saved Chocolate Circle treats.">
+  <main class="store-page wishlist-page" id="storefront">
+    <section class="store-heading">
+      <p class="eyebrow">Saved for later</p>
+      <h1>Your <em>wishlist.</em></h1>
+      <p>Treats you've hearted on this device.</p>
+    </section>
+    <section class="store-results" aria-label="Wishlist">
+      <div class="product-grid store-grid" id="wishlist-grid">
+        {products.map((product, index) => (
+          <ProductCard product={product} image={resolveImage(product.image)} index={index} hidden />
+        ))}
+      </div>
+      <div class="store-empty" id="wishlist-empty" hidden>
+        <p>Nothing saved yet. Tap the heart on any treat to keep it here.</p>
+        <a class="button button-primary" href={`${base}store/`}>Browse treats</a>
+      </div>
+    </section>
+  </main>
+  <script>
+    import "../scripts/flat-discount-prices";
+    const grid = document.querySelector<HTMLElement>("#wishlist-grid");
+    const empty = document.querySelector<HTMLElement>("#wishlist-empty");
+    const update = (ids: string[]) => {
+      const saved = new Set(ids);
+      let shown = 0;
+      grid?.querySelectorAll<HTMLElement>(".product-card").forEach((card) => {
+        const on = saved.has(card.dataset.productId ?? "");
+        card.hidden = !on;
+        if (on) shown += 1;
+      });
+      if (empty) empty.hidden = shown > 0;
+    };
+    document.addEventListener("cc:wishlist", (event) => update((event as CustomEvent<string[]>).detail));
+    try { update(JSON.parse(localStorage.getItem("cc-wishlist") || "[]")); } catch { update([]); }
+  </script>
+</SiteLayout>

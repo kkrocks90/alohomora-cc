@@ -78,6 +78,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <a href={`${base}#kindness`}>Good to know</a>
       </nav>
       <a class="shop-link" href={`${base}store/`}>Shop</a>
+      <a class="wish-link" href={`${base}wishlist/`} aria-label="Wishlist"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20.5s-7.5-4.6-7.5-10A4.5 4.5 0 0 1 12 7.8a4.5 4.5 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"></path></svg><span class="wish-count" data-wish-count hidden>0</span></a>
       <div class="account-group">
       <a class="account-link" href={`${base}account/`}>
         <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -125,6 +126,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <a href={`${base}about/`}>About us <span aria-hidden="true">↗</span></a>
         <a href={`${base}corporate/`}>Corporate orders <span aria-hidden="true">↗</span></a>
         <a href={`${base}#kindness`}>Good to know <span aria-hidden="true">↗</span></a>
+        <a href={`${base}wishlist/`}>Wishlist <span aria-hidden="true">&#8599;</span></a>
         <a href={`${base}account/`}><span data-account-label>Login</span> <span aria-hidden="true">↗</span></a>
         <button class="mobile-menu-signout" type="button" data-sign-out hidden>Sign out</button>
       </nav>
@@ -251,6 +253,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     <script>
       import "../scripts/navigation";
       import "../scripts/storefront";
+      import "../scripts/wishlist";
     </script>
   </body>
 </html>

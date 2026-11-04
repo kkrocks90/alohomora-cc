@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.48.0 - 2026-11-04
+
+- **Wishlist:** heart on every product card and product page, saved on the shopper's device (no login), with a header heart + count, a mobile-menu link and a /wishlist/ page.
+- **Share:** Share button on the product page uses the phone's share sheet, or copies the link on desktop.
+- **Motion:** subtle fade-in, image hover zoom, press feedback and a heart pop. Transform/opacity only, theme-independent, disabled for reduced-motion users.
+
 ## 1.47.1 - 2026-11-04
 
 - Dimensions example in the admin form is now length x width (no thickness).

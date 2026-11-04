@@ -19,14 +19,17 @@ interface Props {
   product: Product;
   image: ProductImage;
   index: number;
+  hidden?: boolean;
 }
 
-const { product, image, index } = Astro.props;
+const { product, image, index, hidden = false } = Astro.props;
 const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
 ---
 
 <article
   class="product-card"
+  data-product-id={product.id}
+  hidden={hidden}
   data-product-name={product.name.toLowerCase()}
   data-product-search={`${product.name} ${product.description} ${product.tag}`.toLowerCase()}
   data-product-tag={[product.tag, ...(product.extraTags ?? [])].join("|")}
@@ -51,6 +54,7 @@ const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
       <span class="product-tag">{product.tag}</span>
     </div>
   </a>
+  <button class="wish-button" type="button" data-wish={product.id} data-wish-name={product.name} aria-pressed="false" aria-label={`Save ${product.name} to wishlist`}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20.5s-7.5-4.6-7.5-10A4.5 4.5 0 0 1 12 7.8a4.5 4.5 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"></path></svg></button>
   <div class="product-copy">
     <div class="product-name-row">
       <h2 class="product-card-title"><a href={productUrl}>{product.name}</a></h2>
