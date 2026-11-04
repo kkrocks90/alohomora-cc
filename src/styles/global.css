@@ -8148,3 +8148,17 @@ main { animation: cc-fade .4s ease both; }
   .product-image, .button, .add-button, .bag-button, .wish-button, .wish-link, .product-action { transition: none !important; }
   .product-card:hover .product-image, .button:hover, .add-button:hover, .bag-button:hover, .wish-button:hover, .wish-link:hover { transform: none !important; }
 }
+
+/* Admin order book: status checkboxes and WhatsApp share */
+.admin-list-tools .admin-status-filter { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 0; border: 0; }
+.admin-status-filter legend { padding: 0; margin-bottom: 8px; font-size: 13px; }
+.admin-status-checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-status-check { position: relative; display: inline-flex; margin: 0; cursor: pointer; }
+.admin-status-check input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.admin-status-check span { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px 7px 10px; border: 1px solid #d9cabb; border-radius: 999px; background: #fffdfa; color: #6f5a4d; font-size: 13px; font-weight: 600; transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+.admin-status-check span::before { content: ""; width: 16px; height: 16px; border: 1.5px solid #b9a595; border-radius: 5px; background: #fff center / 11px no-repeat; transition: background-color .15s ease, border-color .15s ease; }
+.admin-status-check input:checked + span { border-color: #7a3b2a; background: #f6e9df; color: #4a2418; }
+.admin-status-check input:checked + span::before { border-color: #7a3b2a; background-color: #7a3b2a; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.4l2.3 2.3 4.7-5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.admin-status-check input:focus-visible + span { outline: 2px solid #7a3b2a; outline-offset: 2px; }
+.admin-status-check:hover span { border-color: #7a3b2a; }
+.admin-share-whatsapp { color: #166534; border-color: #86c9a0; }

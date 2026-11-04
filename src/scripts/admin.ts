@@ -113,6 +113,24 @@ function formatDeliveryAddress(order: Pick<AdminOrder, "deliveryAddress" | "city
   return [order.deliveryAddress, order.city, order.state, order.pincode].filter(Boolean).join(", ");
 }
 
+function orderShareText(order: AdminOrder) {
+  const lines = [`*Order ${order.orderId}*`, "", "*Items*"];
+  order.items.forEach((item, index) => {
+    lines.push(`${index + 1}. ${item.name} x ${item.quantity}`);
+    if (item.flavour) lines.push(`   Flavour: ${item.flavour}`);
+    if (item.wrapper) lines.push(`   Wrapper: ${item.wrapper}`);
+    (item.custom ?? []).forEach((answer) => lines.push(`   ${answer.label}: ${answer.value}`));
+  });
+  const extras = order.customFields ?? [];
+  if (extras.length > 0) {
+    lines.push("", "*Customisation*");
+    extras.forEach((answer) => lines.push(`${answer.label}: ${answer.value}`));
+  }
+  lines.push("", "*Delivery*", `Name: ${order.customerName}`, `Address: ${formatDeliveryAddress(order)}`, `Method: ${order.deliveryMethod}`);
+  if (order.eventDate) lines.push(`Event date: ${new Date(`${order.eventDate}T00:00:00`).toLocaleDateString("en-IN", { dateStyle: "medium" })}`);
+  return lines.join("\n");
+}
+
 function isAdminProduct(value: unknown): value is AdminProduct {
   if (!value || typeof value !== "object") return false;
   const product = value as Record<string, unknown>;
@@ -313,7 +331,8 @@ if (root) {
   const dueNote = requireElement<HTMLElement>(root, "#admin-order-due");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
   const orderSearch = requireElement<HTMLInputElement>(root, "#admin-order-search");
-  const orderStatusFilter = requireElement<HTMLSelectElement>(root, "#admin-order-status-filter");
+  const orderStatusChecks = requireElement<HTMLElement>(root, "#admin-order-status-checks");
+  let selectedStatuses: Set<string> | null = null;
   const orderCount = requireElement<HTMLElement>(root, "#admin-order-count");
   const orderPagination = requireElement<HTMLElement>(root, "#admin-order-pagination");
   const invoice = requireElement<HTMLElement>(root, "#admin-invoice-print");
@@ -894,15 +913,27 @@ if (root) {
     if (!adminData) return;
     renderStats();
     orderList.replaceChildren();
-    if (orderStatusFilter.options.length === 1) {
+    if (!selectedStatuses) {
+      selectedStatuses = new Set(adminData.orderStatuses.filter((value) => value !== "delivered"));
+      orderStatusChecks.replaceChildren();
       adminData.orderStatuses.forEach((value) => {
-        orderStatusFilter.append(new Option(statusLabels[value] ?? value, value));
+        const label = document.createElement("label");
+        label.className = "admin-status-check";
+        label.dataset.status = value;
+        const box = document.createElement("input");
+        box.type = "checkbox";
+        box.value = value;
+        box.checked = selectedStatuses!.has(value);
+        const text = document.createElement("span");
+        text.textContent = statusLabels[value] ?? value;
+        label.append(box, text);
+        orderStatusChecks.append(label);
       });
     }
     const query = orderSearch.value.trim().toLocaleLowerCase();
-    const selectedStatus = orderStatusFilter.value;
+    const activeStatuses = selectedStatuses;
     const matchingOrders = adminData.orders.filter((order) => {
-      if (selectedStatus && order.orderStatus !== selectedStatus) return false;
+      if (activeStatuses && !activeStatuses.has(order.orderStatus)) return false;
       const searchable = [
         order.orderId,
         order.razorpayOrderId ?? "",
@@ -1093,6 +1124,12 @@ if (root) {
       detailsLink.className = "button button-secondary";
       detailsLink.href = `${import.meta.env.BASE_URL}order/?id=${encodeURIComponent(order.orderId)}`;
       detailsLink.textContent = "View details";
+      const shareButton = document.createElement("a");
+      shareButton.className = "button button-secondary admin-share-whatsapp";
+      shareButton.target = "_blank";
+      shareButton.rel = "noopener";
+      shareButton.href = `https://wa.me/?text=${encodeURIComponent(orderShareText(order))}`;
+      shareButton.textContent = "Share on WhatsApp";
       const editButtons: HTMLElement[] = [];
       if (order.paymentMethod === "manual") {
         const editButton = document.createElement("button");
@@ -1102,7 +1139,7 @@ if (root) {
         editButton.addEventListener("click", () => startOrderEdit(order));
         editButtons.push(editButton);
       }
-      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, ...editButtons, ...payActions);
+      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, shareButton, ...editButtons, ...payActions);
       card.append(heading, details, items, actions);
       orderList.append(card);
     }
@@ -1444,7 +1481,8 @@ if (root) {
     orderPage = 0;
     renderOrders();
   });
-  orderStatusFilter.addEventListener("change", () => {
+  orderStatusChecks.addEventListener("change", () => {
+    selectedStatuses = new Set(Array.from(orderStatusChecks.querySelectorAll<HTMLInputElement>("input:checked"), (box) => box.value));
     orderPage = 0;
     renderOrders();
   });

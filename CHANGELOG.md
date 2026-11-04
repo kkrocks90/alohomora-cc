@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.49.0 - 2026-11-04
+
+- **Admin order book:** the status dropdown is now styled checkbox chips. Delivered orders are hidden by default; tick Delivered to see them.
+- **Admin:** every order has a Share on WhatsApp button (items, flavours, customisation and delivery details only).
+- **SEO:** descriptive alt text on the home category images and logos; admin page set to noindex.
+
 ## 1.48.1 - 2026-11-04
 
 - Fixed the Browse treats button on the empty wishlist (centred, upright text).

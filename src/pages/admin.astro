@@ -154,7 +154,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           </div>
           <div class="admin-list-tools">
             <label>Search orders<input id="admin-order-search" type="search" placeholder="Order ID, customer, phone, or email" autocomplete="off" /></label>
-            <label>Order status<select id="admin-order-status-filter"><option value="">All statuses</option></select></label>
+            <fieldset class="admin-status-filter" id="admin-order-status-filter"><legend>Show orders</legend><div class="admin-status-checks" id="admin-order-status-checks"></div></fieldset>
             <p class="admin-list-count" id="admin-order-count" aria-live="polite"></p>
           </div>
           <div class="admin-order-list" id="admin-order-list"></div>
