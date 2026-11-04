@@ -8168,3 +8168,26 @@ main { animation: cc-fade .4s ease both; }
   .admin-status-check span { min-height: 44px; padding: 8px 12px; font-size: 14px; }
   .admin-status-check span::before { flex: 0 0 18px; width: 18px; height: 18px; }
 }
+
+/* Order book: larger text on compact cards; status filter as a swipeable row on phones */
+.admin-order-card-heading strong:first-child { font-size: 18px; }
+.admin-order-card-heading > div span { font-size: 15px; }
+.admin-order-card .admin-order-amount { font-size: 18px; }
+.admin-status-chip { padding: 3px 11px; font-size: 12px; }
+.admin-payment-badge { padding: 3px 11px; font-size: 13px; }
+.admin-order-card-details, .admin-order-card-details span { font-size: 15px; }
+.admin-order-items-list li { font-size: 16px; }
+.admin-order-item-meta { font-size: 14px; }
+.admin-order-item-qty { font-size: 14px; }
+.admin-order-items-list::before { font-size: 12px; }
+@media (max-width: 620px) {
+  .admin-order-card-heading strong:first-child { font-size: 19px; }
+  .admin-order-card-details, .admin-order-card-details span { font-size: 16px; }
+  .admin-order-items-list li { font-size: 17px; }
+  .admin-order-item-meta { font-size: 15px; }
+  .admin-status-checks { display: flex; flex-wrap: nowrap; gap: 8px; margin: 0 -12px; padding: 2px 12px 8px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .admin-status-checks::-webkit-scrollbar { display: none; }
+  .admin-status-check { flex: 0 0 auto; width: auto; scroll-snap-align: start; }
+  .admin-status-check span { width: auto; white-space: nowrap; }
+}
+.admin-order-card-details .admin-payment-badge { font-size: 13px; }

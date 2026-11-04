@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.49.3 - 2026-11-04
+
+- On phones the order status checkboxes are a swipeable single row. Order cards use larger text.
+
 ## 1.49.2 - 2026-11-04
 
 - Admin order cards are compact: order no, status, payment status, items, and customer name, email and phone. Address, delivery, promo and Razorpay details are on View details.
