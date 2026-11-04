@@ -8129,7 +8129,7 @@ img.story-mark { display: block; border: 0; border-radius: 0; object-fit: contai
 .product-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 14px; }
 .product-action { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line, #e5d6c6); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 14px; cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
 .product-action:hover { border-color: currentColor; }
-.wishlist-page .store-empty a { display: inline-block; margin-top: 12px; }
+.wishlist-page .store-empty a.button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: 8px; padding: 0 28px; font-family: inherit; font-size: 15px; font-style: normal; font-weight: 700; line-height: 1; text-decoration: none; }
 @media (max-width: 620px) { .wish-link { display: none; } }
 
 @keyframes cc-fade { from { opacity: 0; } to { opacity: 1; } }

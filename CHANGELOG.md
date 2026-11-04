@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.48.1 - 2026-11-04
+
+- Fixed the Browse treats button on the empty wishlist (centred, upright text).
+
 ## 1.48.0 - 2026-11-04
 
 - **Wishlist:** heart on every product card and product page, saved on the shopper's device (no login), with a header heart + count, a mobile-menu link and a /wishlist/ page.
