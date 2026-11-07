@@ -8,6 +8,7 @@ import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
 import { mountGoogleSignIn } from "./google-signin";
 import { initFlavoursAdmin, isCatalogueFlavour } from "./admin-flavours";
 import { initFlatDiscountAdmin, isFlatDiscount, type FlatDiscount } from "./admin-flat-discount";
+import { initDeliveryAdmin, isDeliverySettings, type DeliverySettings } from "./admin-delivery";
 import type { CustomField } from "./custom-fields";
 
 interface AdminCustomer {
@@ -99,6 +100,7 @@ interface AdminData {
   catalogueFlavours: Parameters<ReturnType<typeof initFlavoursAdmin>["render"]>[0];
   flavourExtras: Record<string, number>;
   flatDiscount: FlatDiscount | null;
+  deliverySettings: DeliverySettings | null;
   rebuildConfigured: boolean;
 }
 
@@ -252,6 +254,9 @@ function normalizeAdminData(data: AdminData): AdminData {
       : {},
     flatDiscount: isFlatDiscount((data as { flatDiscount?: unknown }).flatDiscount)
       ? (data as { flatDiscount: FlatDiscount }).flatDiscount
+      : null,
+    deliverySettings: isDeliverySettings((data as { deliverySettings?: unknown }).deliverySettings)
+      ? (data as { deliverySettings: DeliverySettings }).deliverySettings
       : null,
     rebuildConfigured: data.rebuildConfigured === true,
     orders: data.orders.map((order) => ({
@@ -1247,6 +1252,7 @@ if (root) {
     flavoursAdmin.render(adminData.catalogueFlavours);
     categoriesAdmin.render(adminData.catalogueCategories);
     flatDiscountAdmin.render(adminData.flatDiscount);
+    deliveryAdmin.render(adminData.deliverySettings);
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     if (!editingOrderId) {
@@ -1285,6 +1291,13 @@ if (root) {
   });
 
   const flatDiscountAdmin = initFlatDiscountAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    setStatus,
+    reload: () => loadDashboard(),
+  });
+
+  const deliveryAdmin = initDeliveryAdmin({
     root,
     post: (path, body) => post(path, body),
     setStatus,

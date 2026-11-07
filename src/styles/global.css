@@ -8203,3 +8203,8 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
 @media (prefers-reduced-motion: reduce) {
   .theme-hero-diya, svg.theme-hero-diya path, .theme-hero-banner::after { animation: none !important; }
 }
+
+/* Admin delivery charges */
+.admin-delivery-form { display: grid; gap: 0.9rem; }
+.admin-delivery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.75rem; }
+.admin-delivery-grid label { display: grid; gap: 0.3rem; }

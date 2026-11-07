@@ -1,6 +1,7 @@
 import { ensureCatalogue, getProductById, getFlavours, getProducts, unitPriceRupees } from "./catalogue.js";
 import { imageBaseUrl, listAdminProducts } from "./admin-products.js";
 import { getFlatDiscount } from "./flat-discount.js";
+import { getDeliverySettings } from "./delivery-charges.js";
 import { listAdminCategories } from "./admin-categories.js";
 import { listAdminFlavours } from "./admin-flavours.js";
 import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
@@ -59,7 +60,7 @@ export async function getAdminData(request, env) {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
     await ensureCatalogue(env, { force: true });
-    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts, catalogueCategories, flatDiscount, catalogueFlavours] = await Promise.all([
+    const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts, catalogueCategories, flatDiscount, catalogueFlavours, deliverySettings] = await Promise.all([
       env.ORDERS_DB
         .prepare(
           `SELECT order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
@@ -97,6 +98,7 @@ export async function getAdminData(request, env) {
       listAdminCategories(env),
       getFlatDiscount(env.ORDERS_DB),
       listAdminFlavours(env).catch(() => []),
+      getDeliverySettings(env.ORDERS_DB),
     ]);
     return result(200, {
       email: access.email,
@@ -148,6 +150,7 @@ export async function getAdminData(request, env) {
       catalogueFlavours,
       flavourExtras: Object.fromEntries(getFlavours().map(({ name, extra }) => [name, extra])),
       flatDiscount,
+      deliverySettings,
       imageBaseUrl: imageBaseUrl(env),
       rebuildConfigured: Boolean(env.GITHUB_DISPATCH_TOKEN),
       customFields,

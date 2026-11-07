@@ -19,6 +19,7 @@ import {
   getActiveFlatDiscount,
   handleAdminFlatDiscount,
 } from "./flat-discount.js";
+import { handleAdminDeliverySettings } from "./delivery-charges.js";
 import { handleAdminCategory } from "./admin-categories.js";
 import { handleAdminFlavour } from "./admin-flavours.js";
 import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
@@ -886,6 +887,10 @@ export default {
     }
     if (path === "/admin/flavours/create" || path === "/admin/flavours/update" || path === "/admin/flavours/delete" || path === "/admin/flavours/save-all") {
       const result = await handleAdminFlavour(request, env, path.split("/").pop());
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/delivery-settings/save" || path === "/admin/delivery-settings/preview") {
+      const result = await handleAdminDeliverySettings(request, env, path.split("/").pop());
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/flat-discount/save") {

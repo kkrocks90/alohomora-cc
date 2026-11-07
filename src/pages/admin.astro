@@ -135,6 +135,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="catalogue"
         >Categories &amp; flavours</button>
+        <button
+          class="admin-tab"
+          id="admin-delivery-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-delivery-panel"
+          tabindex="-1"
+          data-admin-tab="delivery"
+        >Delivery charges</button>
       </div>
 
       <section
@@ -356,6 +366,75 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           </div>
           <p class="admin-form-hint" id="admin-product-publish-hint"></p>
           <div class="admin-product-list" id="admin-product-list"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-delivery-panel"
+        role="tabpanel"
+        aria-labelledby="admin-delivery-tab"
+        data-admin-panel="delivery"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-delivery-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Shipping</p>
+              <h2 id="admin-delivery-title">Delivery charges</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Pickup is always free. Within the Porter radius we book a Porter; beyond it we send by courier, priced by weight and whether the customer is in your state. Rates are whole rupees.</p>
+          <p class="admin-flat-summary" id="admin-delivery-summary" role="status"></p>
+          <form class="admin-delivery-form apf-form" id="admin-delivery-form">
+            <section class="apf-card"><h3>Switch</h3>
+              <label class="admin-flat-toggle"><input name="enabled" type="checkbox" /> Charge for delivery</label>
+              <p class="admin-form-hint">Off for now: customers are not charged and checkout is unchanged. Rules below can still be saved and tested.</p>
+            </section>
+            <section class="apf-card"><h3>Porter (nearby)</h3>
+              <div class="admin-delivery-grid">
+                <label>Porter radius (km)<input name="porterRadiusKm" type="number" min="1" step="1" inputmode="numeric" required /></label>
+                <label>Base charge (&#8377;)<input name="porterBaseFee" type="number" min="0" step="1" inputmode="decimal" required /></label>
+                <label>Km included in base<input name="porterIncludedKm" type="number" min="0" step="1" inputmode="decimal" required /></label>
+                <label>Per extra km (&#8377;)<input name="porterPerExtraKm" type="number" min="0" step="1" inputmode="decimal" required /></label>
+              </div>
+            </section>
+            <section class="apf-card"><h3>Courier (beyond the radius)</h3>
+              <div class="admin-delivery-grid">
+                <label>Your state<input name="storeState" maxlength="60" placeholder="Tamil Nadu" /></label>
+                <label>Weight slab (grams)<input name="slabGrams" type="number" min="50" step="50" inputmode="numeric" required /></label>
+                <label>Same state: first slab (&#8377;)<input name="sameFirst" type="number" min="0" step="1" inputmode="decimal" required /></label>
+                <label>Same state: each extra slab (&#8377;)<input name="sameExtra" type="number" min="0" step="1" inputmode="decimal" required /></label>
+                <label>Other states: first slab (&#8377;)<input name="otherFirst" type="number" min="0" step="1" inputmode="decimal" required /></label>
+                <label>Other states: each extra slab (&#8377;)<input name="otherExtra" type="number" min="0" step="1" inputmode="decimal" required /></label>
+              </div>
+            </section>
+            <section class="apf-card"><h3>Weight</h3>
+              <label>Weight used for a product with no weight (grams)<input name="defaultItemWeightGrams" type="number" min="1" step="10" inputmode="numeric" required /></label>
+              <p class="admin-form-hint">Product weights added later (like "250 g") are used automatically.</p>
+            </section>
+            <div class="apf-actions"><button class="button button-primary" type="submit">Save delivery settings</button></div>
+          </form>
+        </section>
+        <section class="admin-panel" aria-labelledby="admin-delivery-test-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Try it</p>
+              <h2 id="admin-delivery-test-title">Charge calculator</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Uses the values in the form above, even before saving.</p>
+          <form class="admin-delivery-form" id="admin-delivery-test-form">
+            <div class="admin-delivery-grid">
+              <label>Method<select name="method"><option value="delivery">Delivery</option><option value="pickup">Pickup</option></select></label>
+              <label>Distance (km)<input name="distanceKm" type="number" min="0" step="0.1" inputmode="decimal" value="10" required /></label>
+              <label>Customer state<input name="customerState" maxlength="60" placeholder="Karnataka" /></label>
+              <label>Total weight (grams)<input name="weightGrams" type="number" min="1" step="10" inputmode="numeric" value="500" required /></label>
+            </div>
+            <button class="button button-secondary" type="submit">Calculate</button>
+          </form>
+          <p class="admin-flat-summary" id="admin-delivery-result" role="status" aria-live="polite"></p>
         </section>
       </section>
 

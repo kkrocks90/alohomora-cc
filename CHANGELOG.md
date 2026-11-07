@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.51.0
+
+- Admin: new Delivery charges tab. Editable Porter rules (radius, base charge, included km, per extra km), courier rules (weight slab, same-state and other-state rates), default weight for products without one, and a charge calculator. Pickup is always free.
+- Master switch to charge for delivery, OFF by default. Customer checkout is unchanged until charges are applied to orders.
+- Needs migration 0021 and a Worker deploy.
+
 ## 1.50.0
 
 - Subtle hero banner motion on all themes: floating centrepiece, diya flame flicker, soft light sheen. Transform/opacity only, disabled for reduced motion.
