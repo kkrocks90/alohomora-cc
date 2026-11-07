@@ -20,9 +20,16 @@ function updateAccountLabels() {
   signOutButtons.forEach((button) => {
     button.hidden = !signedIn;
   });
-  const label = getCustomerSessionToken() ? "My profile" : "Login";
+  const isCustomer = Boolean(getCustomerSessionToken());
+  const isAdmin = !isCustomer && Boolean(getAdminSessionToken());
+  const label = isCustomer ? "My profile" : isAdmin ? "Admin" : "Login";
   accountLabels.forEach((element) => {
     element.textContent = label;
+    const link = element.closest("a");
+    if (link) {
+      const base = link.dataset.accountHref ?? (link.dataset.accountHref = link.getAttribute("href") ?? "");
+      link.setAttribute("href", isAdmin ? base.replace(/account\/?$/, "admin/") : base);
+    }
   });
 }
 
