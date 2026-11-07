@@ -4,6 +4,7 @@ const staticPaths = [
   "/",
   "/store/",
   "/about/",
+  "/contact/",
   "/corporate/",
   "/privacy-policy/",
   "/shipping-policy/",

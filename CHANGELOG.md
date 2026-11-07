@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.56.0
+
+- Added a Contact us page (WhatsApp, phone, email, Instagram, location, helpful links), linked from the footer, mobile menu, About page and sitemap.
+
 ## 1.55.1 - 2026-11-08
 
 - Delivery charges settings: on wide screens the Weight card now sits under Porter, beside the taller Courier card, instead of floating alone.

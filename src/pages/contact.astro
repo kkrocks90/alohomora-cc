@@ -1,0 +1,135 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const base = import.meta.env.BASE_URL;
+const whatsappUrl =
+  "https://wa.me/919500868468?text=Hi%20Chocolate%20Circle%2C%20I%27d%20like%20to%20ask%20about%20your%20chocolates.";
+const contactLd = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contact Chocolate Circle",
+  url: "https://chocolatecircle.in/contact/",
+  mainEntity: {
+    "@type": "Store",
+    name: "Chocolate Circle",
+    legalName: "Alohomora Chocolate Circle",
+    email: "customer.support@chocolatecircle.in",
+    telephone: "+919500868468",
+    address: { "@type": "PostalAddress", addressLocality: "Chennai", addressRegion: "Tamil Nadu", postalCode: "600073", addressCountry: "IN" },
+    sameAs: ["https://www.instagram.com/achocolatecircle/"],
+  },
+};
+---
+
+<SiteLayout
+  title="Contact us — Chocolate Circle"
+  description="Reach Chocolate Circle by WhatsApp, phone, email or Instagram. Handmade chocolates from Chennai."
+  jsonLd={[contactLd]}
+>
+  <main class="policy-page contact-page">
+    <header class="policy-heading">
+      <p class="eyebrow">We’d love to hear from you</p>
+      <h1>Say hello.<br /><em>We reply personally.</em></h1>
+    </header>
+
+    <div class="contact-grid">
+      <a class="contact-card" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+        <span class="contact-icon" aria-hidden="true">💬</span>
+        <strong>WhatsApp</strong>
+        <span>+91 95008 68468</span>
+        <small>The fastest way to ask about an order, flavours or delivery.</small>
+      </a>
+      <a class="contact-card" href="tel:+919500868468">
+        <span class="contact-icon" aria-hidden="true">📞</span>
+        <strong>Phone</strong>
+        <span>+91 95008 68468</span>
+        <small>Tap to call from your phone.</small>
+      </a>
+      <a class="contact-card" href="mailto:customer.support@chocolatecircle.in">
+        <span class="contact-icon" aria-hidden="true">✉️</span>
+        <strong>Email</strong>
+        <span>customer.support@chocolatecircle.in</span>
+        <small>Best for order issues, invoices and corporate enquiries.</small>
+      </a>
+      <a class="contact-card" href="https://www.instagram.com/achocolatecircle/" target="_blank" rel="noopener noreferrer">
+        <span class="contact-icon" aria-hidden="true">📸</span>
+        <strong>Instagram</strong>
+        <span>@achocolatecircle</span>
+        <small>See our latest creations and send us a message.</small>
+      </a>
+    </div>
+
+    <article class="policy-content">
+      <h2>Where we are</h2>
+      <p>
+        Chocolate Circle is a small-batch handmade chocolate shop based in Chennai, Tamil Nadu
+        (PIN 600073), operated by Alohomora Chocolate Circle. We make everything to order at home,
+        so we’re an online shop and don’t have a walk-in store. Pickup can be arranged by
+        appointment, just message us first.
+      </p>
+
+      <h2>When to contact us</h2>
+      <ul>
+        <li><strong>Before you order:</strong> flavours, ingredients, gifting and custom wrappers.</li>
+        <li><strong>After you order:</strong> we’ll reach out to confirm delivery options and the delivery fee. You can also write to us with your order ID.</li>
+        <li><strong>Events and gifting:</strong> please allow at least 3 to 4 days for preparation and tell us your event date.</li>
+        <li><strong>Bulk and corporate gifts:</strong> use our <a href={`${base}corporate/`}>corporate orders page</a>.</li>
+      </ul>
+
+      <h2>Helpful links</h2>
+      <p>
+        <a href={`${base}shipping-policy/`}>Shipping Policy</a> ·
+        <a href={`${base}terms-and-conditions/`}>Terms &amp; Conditions</a> ·
+        <a href={`${base}privacy-policy/`}>Privacy Policy</a> ·
+        <a href={`${base}about/`}>About us</a>
+      </p>
+      <p>
+        <a class="button button-primary" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+          Chat on WhatsApp <span aria-hidden="true">↗</span>
+        </a>
+      </p>
+    </article>
+  </main>
+</SiteLayout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 0 auto 2rem;
+    max-width: 900px;
+  }
+  .contact-card {
+    display: grid;
+    gap: 4px;
+    padding: 18px;
+    border: 1px solid var(--line, #e8ded3);
+    border-radius: 16px;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .contact-card:hover,
+  .contact-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgb(80 50 30 / 12%);
+  }
+  .contact-icon {
+    font-size: 26px;
+  }
+  .contact-card strong {
+    font-size: 1.05rem;
+  }
+  .contact-card small {
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .contact-card {
+      transition: none;
+    }
+  }
+</style>
