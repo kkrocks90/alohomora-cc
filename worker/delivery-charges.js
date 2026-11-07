@@ -1,5 +1,5 @@
 import { requireAdmin } from "./admin.js";
-import { getDistanceKm, getStoreLocation } from "./delivery.js";
+import { getDistanceKm, getRoadDistanceKm, getStoreLocation } from "./delivery.js";
 import { PincodeLookupError, lookupPincode } from "./pincode.js";
 
 // A 2-wheeler Porter carries up to 20 kg, so the calculator accepts 50 g to 20 kg.
@@ -147,16 +147,19 @@ export async function previewDeliveryCharge(env, body, lookup = lookupPincode) {
   const method = body.method === "pickup" ? "pickup" : "delivery";
   let distanceKm = 0;
   let place = null;
+  let distanceSource = "";
   if (method === "delivery") {
     const storeLocation = getStoreLocation(env);
     if (!storeLocation) throw new InputError("The store location is not configured on the server.", 503);
     try {
-      place = await lookup(typeof body.pincode === "string" ? body.pincode : "");
+      place = await lookup(typeof body.pincode === "string" ? body.pincode : "", env);
     } catch (error) {
       if (error instanceof PincodeLookupError) throw new InputError(error.message, error.status);
       throw error;
     }
-    distanceKm = getDistanceKm(storeLocation, place);
+    const roadKm = await getRoadDistanceKm(env, storeLocation, place);
+    distanceSource = roadKm === null ? "straight-line" : "road";
+    distanceKm = roadKm ?? getDistanceKm(storeLocation, place);
   }
   // Preview ignores the on/off switch so rules can be tested while charges are disabled.
   const charge = calculateDeliveryCharge({ ...settings, enabled: true }, {
@@ -168,6 +171,7 @@ export async function previewDeliveryCharge(env, body, lookup = lookupPincode) {
   return {
     charge,
     distanceKm: Math.round(distanceKm * 10) / 10,
+    distanceSource,
     place: place ? { pincode: place.pincode, city: place.city, state: place.state } : null,
   };
 }

@@ -47,6 +47,33 @@ test("reports unknown PIN codes", async () => {
   );
 });
 
+test("uses Google for the PIN code when a key is set, and falls back to the free lookup if it fails", async () => {
+  const googleFetch = async (url) =>
+    String(url).startsWith("https://maps.googleapis.com/maps/api/geocode/")
+      ? Response.json({
+          status: "OK",
+          results: [{
+            geometry: { location: { lat: 12.97, lng: 77.59 } },
+            address_components: [
+              { long_name: "Bengaluru", types: ["locality"] },
+              { long_name: "Karnataka", types: ["administrative_area_level_1"] },
+            ],
+          }],
+        })
+      : providerFetch(url);
+  await withFetch(googleFetch, async () => {
+    const place = await lookupPincode("560001", { GOOGLE_MAPS_API_KEY: "test-key" });
+    assert.deepEqual(place, { pincode: "560001", city: "Bengaluru", state: "Karnataka", latitude: 12.97, longitude: 77.59 });
+  });
+  await withFetch(
+    async (url) => (String(url).includes("googleapis") ? new Response("nope", { status: 403 }) : providerFetch(url)),
+    async () => {
+      const place = await lookupPincode("600042", { GOOGLE_MAPS_API_KEY: "test-key" });
+      assert.equal(place.city, "Chennai");
+    },
+  );
+});
+
 test("the PIN endpoint returns only the PIN code, city, and state", async () => {
   await withFetch(providerFetch, async () => {
     const response = await worker.fetch(

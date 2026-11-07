@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.53.0
+
+- Google Maps support (optional). When the Worker secret GOOGLE_MAPS_API_KEY is set, PIN code lookups use the Google Geocoding API and the admin delivery calculator uses Google driving distance. Without the key, or if Google fails, it falls back to the free lookups and straight-line distance.
+
 ## 1.52.0
 
 - Admin delivery charge calculator now takes the customer's PIN code and works out distance (from the store) and state automatically, showing the town and km.

@@ -306,7 +306,7 @@ async function handleCreateOrder(request, env, origin) {
     }
     body.customer.email = customerEmail;
     if (isValidPincode(body?.customer?.pincode)) {
-      const deliveryPlace = await lookupPincode(body.customer.pincode);
+      const deliveryPlace = await lookupPincode(body.customer.pincode, env);
       body.deliveryLocation = { latitude: deliveryPlace.latitude, longitude: deliveryPlace.longitude };
     } else if (body && typeof body === "object") {
       delete body.deliveryLocation;
@@ -822,7 +822,7 @@ export default {
     const pincodeMatch = path.match(/^\/pincode\/(\d{6})$/);
     if (request.method === "GET" && pincodeMatch) {
       try {
-        const { pincode, city, state } = await lookupPincode(pincodeMatch[1]);
+        const { pincode, city, state } = await lookupPincode(pincodeMatch[1], env);
         const response = jsonResponse({ pincode, city, state }, 200, configuredOrigin);
         response.headers.set("Cache-Control", "public, max-age=86400");
         return response;

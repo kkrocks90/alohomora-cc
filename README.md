@@ -72,6 +72,7 @@ Deploy only when you intend to publish. The order is: apply migrations, deploy t
    npx wrangler secret put RAZORPAY_WEBHOOK_SECRET --config worker/wrangler.toml
    npx wrangler secret put RESEND_API_KEY --config worker/wrangler.toml
    npx wrangler secret put AUTH_TOKEN_SECRET --config worker/wrangler.toml
+   npx wrangler secret put GOOGLE_MAPS_API_KEY --config worker/wrangler.toml   # optional: Google PIN lookup and road distance
    npx wrangler secret put GITHUB_DISPATCH_TOKEN --config worker/wrangler.toml
    ```
 

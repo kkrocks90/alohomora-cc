@@ -114,7 +114,9 @@ export function initDeliveryAdmin({ root, post, setStatus, reload }: Deps) {
       });
       const charge = response.charge as { rupees: number; detail: string };
       const place = response.place as { pincode: string; city: string; state: string } | null;
-      const where = place ? `${place.city}, ${place.state} (${place.pincode}) is about ${response.distanceKm} km away. ` : "";
+      const where = place
+        ? `${place.city}, ${place.state} (${place.pincode}) is about ${response.distanceKm} km away by ${response.distanceSource === "road" ? "road (Google Maps)" : "straight line"}. `
+        : "";
       result.dataset.state = "on";
       result.textContent = `${where}Charge: ₹${charge.rupees}. ${charge.detail}`;
     } catch (error) {

@@ -42,6 +42,32 @@ export function getDistanceKm(first, second) {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(Math.min(1, haversine)));
 }
 
+// Driving distance from Google Distance Matrix, or null when no key is set or the call fails.
+export async function getRoadDistanceKm(env, from, to) {
+  const apiKey = typeof env?.GOOGLE_MAPS_API_KEY === "string" ? env.GOOGLE_MAPS_API_KEY.trim() : "";
+  if (!apiKey) return null;
+  try {
+    const params = new URLSearchParams({
+      origins: `${from.latitude},${from.longitude}`,
+      destinations: `${to.latitude},${to.longitude}`,
+      mode: "driving",
+      units: "metric",
+      key: apiKey,
+    });
+    const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?${params}`, {
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!response.ok) return null;
+    const payload = await response.json();
+    const element = payload?.status === "OK" ? payload.rows?.[0]?.elements?.[0] : null;
+    const meters = Number(element?.status === "OK" ? element.distance?.value : NaN);
+    return Number.isFinite(meters) && meters >= 0 ? meters / 1000 : null;
+  } catch (error) {
+    console.error("Google road distance failed.", error);
+    return null;
+  }
+}
+
 export function getFulfillmentMethod(distanceKm) {
   return distanceKm <= PORTER_RADIUS_KM
     ? "Porter (manual booking)"

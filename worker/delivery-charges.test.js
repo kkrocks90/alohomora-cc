@@ -11,6 +11,7 @@ import {
   validateDeliverySettings,
 } from "./delivery-charges.js";
 import { PincodeLookupError } from "./pincode.js";
+import { getRoadDistanceKm } from "./delivery.js";
 
 const on = { ...DEFAULT_DELIVERY_SETTINGS, enabled: true, storeState: "Tamil Nadu" };
 
@@ -66,6 +67,21 @@ test("preview works out distance and state from a PIN code", async () => {
   await assert.rejects(previewDeliveryCharge(env, { settings, method: "delivery", pincode: "111111", weightGrams: 500 }, lookup), /find that PIN/);
   await assert.rejects(previewDeliveryCharge(env, { settings, method: "delivery", pincode: "600001", weightGrams: 30000 }, lookup), /weight/);
   await assert.rejects(previewDeliveryCharge({}, { settings, method: "delivery", pincode: "600001", weightGrams: 500 }, lookup), /store location/);
+});
+
+test("road distance comes from Google when a key is set, otherwise null", async () => {
+  const from = { latitude: 12.92, longitude: 77.6 };
+  const to = { latitude: 12.97, longitude: 77.59 };
+  assert.equal(await getRoadDistanceKm({}, from, to), null);
+  const original = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => Response.json({ status: "OK", rows: [{ elements: [{ status: "OK", distance: { value: 8400 } }] }] });
+    assert.equal(await getRoadDistanceKm({ GOOGLE_MAPS_API_KEY: "k" }, from, to), 8.4);
+    globalThis.fetch = async () => Response.json({ status: "REQUEST_DENIED", rows: [] });
+    assert.equal(await getRoadDistanceKm({ GOOGLE_MAPS_API_KEY: "k" }, from, to), null);
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 
 test("settings are validated and round-trip through storage", async () => {
