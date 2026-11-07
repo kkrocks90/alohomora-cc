@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.56.3
+
+- Contact page: compact horizontal cards on mobile.
+
 ## 1.56.2
 
 - Fixed product photo slider arrows showing question marks.
