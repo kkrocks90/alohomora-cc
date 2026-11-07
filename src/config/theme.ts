@@ -8,6 +8,13 @@
 // id, or leave it empty to use FALLBACK_THEME, then run the Pages deploy.
 
 import diwaliHero from "../assets/hero-chocolates-diwali.svg";
+import republicDayHero from "../assets/hero-chocolates-republic-day.svg";
+import birthdayHero from "../assets/hero-chocolates-birthday.svg";
+import monsoonHero from "../assets/hero-chocolates-monsoon.svg";
+import christmasHero from "../assets/hero-chocolates-christmas.svg";
+import valentinesDayHero from "../assets/hero-chocolates-valentines-day.svg";
+import independenceDayHero from "../assets/hero-chocolates-independence-day.svg";
+import pongalHero from "../assets/hero-chocolates-pongal.svg";
 
 export interface ThemeBanner {
   text: string;
@@ -63,6 +70,10 @@ export const THEMES: Record<string, Theme> = {
     id: "monsoon",
     label: "Monsoon",
     themeColor: "#14595a",
+    heroImage: {
+      src: monsoonHero,
+      alt: "Handmade chocolate bar with an umbrella and rain cloud",
+    },
     banner: { text: "Monsoon treats! Warm chocolates for rainy evenings.", href: "store/" },
     heroBanner: {
       kicker: "Rainy-day cravings",
@@ -77,6 +88,10 @@ export const THEMES: Record<string, Theme> = {
     id: "christmas",
     label: "Christmas",
     themeColor: "#0f3a27",
+    heroImage: {
+      src: christmasHero,
+      alt: "Handmade chocolate bar with a Christmas tree and bauble",
+    },
     banner: { text: "Merry Christmas! Gift boxes and hampers for the season.", href: "store/" },
     heroBanner: {
       kicker: "Season's greetings",
@@ -91,6 +106,10 @@ export const THEMES: Record<string, Theme> = {
     id: "republic-day",
     label: "Republic Day",
     themeColor: "#0b3d91",
+    heroImage: {
+      src: republicDayHero,
+      alt: "Handmade chocolate bar with a medal and Ashoka Chakra",
+    },
     banner: { text: "Happy Republic Day! Celebrate with something sweet.", href: "store/" },
     heroBanner: {
       kicker: "26 January",
@@ -105,6 +124,10 @@ export const THEMES: Record<string, Theme> = {
     id: "pongal",
     label: "Pongal",
     themeColor: "#7c2d0a",
+    heroImage: {
+      src: pongalHero,
+      alt: "Handmade chocolate bar with a Pongal pot and sun",
+    },
     banner: { text: "Happy Pongal! Sweet treats for the harvest festival.", href: "store/" },
     heroBanner: {
       kicker: "Harvest festival",
@@ -119,6 +142,10 @@ export const THEMES: Record<string, Theme> = {
     id: "birthday",
     label: "Birthday",
     themeColor: "#8a1f63",
+    heroImage: {
+      src: birthdayHero,
+      alt: "Handmade chocolate bar with a birthday cake and balloon",
+    },
     banner: { text: "Birthday treats! Gift boxes for every celebration.", href: "store/" },
     heroBanner: {
       kicker: "Time to celebrate",
@@ -133,6 +160,10 @@ export const THEMES: Record<string, Theme> = {
     id: "independence-day",
     label: "Independence Day",
     themeColor: "#0a4a20",
+    heroImage: {
+      src: independenceDayHero,
+      alt: "Handmade chocolate bar with a tricolour kite and Ashoka Chakra",
+    },
     banner: { text: "Happy Independence Day! Celebrate with something sweet.", href: "store/" },
     heroBanner: {
       kicker: "15 August",
@@ -147,6 +178,10 @@ export const THEMES: Record<string, Theme> = {
     id: "valentines-day",
     label: "Valentine's Day",
     themeColor: "#7d0c2b",
+    heroImage: {
+      src: valentinesDayHero,
+      alt: "Handmade chocolate bar with hearts",
+    },
     banner: { text: "Happy Valentine's Day! Share something sweet with someone special.", href: "store/" },
     heroBanner: {
       kicker: "With love",

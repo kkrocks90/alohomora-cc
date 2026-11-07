@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.58.0
+
+- Home page hero illustration is now themed for Birthday, Christmas, Independence Day, Monsoon, Pongal, Republic Day and Valentine's Day (colours, corner motifs and label), matching the Diwali one.
+
 ## 1.57.0
 
 - Product weight and dimensions are now per piece. Pack weight = piece weight x pieces in the pack size (8 g in a Pack of 40 = 320 g), ready for when delivery charges are applied to orders.
