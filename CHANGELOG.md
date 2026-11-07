@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.50.0
+
+- Subtle hero banner motion on all themes: floating centrepiece, diya flame flicker, soft light sheen. Transform/opacity only, disabled for reduced motion.
+
 ## 1.49.3 - 2026-11-04
 
 - On phones the order status checkboxes are a swipeable single row. Order cards use larger text.
