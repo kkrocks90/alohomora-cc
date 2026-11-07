@@ -4,7 +4,7 @@ import { getFlatDiscount } from "./flat-discount.js";
 import { getDeliverySettings } from "./delivery-charges.js";
 import { listAdminCategories } from "./admin-categories.js";
 import { listAdminFlavours } from "./admin-flavours.js";
-import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
+import { authenticatedEmail, isAdminEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { sendOrderEmails } from "./notify.js";
 import { generateOrderId } from "./order-id.js";
 import { assertFieldCapacity, listCustomFields, validateFieldDefinition } from "./custom-fields.js";
@@ -51,7 +51,7 @@ export async function requireAdmin(request, env) {
   }
   const email = await authenticatedEmail(request, env);
   if (!email) return { error: result(401, { error: "Please sign in to continue." }) };
-  if (email !== adminEmail) return { error: result(403, { error: "This account does not have admin access." }) };
+  if (!isAdminEmail(env, email)) return { error: result(403, { error: "This account does not have admin access." }) };
   return { email };
 }
 

@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.54.1 - 2026-11-07
+
+- Added admin.chocolatecircle@gmail.com as a second admin via the new `ADMIN_EMAILS` setting.
+
 ## 1.54.0 - 2026-11-07
 
 - PIN code lookups now use a bundled dataset (about 7,100 PIN codes, MIT-licensed) for coordinates, state and area, so they are instant and reliable. PIN codes outside the dataset still fall back to the free live lookups.

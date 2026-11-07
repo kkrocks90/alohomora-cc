@@ -11,6 +11,7 @@ LOGIN_FROM_EMAIL = "Chocolate Circle <login@auth.chocolatecircle.in>"
 # Public Google OAuth client ID (ends in .apps.googleusercontent.com). Leave empty to hide Google sign-in.
 GOOGLE_CLIENT_ID = "257349998723-vsp3avjcvpjqk7hu9uog8ufptvs9kcqc.apps.googleusercontent.com"
 ADMIN_EMAIL = "alohomora.chocolatecircle@gmail.com"
+ADMIN_EMAILS = "admin.chocolatecircle@gmail.com"
 
 [[d1_databases]]
 binding = "ORDERS_DB"

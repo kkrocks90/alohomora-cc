@@ -1,4 +1,4 @@
-import { authenticatedEmail, normalizeCustomerEmail } from "./customer-auth.js";
+import { authenticatedEmail, isAdminEmail, normalizeCustomerEmail } from "./customer-auth.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const encoder = new TextEncoder();
@@ -18,7 +18,7 @@ async function requireAdmin(request, env) {
   }
   const email = await authenticatedEmail(request, env);
   if (!email) return result(401, { error: "Please sign in to continue." });
-  if (email !== adminEmail) return result(403, { error: "This account does not have admin access." });
+  if (!isAdminEmail(env, email)) return result(403, { error: "This account does not have admin access." });
   return null;
 }
 
