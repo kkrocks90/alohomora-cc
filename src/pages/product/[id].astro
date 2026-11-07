@@ -104,8 +104,8 @@ const customizable = product.customizable !== false;
         <p class="product-detail-description">{product.description}</p>
         {(product.dimensions || product.weight) && (
           <dl class="product-specs">
-            {product.dimensions && <div><dt>Dimensions</dt><dd>{product.dimensions}</dd></div>}
-            {product.weight && <div><dt>Weight</dt><dd>{product.weight}</dd></div>}
+            {product.dimensions && <div><dt>Size (each)</dt><dd>{product.dimensions}</dd></div>}
+            {product.weight && <div><dt>Weight (each)</dt><dd>{product.weight}</dd></div>}
           </dl>
         )}
         <div class="product-detail-price">

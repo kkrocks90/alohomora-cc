@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.57.0
+
+- Product weight and dimensions are now per piece. Pack weight = piece weight x pieces in the pack size (8 g in a Pack of 40 = 320 g), ready for when delivery charges are applied to orders.
+- Admin product form and product page labels clarify per-piece values.
+
 ## 1.56.3
 
 - Contact page: compact horizontal cards on mobile.

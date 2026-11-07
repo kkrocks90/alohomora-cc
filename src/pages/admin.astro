@@ -332,9 +332,10 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
                 <label>Pack size<input name="packSize" maxlength="60" placeholder="Box of 9" required /></label>
               </div>
               <div class="apf-row">
-                <label>Dimensions <span class="apf-optional">Optional</span><input name="dimensions" maxlength="60" placeholder="12 x 8 cm (length x width)" /></label>
-                <label>Weight <span class="apf-optional">Optional</span><input name="weight" maxlength="40" placeholder="250 g" /></label>
+                <label>Dimensions of 1 piece <span class="apf-optional">Optional</span><input name="dimensions" maxlength="60" placeholder="12 x 8 cm (length x width)" /></label>
+                <label>Weight of 1 piece <span class="apf-optional">Optional</span><input name="weight" maxlength="40" placeholder="8 g" /></label>
               </div>
+              <p class="admin-form-hint">Enter size and weight for a single piece, not the whole pack. The pack weight is worked out from the pack size, e.g. 8 g in a "Pack of 40" is 320 g.</p>
               <label>Category<input name="tag" maxlength="60" list="admin-product-categories" required placeholder="Choose or type a new one" /></label>
               <datalist id="admin-product-categories"></datalist>
             </section>
@@ -429,7 +430,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <section class="apf-card dc-weight">
               <h3><span aria-hidden="true">⚖️</span> Weight <small>used until products have weights</small></h3>
               <label class="dc-field"><span class="dc-label">Weight of a product with none set</span><span class="dc-input"><input name="defaultItemWeightGrams" type="number" min="1" step="10" inputmode="numeric" required /><i>g</i></span></label>
-              <p class="admin-form-hint">Weights you add to products later (like "250 g") are used automatically.</p>
+              <p class="admin-form-hint">Product weights are per piece and multiplied by the pack size (8 g in a "Pack of 40" = 320 g). The weight above is only for products with no weight set, and is for the whole pack.</p>
             </section>
             <div class="apf-actions"><button class="button button-primary" type="submit">Save delivery settings</button></div>
           </form>

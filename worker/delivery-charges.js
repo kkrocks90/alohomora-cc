@@ -96,11 +96,22 @@ export function parseWeightGrams(text) {
   return grams > 0 ? Math.round(grams) : null;
 }
 
+// A product's weight is for ONE piece. The pieces in a pack come from the pack size
+// ("Pack of 40" -> 40), so an 8 g piece in a pack of 40 weighs 320 g.
+export function piecesPerPack(packSize) {
+  const match = typeof packSize === "string" ? packSize.match(/\d+/) : null;
+  const pieces = match ? Number(match[0]) : 1;
+  return pieces >= 1 ? pieces : 1;
+}
+
+// Weight of one pack. Products with no weight use the default, which is already per pack.
+export function packWeightGrams(item, settings) {
+  const piece = parseWeightGrams(item.weight);
+  return piece === null ? settings.defaultItemWeightGrams : piece * piecesPerPack(item.packSize);
+}
+
 export function totalWeightGrams(items, settings) {
-  return items.reduce(
-    (sum, item) => sum + (parseWeightGrams(item.weight) ?? settings.defaultItemWeightGrams) * item.quantity,
-    0,
-  );
+  return items.reduce((sum, item) => sum + packWeightGrams(item, settings) * item.quantity, 0);
 }
 
 function sameState(first, second) {

@@ -5,6 +5,7 @@ import {
   calculateDeliveryCharge,
   getDeliverySettings,
   parseWeightGrams,
+  piecesPerPack,
   previewDeliveryCharge,
   saveDeliverySettings,
   totalWeightGrams,
@@ -45,6 +46,14 @@ test("weights are parsed from text and fall back to the default", () => {
   assert.equal(parseWeightGrams("1.2kg"), 1200);
   assert.equal(parseWeightGrams("about a kilo"), null);
   assert.equal(totalWeightGrams([{ weight: "250 g", quantity: 2 }, { weight: "", quantity: 1 }], on), 1000);
+});
+
+test("product weight is per piece and multiplied by the pack size", () => {
+  assert.equal(piecesPerPack("Pack of 40"), 40);
+  assert.equal(piecesPerPack("Set of 6"), 6);
+  assert.equal(piecesPerPack("Box"), 1);
+  assert.equal(totalWeightGrams([{ weight: "8 g", packSize: "Pack of 40", quantity: 1 }], on), 320);
+  assert.equal(totalWeightGrams([{ weight: "8 g", packSize: "Pack of 40", quantity: 2 }, { weight: "", packSize: "Pack of 10", quantity: 1 }], on), 640 + 500);
 });
 
 test("preview works out distance and state from a PIN code", async () => {
