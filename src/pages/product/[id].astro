@@ -88,8 +88,8 @@ const customizable = product.customizable !== false;
         <span class="product-tag">{product.tag}</span>
         {gallery.length > 1 && (
           <>
-            <button class="gallery-arrow gallery-arrow-prev" type="button" data-gallery-prev aria-label="Previous photo">?</button>
-            <button class="gallery-arrow gallery-arrow-next" type="button" data-gallery-next aria-label="Next photo">?</button>
+            <button class="gallery-arrow gallery-arrow-prev" type="button" data-gallery-prev aria-label="Previous photo">&#8249;</button>
+            <button class="gallery-arrow gallery-arrow-next" type="button" data-gallery-next aria-label="Next photo">&#8250;</button>
             <div class="gallery-dots" role="group" aria-label="Choose photo">
               {gallery.map((_, dotIndex) => (
                 <button class="gallery-dot" type="button" data-gallery-dot={dotIndex} aria-label={`Show photo ${dotIndex + 1}`}></button>
