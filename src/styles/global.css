@@ -8304,3 +8304,8 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
 }
 .dc-field[hidden] { display: none; }
 .dc-hint { color: #8a7565; font-size: 12px; font-weight: 400; line-height: 1.4; }
+@media (min-width: 701px) {
+  .dc-porter { grid-column: 1; grid-row: 2; align-self: start; }
+  .dc-weight { grid-column: 1; grid-row: 3; align-self: start; }
+  .dc-courier { grid-column: 2; grid-row: 2 / span 2; align-self: start; }
+}

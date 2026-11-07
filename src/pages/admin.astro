@@ -395,7 +395,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
                 <span class="dc-switch-track" aria-hidden="true"></span>
               </label>
             </section>
-            <section class="apf-card">
+            <section class="apf-card dc-porter">
               <h3><span aria-hidden="true">🏍️</span> Porter <small>nearby deliveries</small></h3>
               <div class="dc-grid">
                 <label class="dc-field"><span class="dc-label">Porter radius</span><span class="dc-input"><input name="porterRadiusKm" type="number" min="1" step="1" inputmode="numeric" required /><i>km</i></span></label>
@@ -404,7 +404,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
                 <label class="dc-field"><span class="dc-label">Each extra km</span><span class="dc-input"><i>&#8377;</i><input name="porterPerExtraKm" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
               </div>
             </section>
-            <section class="apf-card">
+            <section class="apf-card dc-courier">
               <h3><span aria-hidden="true">📦</span> Courier <small>beyond the Porter radius</small></h3>
               <div class="dc-grid">
                 <label class="dc-field"><span class="dc-label">Your state</span><span class="dc-input"><input name="storeState" maxlength="60" placeholder="Tamil Nadu" /></span></label>
@@ -425,7 +425,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
                 </div>
               </div>
             </section>
-            <section class="apf-card">
+            <section class="apf-card dc-weight">
               <h3><span aria-hidden="true">⚖️</span> Weight <small>used until products have weights</small></h3>
               <label class="dc-field"><span class="dc-label">Weight of a product with none set</span><span class="dc-input"><input name="defaultItemWeightGrams" type="number" min="1" step="10" inputmode="numeric" required /><i>g</i></span></label>
               <p class="admin-form-hint">Weights you add to products later (like "250 g") are used automatically.</p>
