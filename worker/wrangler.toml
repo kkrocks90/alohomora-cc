@@ -10,8 +10,8 @@ STORE_LONGITUDE = "80.1873"
 LOGIN_FROM_EMAIL = "Chocolate Circle <login@auth.chocolatecircle.in>"
 # Public Google OAuth client ID (ends in .apps.googleusercontent.com). Leave empty to hide Google sign-in.
 GOOGLE_CLIENT_ID = "257349998723-vsp3avjcvpjqk7hu9uog8ufptvs9kcqc.apps.googleusercontent.com"
-ADMIN_EMAIL = "alohomora.chocolatecircle@gmail.com"
-ADMIN_EMAILS = "admin.chocolatecircle@gmail.com,customer.support@chocolatecircle.in"
+ADMIN_EMAIL = "customer.support@chocolatecircle.in"
+ADMIN_EMAILS = "alohomora.chocolatecircle@gmail.com,admin.chocolatecircle@gmail.com"
 SUPPORT_EMAIL = "customer.support@chocolatecircle.in"
 
 [[d1_databases]]

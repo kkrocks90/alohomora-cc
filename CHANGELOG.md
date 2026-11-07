@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.54.3 - 2026-11-07
+
+- Order and enquiry notifications now go to customer.support@chocolatecircle.in (the primary admin). The earlier Gmail addresses remain admins.
+
 ## 1.54.2 - 2026-11-07
 
 - customer.support@chocolatecircle.in is now the public contact address, the reply-to on order emails (new `SUPPORT_EMAIL` setting) and an admin account.
