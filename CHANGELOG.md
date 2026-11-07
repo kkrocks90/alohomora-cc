@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.51.1
+
+- Admin delivery charges redesigned: iOS-style on/off switch, unit badges (₹, km, g) on inputs, grouped same-state and other-state courier rates, mobile-friendly single-column layout.
+
 ## 1.51.0
 
 - Admin: new Delivery charges tab. Editable Porter rules (radius, base charge, included km, per extra km), courier rules (weight slab, same-state and other-state rates), default weight for products without one, and a charge calculator. Pickup is always free.

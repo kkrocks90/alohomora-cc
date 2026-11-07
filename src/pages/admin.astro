@@ -388,31 +388,47 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           <p class="admin-form-hint">Pickup is always free. Within the Porter radius we book a Porter; beyond it we send by courier, priced by weight and whether the customer is in your state. Rates are whole rupees.</p>
           <p class="admin-flat-summary" id="admin-delivery-summary" role="status"></p>
           <form class="admin-delivery-form apf-form" id="admin-delivery-form">
-            <section class="apf-card"><h3>Switch</h3>
-              <label class="admin-flat-toggle"><input name="enabled" type="checkbox" /> Charge for delivery</label>
-              <p class="admin-form-hint">Off for now: customers are not charged and checkout is unchanged. Rules below can still be saved and tested.</p>
+            <section class="apf-card dc-master">
+              <label class="dc-switch">
+                <span class="dc-switch-text"><strong>Charge for delivery</strong><small>When off, customers are not charged. You can still save and test the rules below.</small></span>
+                <input name="enabled" type="checkbox" role="switch" />
+                <span class="dc-switch-track" aria-hidden="true"></span>
+              </label>
             </section>
-            <section class="apf-card"><h3>Porter (nearby)</h3>
-              <div class="admin-delivery-grid">
-                <label>Porter radius (km)<input name="porterRadiusKm" type="number" min="1" step="1" inputmode="numeric" required /></label>
-                <label>Base charge (&#8377;)<input name="porterBaseFee" type="number" min="0" step="1" inputmode="decimal" required /></label>
-                <label>Km included in base<input name="porterIncludedKm" type="number" min="0" step="1" inputmode="decimal" required /></label>
-                <label>Per extra km (&#8377;)<input name="porterPerExtraKm" type="number" min="0" step="1" inputmode="decimal" required /></label>
+            <section class="apf-card">
+              <h3><span aria-hidden="true">🏍️</span> Porter <small>nearby deliveries</small></h3>
+              <div class="dc-grid">
+                <label class="dc-field"><span class="dc-label">Porter radius</span><span class="dc-input"><input name="porterRadiusKm" type="number" min="1" step="1" inputmode="numeric" required /><i>km</i></span></label>
+                <label class="dc-field"><span class="dc-label">Base charge</span><span class="dc-input"><i>&#8377;</i><input name="porterBaseFee" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
+                <label class="dc-field"><span class="dc-label">Included in base</span><span class="dc-input"><input name="porterIncludedKm" type="number" min="0" step="1" inputmode="decimal" required /><i>km</i></span></label>
+                <label class="dc-field"><span class="dc-label">Each extra km</span><span class="dc-input"><i>&#8377;</i><input name="porterPerExtraKm" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
               </div>
             </section>
-            <section class="apf-card"><h3>Courier (beyond the radius)</h3>
-              <div class="admin-delivery-grid">
-                <label>Your state<input name="storeState" maxlength="60" placeholder="Tamil Nadu" /></label>
-                <label>Weight slab (grams)<input name="slabGrams" type="number" min="50" step="50" inputmode="numeric" required /></label>
-                <label>Same state: first slab (&#8377;)<input name="sameFirst" type="number" min="0" step="1" inputmode="decimal" required /></label>
-                <label>Same state: each extra slab (&#8377;)<input name="sameExtra" type="number" min="0" step="1" inputmode="decimal" required /></label>
-                <label>Other states: first slab (&#8377;)<input name="otherFirst" type="number" min="0" step="1" inputmode="decimal" required /></label>
-                <label>Other states: each extra slab (&#8377;)<input name="otherExtra" type="number" min="0" step="1" inputmode="decimal" required /></label>
+            <section class="apf-card">
+              <h3><span aria-hidden="true">📦</span> Courier <small>beyond the Porter radius</small></h3>
+              <div class="dc-grid">
+                <label class="dc-field"><span class="dc-label">Your state</span><span class="dc-input"><input name="storeState" maxlength="60" placeholder="Tamil Nadu" /></span></label>
+                <label class="dc-field"><span class="dc-label">Weight slab</span><span class="dc-input"><input name="slabGrams" type="number" min="50" step="50" inputmode="numeric" required /><i>g</i></span></label>
+              </div>
+              <div class="dc-zone">
+                <h4>Same state</h4>
+                <div class="dc-grid">
+                  <label class="dc-field"><span class="dc-label">First slab</span><span class="dc-input"><i>&#8377;</i><input name="sameFirst" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
+                  <label class="dc-field"><span class="dc-label">Each extra slab</span><span class="dc-input"><i>&#8377;</i><input name="sameExtra" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
+                </div>
+              </div>
+              <div class="dc-zone">
+                <h4>Other states</h4>
+                <div class="dc-grid">
+                  <label class="dc-field"><span class="dc-label">First slab</span><span class="dc-input"><i>&#8377;</i><input name="otherFirst" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
+                  <label class="dc-field"><span class="dc-label">Each extra slab</span><span class="dc-input"><i>&#8377;</i><input name="otherExtra" type="number" min="0" step="1" inputmode="decimal" required /></span></label>
+                </div>
               </div>
             </section>
-            <section class="apf-card"><h3>Weight</h3>
-              <label>Weight used for a product with no weight (grams)<input name="defaultItemWeightGrams" type="number" min="1" step="10" inputmode="numeric" required /></label>
-              <p class="admin-form-hint">Product weights added later (like "250 g") are used automatically.</p>
+            <section class="apf-card">
+              <h3><span aria-hidden="true">⚖️</span> Weight <small>used until products have weights</small></h3>
+              <label class="dc-field"><span class="dc-label">Weight of a product with none set</span><span class="dc-input"><input name="defaultItemWeightGrams" type="number" min="1" step="10" inputmode="numeric" required /><i>g</i></span></label>
+              <p class="admin-form-hint">Weights you add to products later (like "250 g") are used automatically.</p>
             </section>
             <div class="apf-actions"><button class="button button-primary" type="submit">Save delivery settings</button></div>
           </form>
@@ -425,14 +441,14 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </div>
           <p class="admin-form-hint">Uses the values in the form above, even before saving.</p>
-          <form class="admin-delivery-form" id="admin-delivery-test-form">
-            <div class="admin-delivery-grid">
-              <label>Method<select name="method"><option value="delivery">Delivery</option><option value="pickup">Pickup</option></select></label>
-              <label>Distance (km)<input name="distanceKm" type="number" min="0" step="0.1" inputmode="decimal" value="10" required /></label>
-              <label>Customer state<input name="customerState" maxlength="60" placeholder="Karnataka" /></label>
-              <label>Total weight (grams)<input name="weightGrams" type="number" min="1" step="10" inputmode="numeric" value="500" required /></label>
+          <form class="admin-delivery-form dc-test" id="admin-delivery-test-form">
+            <div class="dc-grid">
+              <label class="dc-field"><span class="dc-label">Method</span><span class="dc-input"><select name="method"><option value="delivery">Delivery</option><option value="pickup">Pickup</option></select></span></label>
+              <label class="dc-field"><span class="dc-label">Distance</span><span class="dc-input"><input name="distanceKm" type="number" min="0" step="0.1" inputmode="decimal" value="10" required /><i>km</i></span></label>
+              <label class="dc-field"><span class="dc-label">Customer state</span><span class="dc-input"><input name="customerState" maxlength="60" placeholder="Karnataka" /></span></label>
+              <label class="dc-field"><span class="dc-label">Total weight</span><span class="dc-input"><input name="weightGrams" type="number" min="1" step="10" inputmode="numeric" value="500" required /><i>g</i></span></label>
             </div>
-            <button class="button button-secondary" type="submit">Calculate</button>
+            <button class="button button-primary" type="submit">Calculate charge</button>
           </form>
           <p class="admin-flat-summary" id="admin-delivery-result" role="status" aria-live="polite"></p>
         </section>

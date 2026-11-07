@@ -8206,5 +8206,99 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
 
 /* Admin delivery charges */
 .admin-delivery-form { display: grid; gap: 0.9rem; }
-.admin-delivery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.75rem; }
-.admin-delivery-grid label { display: grid; gap: 0.3rem; }
+.dc-master { grid-column: 1 / -1; }
+.apf-card h3 small { margin-left: 0.4rem; }
+.apf-card label.dc-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dc-switch-text { display: grid; gap: 3px; min-width: 0; }
+.dc-switch-text strong { color: var(--cocoa-dark, #3b2418); font-size: 16px; }
+.dc-switch-text small { color: #8a7565; font-size: 13px; font-weight: 400; line-height: 1.4; }
+.apf-card .dc-switch input[type="checkbox"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.dc-switch-track {
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 32px;
+  border-radius: 999px;
+  background: #d9cabb;
+  transition: background-color 0.2s ease;
+}
+.dc-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(59 36 24 / 30%);
+  transition: transform 0.2s ease;
+}
+.dc-switch input:checked ~ .dc-switch-track { background: #2f8f5b; }
+.dc-switch input:checked ~ .dc-switch-track::after { transform: translateX(24px); }
+.dc-switch input:focus-visible ~ .dc-switch-track { outline: 3px solid rgb(138 90 60 / 35%); outline-offset: 2px; }
+.dc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.apf-card label.dc-field { gap: 6px; }
+.dc-label { color: #4a3528; font-size: 13px; font-weight: 600; }
+.dc-input {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  border: 1px solid #d9cabb;
+  border-radius: 10px;
+  background: #fffdfa;
+  overflow: hidden;
+}
+.dc-input:focus-within { border-color: #8a5a3c; box-shadow: 0 0 0 3px rgb(138 90 60 / 18%); }
+.dc-input i {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
+  background: #f4ece3;
+  color: #6b3f26;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 700;
+}
+.apf-card .dc-input input:not([type="checkbox"]),
+.apf-card .dc-input select,
+.dc-test .dc-input input,
+.dc-test .dc-input select {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+}
+.dc-test .dc-field { display: grid; gap: 6px; }
+.dc-zone { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: #faf6f0; }
+.dc-zone h4 { margin: 0; color: #6b3f26; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+.dc-test button[type="submit"] { justify-self: start; }
+@media (max-width: 620px) {
+  .dc-grid { grid-template-columns: minmax(0, 1fr); }
+  .dc-test button[type="submit"] { justify-self: stretch; }
+  .admin-delivery-form .apf-actions .button { width: 100%; }
+}
