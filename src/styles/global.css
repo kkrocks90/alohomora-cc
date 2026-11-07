@@ -8302,3 +8302,5 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
   .dc-test button[type="submit"] { justify-self: stretch; }
   .admin-delivery-form .apf-actions .button { width: 100%; }
 }
+.dc-field[hidden] { display: none; }
+.dc-hint { color: #8a7565; font-size: 12px; font-weight: 400; line-height: 1.4; }

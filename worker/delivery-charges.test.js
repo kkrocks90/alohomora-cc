@@ -5,10 +5,12 @@ import {
   calculateDeliveryCharge,
   getDeliverySettings,
   parseWeightGrams,
+  previewDeliveryCharge,
   saveDeliverySettings,
   totalWeightGrams,
   validateDeliverySettings,
 } from "./delivery-charges.js";
+import { PincodeLookupError } from "./pincode.js";
 
 const on = { ...DEFAULT_DELIVERY_SETTINGS, enabled: true, storeState: "Tamil Nadu" };
 
@@ -42,6 +44,28 @@ test("weights are parsed from text and fall back to the default", () => {
   assert.equal(parseWeightGrams("1.2kg"), 1200);
   assert.equal(parseWeightGrams("about a kilo"), null);
   assert.equal(totalWeightGrams([{ weight: "250 g", quantity: 2 }, { weight: "", quantity: 1 }], on), 1000);
+});
+
+test("preview works out distance and state from a PIN code", async () => {
+  const env = { STORE_LATITUDE: "13.0827", STORE_LONGITUDE: "80.2707" };
+  const settings = { ...on };
+  const lookup = async (pin) => {
+    if (pin === "600001") return { pincode: pin, city: "Chennai", state: "Tamil Nadu", latitude: 13.09, longitude: 80.28 };
+    if (pin === "560001") return { pincode: pin, city: "Bengaluru", state: "Karnataka", latitude: 12.9716, longitude: 77.5946 };
+    throw new PincodeLookupError("We couldn’t find that PIN code. Check it and try again.");
+  };
+  const near = await previewDeliveryCharge(env, { settings, method: "delivery", pincode: "600001", weightGrams: 500 }, lookup);
+  assert.equal(near.charge.kind, "porter");
+  assert.equal(near.place.city, "Chennai");
+  const far = await previewDeliveryCharge(env, { settings, method: "delivery", pincode: "560001", weightGrams: 1000 }, lookup);
+  assert.equal(far.charge.kind, "courier");
+  assert.equal(far.charge.rupees, 120 + 60);
+  assert.ok(far.distanceKm > 250);
+  const pickup = await previewDeliveryCharge(env, { settings, method: "pickup", weightGrams: 500 }, lookup);
+  assert.equal(pickup.charge.rupees, 0);
+  await assert.rejects(previewDeliveryCharge(env, { settings, method: "delivery", pincode: "111111", weightGrams: 500 }, lookup), /find that PIN/);
+  await assert.rejects(previewDeliveryCharge(env, { settings, method: "delivery", pincode: "600001", weightGrams: 30000 }, lookup), /weight/);
+  await assert.rejects(previewDeliveryCharge({}, { settings, method: "delivery", pincode: "600001", weightGrams: 500 }, lookup), /store location/);
 });
 
 test("settings are validated and round-trip through storage", async () => {

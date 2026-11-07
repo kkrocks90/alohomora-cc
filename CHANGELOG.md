@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.52.0
+
+- Admin delivery charge calculator now takes the customer's PIN code and works out distance (from the store) and state automatically, showing the town and km.
+- Total weight is a dropdown (250 g to 20 kg) with the allowed range shown; 20 kg is the 2-wheeler Porter limit.
+- Needs a Worker deploy.
+
 ## 1.51.1
 
 - Admin delivery charges redesigned: iOS-style on/off switch, unit badges (₹, km, g) on inputs, grouped same-state and other-state courier rates, mobile-friendly single-column layout.

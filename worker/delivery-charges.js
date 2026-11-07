@@ -1,4 +1,9 @@
 import { requireAdmin } from "./admin.js";
+import { getDistanceKm, getStoreLocation } from "./delivery.js";
+import { PincodeLookupError, lookupPincode } from "./pincode.js";
+
+// A 2-wheeler Porter carries up to 20 kg, so the calculator accepts 50 g to 20 kg.
+export const MAX_PREVIEW_WEIGHT_GRAMS = 20000;
 
 // All money values are whole rupees. Pickup is always free.
 export const DEFAULT_DELIVERY_SETTINGS = {
@@ -128,6 +133,45 @@ export function calculateDeliveryCharge(settings, { method, distanceKm, customer
   };
 }
 
+class InputError extends Error {
+  constructor(message, status = 400) {
+    super(message);
+    this.status = status;
+  }
+}
+
+// Works out the charge for a PIN code and weight using unsaved settings from the admin form.
+export async function previewDeliveryCharge(env, body, lookup = lookupPincode) {
+  const settings = validateDeliverySettings(body.settings);
+  const weightGrams = whole(body.weightGrams, "weight in grams", { min: 50, max: MAX_PREVIEW_WEIGHT_GRAMS });
+  const method = body.method === "pickup" ? "pickup" : "delivery";
+  let distanceKm = 0;
+  let place = null;
+  if (method === "delivery") {
+    const storeLocation = getStoreLocation(env);
+    if (!storeLocation) throw new InputError("The store location is not configured on the server.", 503);
+    try {
+      place = await lookup(typeof body.pincode === "string" ? body.pincode : "");
+    } catch (error) {
+      if (error instanceof PincodeLookupError) throw new InputError(error.message, error.status);
+      throw error;
+    }
+    distanceKm = getDistanceKm(storeLocation, place);
+  }
+  // Preview ignores the on/off switch so rules can be tested while charges are disabled.
+  const charge = calculateDeliveryCharge({ ...settings, enabled: true }, {
+    method,
+    distanceKm,
+    customerState: place?.state ?? "",
+    weightGrams,
+  });
+  return {
+    charge,
+    distanceKm: Math.round(distanceKm * 10) / 10,
+    place: place ? { pincode: place.pincode, city: place.city, state: place.state } : null,
+  };
+}
+
 async function readJson(request) {
   try {
     return JSON.parse(await request.text());
@@ -136,29 +180,18 @@ async function readJson(request) {
   }
 }
 
-export async function handleAdminDeliverySettings(request, env, action) {
+export async function handleAdminDeliverySettings(request, env, action, lookup = lookupPincode) {
   const body = await readJson(request);
   if (body === null) return { status: 400, body: { error: "Request must contain valid JSON." } };
   try {
     const access = await requireAdmin(request, env);
     if (access.error) return access.error;
-    if (action === "preview") {
-      const settings = validateDeliverySettings(body.settings);
-      const distanceKm = whole(body.distanceKm, "distance in km", { min: 0, max: 5000 });
-      const weightGrams = whole(body.weightGrams, "weight in grams", { min: 1, max: 1000000 });
-      const customerState = typeof body.customerState === "string" ? body.customerState : "";
-      // Preview ignores the on/off switch so rules can be tested while charges are disabled.
-      const charge = calculateDeliveryCharge({ ...settings, enabled: true }, {
-        method: body.method === "pickup" ? "pickup" : "delivery",
-        distanceKm,
-        customerState,
-        weightGrams,
-      });
-      return { status: 200, body: { charge } };
-    }
+    if (action === "preview") return { status: 200, body: await previewDeliveryCharge(env, body, lookup) };
     return { status: 200, body: { deliverySettings: await saveDeliverySettings(env.ORDERS_DB, body) } };
   } catch (error) {
-    if (error instanceof Error && /^Enter/.test(error.message)) return { status: 400, body: { error: error.message } };
+    if (error instanceof InputError || (error instanceof Error && /^Enter/.test(error.message))) {
+      return { status: error instanceof InputError ? error.status : 400, body: { error: error.message } };
+    }
     console.error("Could not save the delivery settings.", error);
     return { status: 503, body: { error: "The delivery settings could not be saved right now. Please try again." } };
   }

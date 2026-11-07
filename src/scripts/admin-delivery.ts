@@ -101,22 +101,39 @@ export function initDeliveryAdmin({ root, post, setStatus, reload }: Deps) {
   testForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const data = new FormData(testForm);
+    const submit = testForm.querySelector<HTMLButtonElement>("button[type=submit]");
+    if (submit) submit.disabled = true;
+    result.dataset.state = "off";
+    result.textContent = "Calculating…";
     try {
       const response = await post("/admin/delivery-settings/preview", {
         settings: readForm(),
         method: data.get("method"),
-        distanceKm: Number(data.get("distanceKm")),
-        customerState: data.get("customerState"),
+        pincode: String(data.get("pincode") ?? "").trim(),
         weightGrams: Number(data.get("weightGrams")),
       });
       const charge = response.charge as { rupees: number; detail: string };
+      const place = response.place as { pincode: string; city: string; state: string } | null;
+      const where = place ? `${place.city}, ${place.state} (${place.pincode}) is about ${response.distanceKm} km away. ` : "";
       result.dataset.state = "on";
-      result.textContent = `Charge: ₹${charge.rupees}. ${charge.detail}`;
+      result.textContent = `${where}Charge: ₹${charge.rupees}. ${charge.detail}`;
     } catch (error) {
       result.dataset.state = "off";
       result.textContent = error instanceof Error ? error.message : "The charge could not be calculated.";
+    } finally {
+      if (submit) submit.disabled = false;
     }
   });
+
+  const method = required<HTMLSelectElement>(testForm, "select[name='method']");
+  const testPincode = required<HTMLInputElement>(testForm, "input[name='pincode']");
+  const syncMethod = () => {
+    const pickup = method.value === "pickup";
+    required<HTMLElement>(testForm, "[data-test-delivery]").hidden = pickup;
+    testPincode.required = !pickup;
+  };
+  method.addEventListener("change", syncMethod);
+  syncMethod();
 
   return { render };
 }
