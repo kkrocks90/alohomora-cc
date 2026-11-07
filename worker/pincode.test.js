@@ -47,31 +47,20 @@ test("reports unknown PIN codes", async () => {
   );
 });
 
-test("uses Google for the PIN code when a key is set, and falls back to the free lookup if it fails", async () => {
-  const googleFetch = async (url) =>
-    String(url).startsWith("https://maps.googleapis.com/maps/api/geocode/")
-      ? Response.json({
-          status: "OK",
-          results: [{
-            geometry: { location: { lat: 12.97, lng: 77.59 } },
-            address_components: [
-              { long_name: "Bengaluru", types: ["locality"] },
-              { long_name: "Karnataka", types: ["administrative_area_level_1"] },
-            ],
-          }],
-        })
-      : providerFetch(url);
-  await withFetch(googleFetch, async () => {
-    const place = await lookupPincode("560001", { GOOGLE_MAPS_API_KEY: "test-key" });
-    assert.deepEqual(place, { pincode: "560001", city: "Bengaluru", state: "Karnataka", latitude: 12.97, longitude: 77.59 });
-  });
+test("uses the bundled dataset without any network call, and falls back to live lookups for unknown PINs", async () => {
   await withFetch(
-    async (url) => (String(url).includes("googleapis") ? new Response("nope", { status: 403 }) : providerFetch(url)),
     async () => {
-      const place = await lookupPincode("600042", { GOOGLE_MAPS_API_KEY: "test-key" });
-      assert.equal(place.city, "Chennai");
+      throw new Error("network should not be used");
+    },
+    async () => {
+      const place = await lookupPincode("560001");
+      assert.equal(place.state, "Karnataka");
+      assert.ok(Math.abs(place.latitude - 12.9761) < 0.001 && Math.abs(place.longitude - 77.6021) < 0.001);
     },
   );
+  await withFetch(providerFetch, async () => {
+    assert.equal((await lookupPincode("600042")).city, "Chennai");
+  });
 });
 
 test("the PIN endpoint returns only the PIN code, city, and state", async () => {

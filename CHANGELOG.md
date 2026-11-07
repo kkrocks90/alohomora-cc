@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.54.0 - 2026-11-07
+
+- PIN code lookups now use a bundled dataset (about 7,100 PIN codes, MIT-licensed) for coordinates, state and area, so they are instant and reliable. PIN codes outside the dataset still fall back to the free live lookups.
+- Delivery charge calculator and checkout use OpenRouteService road distance when the optional ORS_API_KEY secret is set, and fall back to straight-line distance otherwise.
+- Removed the optional Google Maps integration added in 1.53.0.
+
 ## 1.53.0
 
 - Google Maps support (optional). When the Worker secret GOOGLE_MAPS_API_KEY is set, PIN code lookups use the Google Geocoding API and the admin delivery calculator uses Google driving distance. Without the key, or if Google fails, it falls back to the free lookups and straight-line distance.

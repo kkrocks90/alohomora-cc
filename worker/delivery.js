@@ -42,28 +42,29 @@ export function getDistanceKm(first, second) {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(Math.min(1, haversine)));
 }
 
-// Driving distance from Google Distance Matrix, or null when no key is set or the call fails.
+// Driving distance from OpenRouteService, or null when no key is set or the call fails.
 export async function getRoadDistanceKm(env, from, to) {
-  const apiKey = typeof env?.GOOGLE_MAPS_API_KEY === "string" ? env.GOOGLE_MAPS_API_KEY.trim() : "";
+  const apiKey = typeof env?.ORS_API_KEY === "string" ? env.ORS_API_KEY.trim() : "";
   if (!apiKey) return null;
   try {
-    const params = new URLSearchParams({
-      origins: `${from.latitude},${from.longitude}`,
-      destinations: `${to.latitude},${to.longitude}`,
-      mode: "driving",
-      units: "metric",
-      key: apiKey,
-    });
-    const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?${params}`, {
+    const response = await fetch("https://api.openrouteservice.org/v2/directions/driving-car", {
+      method: "POST",
+      headers: { Authorization: apiKey, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        coordinates: [
+          [from.longitude, from.latitude],
+          [to.longitude, to.latitude],
+        ],
+        radiuses: [5000, 5000],
+      }),
       signal: AbortSignal.timeout(6000),
     });
     if (!response.ok) return null;
     const payload = await response.json();
-    const element = payload?.status === "OK" ? payload.rows?.[0]?.elements?.[0] : null;
-    const meters = Number(element?.status === "OK" ? element.distance?.value : NaN);
+    const meters = Number(payload?.routes?.[0]?.summary?.distance);
     return Number.isFinite(meters) && meters >= 0 ? meters / 1000 : null;
   } catch (error) {
-    console.error("Google road distance failed.", error);
+    console.error("OpenRouteService road distance failed.", error);
     return null;
   }
 }

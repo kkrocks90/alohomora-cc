@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+﻿import assert from "node:assert/strict";
 import test from "node:test";
 import worker from "./index.js";
 
@@ -347,7 +347,7 @@ test("includes different selected variants in the Razorpay order notes", async (
           address: "123 Sample Street",
           city: "Chennai",
           state: "Tamil Nadu",
-          pincode: "600001",
+          pincode: "600099",
           policyConsent: true,
         },
         deliveryLocation: { latitude: 0, longitude: 0 },
@@ -394,7 +394,7 @@ test("includes different selected variants in the Razorpay order notes", async (
     d: "0.00",
     c: "Chennai",
     s: "Tamil Nadu",
-    p: "600001",
+    p: "600099",
     ok: "1",
   });
 });

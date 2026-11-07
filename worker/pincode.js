@@ -1,3 +1,5 @@
+import { PINCODE_DATA, PINCODE_STATES } from "./pincode-data.js";
+
 const PINCODE_PATTERN = /^[1-9][0-9]{5}$/;
 const LOOKUP_TIMEOUT_MS = 6000;
 const CACHE_SECONDS = 60 * 60 * 24 * 30;
@@ -45,49 +47,33 @@ async function fetchCoordinates(pincode) {
   return { latitude, longitude };
 }
 
-async function fetchGoogleLocation(pincode, apiKey) {
-  const params = new URLSearchParams({ components: `postal_code:${pincode}|country:IN`, key: apiKey });
-  const payload = await fetchJson(`https://maps.googleapis.com/maps/api/geocode/json?${params}`);
-  const match = payload?.status === "OK" && Array.isArray(payload.results) ? payload.results[0] : null;
-  const latitude = Number(match?.geometry?.location?.lat);
-  const longitude = Number(match?.geometry?.location?.lng);
-  if (!match || !Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
-  const part = (type) => match.address_components?.find((component) => component.types?.includes(type))?.long_name ?? "";
-  const city = (part("locality") || part("administrative_area_level_2") || part("sublocality")).slice(0, 40);
-  const state = part("administrative_area_level_1").slice(0, 40);
-  return city && state ? { city, state, latitude, longitude } : null;
+function bundledPlace(pincode) {
+  const entry = PINCODE_DATA[pincode];
+  if (!entry) return null;
+  const [latitude, longitude, stateIndex, area] = entry;
+  return { city: area, state: PINCODE_STATES[stateIndex], latitude, longitude };
 }
 
-export async function lookupPincode(pincodeInput, env = {}) {
+// Bundled dataset first (reliable, no network); live lookups only for PIN codes it doesn't cover.
+export async function lookupPincode(pincodeInput) {
   if (!isValidPincode(pincodeInput)) throw new PincodeLookupError("Enter a valid 6-digit PIN code.");
   const pincode = pincodeInput.trim();
-  const googleKey = typeof env?.GOOGLE_MAPS_API_KEY === "string" ? env.GOOGLE_MAPS_API_KEY.trim() : "";
+
+  const bundled = bundledPlace(pincode);
+  if (bundled) return { pincode, ...bundled };
 
   const cache = globalThis.caches?.default;
-  const cacheKey = new Request(`https://pincode-cache.invalid/${googleKey ? "g/" : ""}${pincode}`);
+  const cacheKey = new Request(`https://pincode-cache.invalid/${pincode}`);
   const cached = cache ? await cache.match(cacheKey) : null;
   if (cached) return cached.json();
 
-  let place = null;
-  let location = null;
-  if (googleKey) {
-    try {
-      const google = await fetchGoogleLocation(pincode, googleKey);
-      if (google) {
-        place = { city: google.city, state: google.state };
-        location = { latitude: google.latitude, longitude: google.longitude };
-      }
-    } catch (error) {
-      console.error("Google PIN code lookup failed; using the free lookup.", error);
-    }
-  }
-  if (!place || !location) {
-    try {
-      [place, location] = await Promise.all([fetchPlace(pincode), fetchCoordinates(pincode)]);
-    } catch (error) {
-      console.error("PIN code lookup failed.", error);
-      throw new PincodeLookupError("We couldn’t check that PIN code right now. Please try again shortly.", 503);
-    }
+  let place;
+  let location;
+  try {
+    [place, location] = await Promise.all([fetchPlace(pincode), fetchCoordinates(pincode)]);
+  } catch (error) {
+    console.error("PIN code lookup failed.", error);
+    throw new PincodeLookupError("We couldn’t check that PIN code right now. Please try again shortly.", 503);
   }
   if (!place || !location) throw new PincodeLookupError("We couldn’t find that PIN code. Check it and try again.");
 
