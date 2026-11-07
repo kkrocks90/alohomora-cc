@@ -22,6 +22,7 @@ export interface OrderView {
   amountPaise: number;
   productSubtotalPaise: number;
   discountPaise: number;
+  deliveryPaise: number;
   promoCode: string;
   deliveryMethod: string;
   eventDate: string;
@@ -112,6 +113,7 @@ export function toOrderView(value: unknown): OrderView | null {
     amountPaise,
     productSubtotalPaise: typeof value.productSubtotalPaise === "number" ? value.productSubtotalPaise : amountPaise,
     discountPaise: number(value.discountPaise),
+    deliveryPaise: number(value.deliveryPaise),
     promoCode: text(value.promoCode),
     deliveryMethod: text(value.deliveryMethod),
     eventDate: text(value.eventDate),
@@ -188,14 +190,19 @@ export function renderInvoice(container: HTMLElement, order: OrderView, customer
   container.append(table);
 
   appendText(container, "p", `Product subtotal: ${formatMoney(order.productSubtotalPaise)}`, "invoice-total");
-  if (order.discountPaise > 0) {
-    appendText(container, "p", `${order.promoCode ? `Promo ${order.promoCode}` : "Discount"}: −${formatMoney(order.discountPaise)}`, "invoice-note");
+  if (order.discountPaise > 0 || order.deliveryPaise > 0) {
+    if (order.discountPaise > 0) {
+      appendText(container, "p", `${order.promoCode ? `Promo ${order.promoCode}` : "Discount"}: −${formatMoney(order.discountPaise)}`, "invoice-note");
+    }
+    if (order.deliveryPaise > 0) appendText(container, "p", `Delivery charge: +${formatMoney(order.deliveryPaise)}`, "invoice-note");
     appendText(container, "p", `${order.paymentMethod === "promo" ? "Total due" : order.paymentMethod === "manual" ? "Order total" : "Paid total"}: ${formatMoney(order.amountPaise)}`, "invoice-total");
   }
   appendText(
     container,
     "p",
-    "This is an order invoice/receipt, not a GST tax invoice. Delivery charges, if any, are not included in this product total.",
+    order.deliveryPaise > 0
+      ? "This is an order invoice/receipt, not a GST tax invoice."
+      : "This is an order invoice/receipt, not a GST tax invoice. Delivery charges, if any, are not included in this product total.",
     "invoice-note",
   );
 }

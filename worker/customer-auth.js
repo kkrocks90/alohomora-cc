@@ -395,7 +395,7 @@ export async function getCustomerOrders(request, env) {
         `SELECT order_id, payment_status, order_status, payment_method, items_json, amount_paise,
                 product_subtotal_paise, discount_paise, promo_code, currency,
                 delivery_method, created_at, customer_name, customer_phone,
-                delivery_address, city, state, pincode, event_date, custom_json
+                delivery_address, city, state, pincode, event_date, custom_json, delivery_paise
          FROM orders
          WHERE customer_email = ? COLLATE NOCASE
          ORDER BY created_at DESC
@@ -432,6 +432,7 @@ export async function getCustomerOrders(request, env) {
         amountPaise: order.amount_paise,
         productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
         discountPaise: order.discount_paise ?? 0,
+        deliveryPaise: order.delivery_paise ?? 0,
         promoCode: order.promo_code ?? "",
         currency: order.currency,
         deliveryMethod: order.delivery_method,

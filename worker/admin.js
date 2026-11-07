@@ -67,7 +67,7 @@ export async function getAdminData(request, env) {
                   customer_id, customer_name, customer_phone, customer_email,
                   delivery_address, city, state, pincode, items_json, custom_json, amount_paise, product_subtotal_paise,
                   discount_paise, promo_code, currency, delivery_method, event_date, created_at, payment_link_url,
-                  amount_received_paise
+                  amount_received_paise, delivery_paise
            FROM orders
            ORDER BY created_at DESC`,
         )
@@ -123,6 +123,7 @@ export async function getAdminData(request, env) {
         amountPaise: order.amount_paise,
         productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
         discountPaise: order.discount_paise ?? 0,
+        deliveryPaise: order.delivery_paise ?? 0,
         promoCode: order.promo_code ?? "",
         currency: order.currency,
         deliveryMethod: order.delivery_method,
@@ -629,7 +630,12 @@ async function parseManualOrderInput(body, env) {
     if (!Number.isSafeInteger(discountPaise) || discountPaise < 0 || discountPaise >= subtotalPaise) {
       return result(400, { error: "Enter a discount that is less than the product total." });
     }
-    const amountPaise = subtotalPaise - discountPaise;
+    const rawDelivery = body?.deliveryRupees;
+    const deliveryPaise = rawDelivery === undefined || rawDelivery === null || rawDelivery === "" ? 0 : Math.round(Number(rawDelivery) * 100);
+    if (!Number.isSafeInteger(deliveryPaise) || deliveryPaise < 0 || deliveryPaise > 10_000_000) {
+      return result(400, { error: "Enter a valid delivery charge." });
+    }
+    const amountPaise = subtotalPaise - discountPaise + deliveryPaise;
     const paymentState = body?.paymentStatus ?? "unpaid";
     let amountReceivedPaise = 0;
     if (paymentState === "paid") {
@@ -642,7 +648,7 @@ async function parseManualOrderInput(body, env) {
     } else if (paymentState !== "unpaid") {
       return result(400, { error: "Choose a valid payment status." });
     }
-    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, amountReceivedPaise };
+    return { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, deliveryPaise, amountReceivedPaise };
 }
 
 export async function createManualOrder(request, env) {
@@ -657,7 +663,7 @@ export async function createManualOrder(request, env) {
     if (access.error) return access.error;
     const parsed = await parseManualOrderInput(body, env);
     if (parsed.status) return parsed;
-    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, amountReceivedPaise } = parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, deliveryPaise, amountReceivedPaise } = parsed;
 
     const orderId = generateOrderId();
     const createdAt = new Date().toISOString();
@@ -668,8 +674,8 @@ export async function createManualOrder(request, env) {
           customer_id, customer_name, customer_phone, customer_email,
           delivery_address, city, state, pincode, items_json, amount_paise, product_subtotal_paise,
           discount_paise, promo_code, currency,
-          delivery_method, distance_km, policies_accepted, event_date, created_at, amount_received_paise
-        ) VALUES (?, NULL, ?, 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', 'INR', ?, 0, 'admin_manual_order', ?, ?, ?)`,
+          delivery_method, distance_km, policies_accepted, event_date, created_at, amount_received_paise, delivery_paise
+        ) VALUES (?, NULL, ?, 'manual', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', 'INR', ?, 0, 'admin_manual_order', ?, ?, ?, ?)`,
       )
       .bind(
         orderId,
@@ -690,6 +696,7 @@ export async function createManualOrder(request, env) {
         eventDate,
         createdAt,
         amountReceivedPaise,
+        deliveryPaise,
       )
       .run();
     await sendOrderEmails(env, {
@@ -706,6 +713,7 @@ export async function createManualOrder(request, env) {
       items,
       amountPaise,
       discountPaise,
+      deliveryPaise,
       amountReceivedPaise,
     });
     return result(201, {
@@ -740,7 +748,7 @@ export async function updateManualOrder(request, env) {
     }
     const parsed = await parseManualOrderInput(body, env);
     if (parsed.status) return parsed;
-    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, amountReceivedPaise } = parsed;
+    const { customer, deliveryAddress, city, state, pincode, deliveryMethod, eventDate, items, amountPaise, subtotalPaise, discountPaise, deliveryPaise, amountReceivedPaise } = parsed;
     const dueChanged = amountPaise - amountReceivedPaise !== existing.amount_paise - (existing.amount_received_paise ?? 0);
     const dropLink = dueChanged && existing.payment_link_id && existing.payment_status !== "paid";
     if (dropLink && env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET) {
@@ -758,7 +766,7 @@ export async function updateManualOrder(request, env) {
         `UPDATE orders SET
           customer_id = ?, customer_name = ?, customer_phone = ?, customer_email = ?,
           delivery_address = ?, city = ?, state = ?, pincode = ?, items_json = ?,
-          amount_paise = ?, product_subtotal_paise = ?, discount_paise = ?, delivery_method = ?, event_date = ?,
+          amount_paise = ?, product_subtotal_paise = ?, discount_paise = ?, delivery_paise = ?, delivery_method = ?, event_date = ?,
           payment_status = ?, amount_received_paise = ?,
           payment_link_id = CASE WHEN ? THEN NULL ELSE payment_link_id END,
           payment_link_url = CASE WHEN ? THEN NULL ELSE payment_link_url END
@@ -777,6 +785,7 @@ export async function updateManualOrder(request, env) {
         amountPaise,
         subtotalPaise,
         discountPaise,
+        deliveryPaise,
         deliveryMethod,
         eventDate,
         amountReceivedPaise >= amountPaise ? "paid" : "unpaid",

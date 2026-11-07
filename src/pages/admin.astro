@@ -607,6 +607,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </fieldset>
             <p class="admin-order-total" id="admin-order-total">Product total: ₹0</p>
             <label class="admin-order-discount">Discount (&#8377;, optional)<input name="discountRupees" id="admin-order-discount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" /></label>
+                        <label class="admin-order-discount">Delivery charge (&#8377;, optional)<input name="deliveryRupees" id="admin-order-delivery" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" /></label>
             <fieldset class="admin-order-payment apf-card">
               <legend>Payment</legend>
               <div class="admin-order-inline-fields">

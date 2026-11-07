@@ -143,9 +143,10 @@ if (root) {
       if (strong) total.classList.add("is-grand-total");
       items.append(total);
     };
-    if (order.discountPaise > 0) {
+    if (order.discountPaise > 0 || order.deliveryPaise > 0) {
       totals("Product subtotal", formatMoney(order.productSubtotalPaise));
-      totals(order.promoCode ? `Promo ${order.promoCode}` : "Discount", `−${formatMoney(order.discountPaise)}`);
+      if (order.discountPaise > 0) totals(order.promoCode ? `Promo ${order.promoCode}` : "Discount", `−${formatMoney(order.discountPaise)}`);
+      if (order.deliveryPaise > 0) totals("Delivery charge", `+${formatMoney(order.deliveryPaise)}`);
     }
     totals(order.paymentMethod === "promo" ? "Total due" : order.paymentStatus === "paid" ? "Paid" : "Total", formatMoney(order.amountPaise), true);
     container!.append(items);

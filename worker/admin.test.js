@@ -106,6 +106,7 @@ function makeDatabase(email) {
               payment_id: null,
               payment_status,
               amount_received_paise,
+              delivery_paise: this.values.at(-1),
               payment_method: "manual",
               order_status: "received",
               customer_id,
@@ -387,6 +388,18 @@ test("admin manual orders accept custom products saved separately from the catal
 
   assert.equal((await send([{ custom: true, name: "", unitPriceRupees: 10, quantity: 1 }])).status, 400);
   assert.equal((await send([{ custom: true, name: "Free thing", unitPriceRupees: 0, quantity: 1 }])).status, 400);
+
+  const withDelivery = await worker.fetch(makeRequest("/admin/orders/create", {
+    body: { customerId: "cus_1", deliveryMethod: "Porter (manual booking)", deliveryRupees: "75.50", items: [{ custom: true, name: "Special Plum Cake", unitPriceRupees: 500, quantity: 1 }] },
+  }), env);
+  assert.equal(withDelivery.status, 201);
+  const deliveryOrder = database.orders.get((await withDelivery.json()).orderId);
+  assert.equal(deliveryOrder.amount_paise, 57550);
+  assert.equal(deliveryOrder.delivery_paise, 7550);
+  const badDelivery = await worker.fetch(makeRequest("/admin/orders/create", {
+    body: { customerId: "cus_1", deliveryMethod: "Porter (manual booking)", deliveryRupees: "-5", items: [{ custom: true, name: "Special Plum Cake", unitPriceRupees: 500, quantity: 1 }] },
+  }), env);
+  assert.equal(badDelivery.status, 400);
 
   const dashboard = await (await worker.fetch(makeRequest("/admin/data"), env)).json();
   assert.deepEqual(dashboard.customProducts.map((p) => p.name), ["Special Plum Cake"]);

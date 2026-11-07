@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.55.0 - 2026-11-08
+
+- Manual orders have an optional delivery charge. It is added to the order total (and balance due), saved on the order (migration 0022), editable later, and shown on the invoice, the order page and the confirmation emails.
+
 ## 1.54.3 - 2026-11-07
 
 - Order and enquiry notifications now go to customer.support@chocolatecircle.in (the primary admin). The earlier Gmail addresses remain admins.

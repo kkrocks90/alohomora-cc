@@ -61,6 +61,7 @@ interface AdminOrder {
   amountPaise: number;
   productSubtotalPaise: number;
   discountPaise: number;
+  deliveryPaise: number;
   promoCode: string;
   currency: string;
   deliveryMethod: string;
@@ -333,6 +334,7 @@ if (root) {
   const receivedLabel = requireElement<HTMLElement>(root, "#admin-order-received-label");
   const receivedInput = requireElement<HTMLInputElement>(root, "#admin-order-received");
   const discountInput = requireElement<HTMLInputElement>(root, "#admin-order-discount");
+  const deliveryInput = requireElement<HTMLInputElement>(root, "#admin-order-delivery");
   const dueNote = requireElement<HTMLElement>(root, "#admin-order-due");
   const orderList = requireElement<HTMLElement>(root, "#admin-order-list");
   const orderSearch = requireElement<HTMLInputElement>(root, "#admin-order-search");
@@ -798,9 +800,10 @@ if (root) {
       total += price * Number(row.querySelector<HTMLInputElement>("[data-custom-quantity]")?.value);
     });
     const discount = Math.max(Number(discountInput.value) || 0, 0);
-    const payable = total - discount;
-    orderTotal.textContent = discount > 0
-      ? `Product total: ${currency.format(total)} − discount ${currency.format(discount)} = ${currency.format(Math.max(payable, 0))}`
+    const delivery = Math.max(Number(deliveryInput.value) || 0, 0);
+    const payable = total - discount + delivery;
+    orderTotal.textContent = discount > 0 || delivery > 0
+      ? `Product total: ${currency.format(total)}${discount > 0 ? ` − discount ${currency.format(discount)}` : ""}${delivery > 0 ? ` + delivery ${currency.format(delivery)}` : ""} = ${currency.format(Math.max(payable, 0))}`
       : `Product total: ${currency.format(total)}`;
     const partial = paymentSelect.value === "partial";
     receivedLabel.hidden = !partial;
@@ -869,6 +872,7 @@ if (root) {
     paymentSelect.value = "unpaid";
     receivedInput.value = "";
     discountInput.value = "";
+    deliveryInput.value = "";
     updateOrderTotal();
   }
 
@@ -908,6 +912,7 @@ if (root) {
     paymentSelect.value = order.paymentStatus === "paid" ? "paid" : receivedPaise > 0 ? "partial" : "unpaid";
     receivedInput.value = receivedPaise > 0 ? String(receivedPaise / 100) : "";
     discountInput.value = order.discountPaise > 0 ? String(order.discountPaise / 100) : "";
+    deliveryInput.value = order.deliveryPaise > 0 ? String(order.deliveryPaise / 100) : "";
     updateOrderTotal();
     const createTab = adminTabs.find((tab) => tab.dataset.adminTab === "create-order");
     if (createTab) activateAdminTab(createTab);
@@ -1540,6 +1545,7 @@ if (root) {
         paymentStatus: formData.get("paymentStatus"),
         amountReceivedRupees: formData.get("amountReceivedRupees"),
         discountRupees: formData.get("discountRupees"),
+        deliveryRupees: formData.get("deliveryRupees"),
         items,
       });
       resetOrderForm();
