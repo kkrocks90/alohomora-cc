@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.54.2 - 2026-11-07
+
+- customer.support@chocolatecircle.in is now the public contact address, the reply-to on order emails (new `SUPPORT_EMAIL` setting) and an admin account.
+
 ## 1.54.1 - 2026-11-07
 
 - Added admin.chocolatecircle@gmail.com as a second admin via the new `ADMIN_EMAILS` setting.

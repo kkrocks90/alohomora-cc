@@ -69,7 +69,7 @@ export async function sendOrderEmails(env, order) {
     ].join("\n");
     await send(env, {
       to: [order.customerEmail],
-      reply_to: env.ADMIN_EMAIL || undefined,
+      reply_to: env.SUPPORT_EMAIL || env.ADMIN_EMAIL || undefined,
       subject: `Your Chocolate Circle order ${order.orderId}`,
       text,
       html: `<p>Hi ${escapeHtml(order.customerName)},</p><p>Thank you for your order with Chocolate Circle! Your order number is <b>${escapeHtml(order.orderId)}</b>.</p>${listHtml}<p><b>Total ${escapeHtml(total)}</b> - ${escapeHtml(payment)}</p><p>We will be in touch on WhatsApp or phone if we need anything. Reply to this email or message us on WhatsApp at +91 95008 68468 for any questions.</p>`,
