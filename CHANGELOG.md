@@ -5,6 +5,16 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.60.2 - 2026-11-09
+
+### Fixed
+
+- Admin: removed leftover duplicate category and flavour forms so each page only shows its own add form.
+
+### Changed
+
+- Admin desktop and tablet: tabs are now a vertical sidebar so every section is visible.
+
 ## v1.60.1 - 2026-11-09
 
 ### Fixed

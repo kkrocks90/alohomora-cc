@@ -8872,3 +8872,64 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
 }
 .admin-header.admin-header .admin-header-menu { display: none; margin-right: 0; }
 @media (max-width: 620px) { .admin-header.admin-header .admin-header-menu:not([hidden]) { display: flex; } }
+
+/* Admin desktop/tablet: vertical sidebar so every section is visible */
+@media (min-width: 621px) {
+  .admin-dashboard {
+    display: grid;
+    grid-template-columns: 224px minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+    max-width: 1280px;
+  }
+
+  .admin-dashboard[hidden] {
+    display: none;
+  }
+
+  .admin-dashboard > .admin-dashboard-heading,
+  .admin-dashboard > .admin-status,
+  .admin-dashboard > .admin-stats {
+    grid-column: 1 / -1;
+  }
+
+  .admin-dashboard > .admin-tabs {
+    position: sticky;
+    z-index: 5;
+    top: 90px;
+    grid-column: 1;
+    grid-row: 4 / span 40;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 10px;
+    overflow: visible;
+    border: 1px solid #e8ded3;
+    border-radius: 18px;
+    background: #fffdf9;
+    box-shadow: 0 8px 26px rgb(65 44 31 / 6%);
+  }
+
+  .admin-dashboard > .admin-tab-panel {
+    grid-column: 2;
+    min-width: 0;
+  }
+
+  .admin-tabs .admin-tab {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .admin-tabs .admin-tab[aria-selected="true"] {
+    background: #5f4033;
+    color: #fff;
+    box-shadow: 0 4px 12px rgb(60 30 20 / 22%);
+  }
+}
