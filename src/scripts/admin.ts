@@ -385,8 +385,25 @@ if (root) {
     for (const panel of adminTabPanels) {
       panel.hidden = panel.dataset.adminPanel !== selectedTab;
     }
+    if (menuLabel) menuLabel.textContent = tab.textContent?.trim() ?? "";
+    setMenuOpen(false);
     if (moveFocus) tab.focus();
   }
+
+  const menuToggle = root.querySelector<HTMLButtonElement>("#admin-menu-toggle");
+  const menuLabel = root.querySelector<HTMLElement>("#admin-menu-label");
+  const menuBackdrop = root.querySelector<HTMLElement>("#admin-menu-backdrop");
+  const tabList = root.querySelector<HTMLElement>(".admin-tabs");
+  function setMenuOpen(open: boolean) {
+    tabList?.classList.toggle("is-open", open);
+    if (menuBackdrop) menuBackdrop.hidden = !open;
+    menuToggle?.setAttribute("aria-expanded", String(open));
+  }
+  menuToggle?.addEventListener("click", () => setMenuOpen(!tabList?.classList.contains("is-open")));
+  menuBackdrop?.addEventListener("click", () => setMenuOpen(false));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setMenuOpen(false);
+  });
 
   for (const tab of adminTabs) {
     tab.addEventListener("click", () => activateAdminTab(tab));

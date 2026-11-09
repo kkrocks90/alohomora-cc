@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.58.1
+
+- Arrow icons no longer turn into blue emoji boxes on iPhone (all pages).
+- Admin on mobile: tabs are now a slide-in side menu, View store and Refresh sit side by side, and Categories and Flavours rows are stacked and easier to tap.
+- Delivery calculator result is now short: location, distance, delivery type and cost.
+
 ## 1.58.0
 
 - Home page hero illustration is now themed for Birthday, Christmas, Independence Day, Monsoon, Pongal, Republic Day and Valentine's Day (colours, corner motifs and label), matching the Diwali one.

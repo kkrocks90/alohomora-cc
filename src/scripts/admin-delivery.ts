@@ -112,13 +112,17 @@ export function initDeliveryAdmin({ root, post, setStatus, reload }: Deps) {
         pincode: String(data.get("pincode") ?? "").trim(),
         weightGrams: Number(data.get("weightGrams")),
       });
-      const charge = response.charge as { rupees: number; detail: string };
+      const charge = response.charge as { rupees: number; kind: string };
       const place = response.place as { pincode: string; city: string; state: string } | null;
-      const where = place
-        ? `${place.city}, ${place.state} (${place.pincode}) is about ${response.distanceKm} km away by ${response.distanceSource === "road" ? "road (OpenRouteService)" : "straight line"}. `
-        : "";
+      const types: Record<string, string> = { porter: "Porter", courier: "Courier", pickup: "Pickup", disabled: "Delivery off" };
+      const parts = [
+        place ? `${place.city}, ${place.state}` : "",
+        place ? `${response.distanceKm} km` : "",
+        types[charge.kind] ?? charge.kind,
+        `₹${charge.rupees}`,
+      ].filter(Boolean);
       result.dataset.state = "on";
-      result.textContent = `${where}Charge: ₹${charge.rupees}. ${charge.detail}`;
+      result.textContent = parts.join(" · ");
     } catch (error) {
       result.dataset.state = "off";
       result.textContent = error instanceof Error ? error.message : "The charge could not be calculated.";
