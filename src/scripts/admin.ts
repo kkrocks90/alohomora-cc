@@ -1155,7 +1155,32 @@ if (root) {
         editButton.addEventListener("click", () => startOrderEdit(order));
         editButtons.push(editButton);
       }
-      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, shareButton, ...editButtons, ...payActions);
+      const reviewActions: HTMLElement[] = [];
+      const reviewUrl = String(import.meta.env.PUBLIC_GOOGLE_REVIEW_URL ?? "").trim();
+      if (order.orderStatus === "delivered" && reviewUrl) {
+        const reviewText = `Hi ${order.customerName}, thank you for ordering from Chocolate Circle! If you enjoyed your chocolates, we'd love a quick review: ${reviewUrl}`;
+        const reviewShare = document.createElement("a");
+        reviewShare.className = "button button-secondary";
+        reviewShare.target = "_blank";
+        reviewShare.rel = "noopener";
+        const reviewPhone = order.customerPhone.replace(/\D/g, "");
+        reviewShare.href = `https://wa.me/${reviewPhone.length === 10 ? `91${reviewPhone}` : reviewPhone}?text=${encodeURIComponent(reviewText)}`;
+        reviewShare.textContent = "Request review";
+        const reviewCopy = document.createElement("button");
+        reviewCopy.type = "button";
+        reviewCopy.className = "button button-secondary";
+        reviewCopy.textContent = "Copy review link";
+        reviewCopy.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(reviewUrl);
+            reviewCopy.textContent = "Copied";
+          } catch {
+            window.prompt("Review link", reviewUrl);
+          }
+        });
+        reviewActions.push(reviewShare, reviewCopy);
+      }
+      actions.append(statusLabel, updateButton, detailsLink, invoiceButton, shareButton, ...reviewActions, ...editButtons, ...payActions);
       card.append(heading, details, items, actions);
       orderList.append(card);
     }

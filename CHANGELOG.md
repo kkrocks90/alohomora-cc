@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.61.0 - 2026-11-09
+
+### Added
+
+- Delivered orders now have Request review (WhatsApp message with the Google review link) and Copy review link buttons.
+
 ## v1.60.5 - 2026-11-09
 
 ### Changed
