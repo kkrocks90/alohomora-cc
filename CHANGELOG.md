@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.59.1 - 2026-11-09
+
+### Changed
+
+- Mobile admin menu now slides in from the right and matches the storefront menu (heading, close button, serif links with arrow chips).
+
 ## 1.59.0
 
 - Public order tracking page (/track/): enter order number plus phone or email, no sign-in. Shows progress only, no address or contact details. Linked from header, footer and mobile menu.

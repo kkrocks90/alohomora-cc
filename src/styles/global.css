@@ -8406,36 +8406,86 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     position: fixed;
     z-index: 50;
     top: 0;
+    right: 0;
     bottom: 0;
-    left: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    width: min(78vw, 300px);
+    gap: 0;
+    width: min(86vw, 360px);
     margin: 0;
-    padding: 20px 12px;
+    padding: 31px 26px;
     overflow-y: auto;
     border: 0;
-    border-radius: 0 20px 20px 0;
-    background: #fff8f0;
-    box-shadow: 8px 0 30px rgb(30 15 10 / 30%);
-    transform: translateX(-105%);
-    transition: transform 0.22s ease;
+    border-radius: 28px 0 0 28px;
+    background: var(--paper);
+    box-shadow: -14px 0 46px rgb(47 31 22 / 14%);
+    transform: translateX(105%);
+    transition: transform 0.26s ease, visibility 0.26s;
+    visibility: hidden;
   }
 
   .admin-tabs.is-open {
     transform: translateX(0);
+    visibility: visible;
+  }
+
+  .admin-menu-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 19px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .admin-menu-heading .eyebrow {
+    margin: 0;
   }
 
   .admin-tabs .admin-tab {
-    width: 100%;
-    min-height: 48px;
-    padding: 0 16px;
-    border-radius: 12px;
-    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: auto;
+    min-height: 0;
+    margin: 0 -10px;
+    padding: 17px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 14px;
+    background: transparent;
+    box-shadow: none;
+    color: #563b30;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
     text-align: left;
   }
 
+  .admin-tabs .admin-tab::after {
+    display: grid;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 50%;
+    background: #f1e3d4;
+    color: #a47d67;
+    font-family: var(--sans);
+    font-size: 14px;
+    content: "\2197\FE0E";
+  }
+
+  .admin-tabs .admin-tab[aria-selected="true"] {
+    background: #f1e7dc;
+    color: #a25f4c;
+  }
+
+  .admin-tabs .admin-tab:active,
+  .admin-tabs .admin-tab:hover {
+    background: #f1e7dc;
+  }
   .admin-category-row {
     flex-direction: column;
     align-items: stretch;
@@ -8576,3 +8626,5 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     padding: 40px 14px 16px;
   }
 }
+
+@media (min-width: 621px) { .admin-menu-heading { display: none; } }

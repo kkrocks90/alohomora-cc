@@ -402,6 +402,7 @@ if (root) {
   }
   menuToggle?.addEventListener("click", () => setMenuOpen(!tabList?.classList.contains("is-open")));
   menuBackdrop?.addEventListener("click", () => setMenuOpen(false));
+  root.querySelector("#admin-menu-close")?.addEventListener("click", () => setMenuOpen(false));
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") setMenuOpen(false);
   });
