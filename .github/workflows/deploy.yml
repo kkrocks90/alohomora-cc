@@ -45,6 +45,11 @@ jobs:
         env:
           GITHUB_ACTIONS: "true"
           PUBLIC_CHECKOUT_API_URL: ${{ vars.PUBLIC_CHECKOUT_API_URL }}
+          PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+          PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}
+          PUBLIC_SEARCH_CONSOLE_VERIFICATION: ${{ vars.PUBLIC_SEARCH_CONSOLE_VERIFICATION }}
+          PUBLIC_GOOGLE_REVIEW_URL: ${{ vars.PUBLIC_GOOGLE_REVIEW_URL }}
+          PUBLIC_GOOGLE_MAPS_URL: ${{ vars.PUBLIC_GOOGLE_MAPS_URL }}
           PUBLIC_SITE_THEME: ${{ (inputs.theme != 'repo-setting' && inputs.theme) || vars.SITE_THEME }}
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

@@ -5,6 +5,14 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## 1.59.0
+
+- Public order tracking page (/track/): enter order number plus phone or email, no sign-in. Shows progress only, no address or contact details. Linked from header, footer and mobile menu.
+- Customer reviews: admin Reviews tab to add, edit, hide and delete testimonials; published ones show on the home page. New migration 0023.
+- Analytics and Search Console: optional, switched on by repo variables PUBLIC_GA_ID, PUBLIC_CF_ANALYTICS_TOKEN, PUBLIC_SEARCH_CONSOLE_VERIFICATION.
+- Google Business Profile: optional PUBLIC_GOOGLE_MAPS_URL and PUBLIC_GOOGLE_REVIEW_URL add a Find us on Google card, a review link and structured data.
+- Privacy policy updated for analytics and tracking.
+
 ## 1.58.1
 
 - Arrow icons no longer turn into blue emoji boxes on iPhone (all pages).

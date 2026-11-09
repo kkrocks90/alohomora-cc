@@ -30,6 +30,10 @@ const {
   jsonLd = [],
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const gaId = import.meta.env.PUBLIC_GA_ID?.trim() ?? "";
+const cfAnalyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN?.trim() ?? "";
+const searchConsoleToken = import.meta.env.PUBLIC_SEARCH_CONSOLE_VERIFICATION?.trim() ?? "";
+const googleReviewUrl = import.meta.env.PUBLIC_GOOGLE_REVIEW_URL?.trim() ?? "";
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const socialImageUrl = new URL(socialImage, Astro.site);
 ---
@@ -61,6 +65,10 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     <link rel="icon" type="image/png" href={`${base}favicon.png`} />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
     <title>{title}</title>
+    {searchConsoleToken && <meta name="google-site-verification" content={searchConsoleToken} />}
+    {gaId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>}
+    {gaId && <script is:inline define:vars={{ gaId }}>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date()); gtag("config", gaId, { anonymize_ip: true });</script>}
+    {cfAnalyticsToken && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfAnalyticsToken })}></script>}
     {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data).replaceAll("<", "\\u003c")} />)}
   </head>
   <body>
@@ -76,6 +84,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <a href={`${base}about/`}>About us</a>
         <a href={`${base}contact/`}>Contact us</a>
         <a href={`${base}corporate/`}>Corporate</a>
+        <a href={`${base}track/`}>Track order</a>
         <a href={`${base}#kindness`}>Good to know</a>
       </nav>
       <a class="shop-link" href={`${base}store/`}>Shop</a>
@@ -127,6 +136,7 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <a href={`${base}about/`}>About us <span aria-hidden="true">↗︎</span></a>
         <a href={`${base}contact/`}>Contact us <span aria-hidden="true">↗︎</span></a>
         <a href={`${base}corporate/`}>Corporate orders <span aria-hidden="true">↗︎</span></a>
+        <a href={`${base}track/`}>Track your order <span aria-hidden="true">↗︎</span></a>
         <a href={`${base}#kindness`}>Good to know <span aria-hidden="true">↗︎</span></a>
         <a href={`${base}wishlist/`}>Wishlist <span aria-hidden="true">&#8599;&#xFE0E;</span></a>
         <a href={`${base}account/`}><span data-account-label>Login</span> <span aria-hidden="true">↗︎</span></a>
@@ -192,6 +202,8 @@ const socialImageUrl = new URL(socialImage, Astro.site);
         <a href={`${base}about/`}>About us</a>
         <a href={`${base}contact/`}>Contact us</a>
         <a href={`${base}corporate/`}>Corporate orders</a>
+        <a href={`${base}track/`}>Track your order</a>
+        {googleReviewUrl && <a href={googleReviewUrl} target="_blank" rel="noopener noreferrer">Review us on Google</a>}
         <a href={`${base}terms-and-conditions/`}>Terms &amp; Conditions</a>
         <a href={`${base}privacy-policy/`}>Privacy Policy</a>
         <a href={`${base}shipping-policy/`}>Shipping Policy</a>

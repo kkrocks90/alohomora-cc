@@ -10,6 +10,7 @@ import { theme } from "../config/theme";
 import { resolveImage } from "../lib/product-images";
 
 const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const googleReviewUrl = import.meta.env.PUBLIC_GOOGLE_REVIEW_URL?.trim() ?? "";
 const highlightedProducts = products.filter((product) => product.featured);
 const categoryCards = [...new Set(products.map((product) => product.tag))]
   .filter((tag) => !(hiddenCategories as string[]).includes(tag))
@@ -216,6 +217,15 @@ const orgLd = {
       </div>
     </section>
 
+    <section class="reviews-section" id="reviews" aria-labelledby="reviews-title" hidden>
+      <p class="eyebrow">Kind words</p>
+      <h2 id="reviews-title">What our customers <em>say.</em></h2>
+      <div class="reviews-grid" id="reviews-grid"></div>
+      {googleReviewUrl && (
+        <p class="reviews-cta"><a class="text-link" href={googleReviewUrl} target="_blank" rel="noopener noreferrer">Leave us a Google review</a></p>
+      )}
+    </section>
+
     <section class="closing-banner">
       <p class="eyebrow">Go on, you deserve it</p>
       <h2>Let’s make today<br /><em>a little sweeter.</em></h2>
@@ -227,5 +237,6 @@ const orgLd = {
   <script>
     import "../scripts/flat-discount-banner";
     import "../scripts/flat-discount-prices";
+    import "../scripts/reviews";
   </script>
 </SiteLayout>

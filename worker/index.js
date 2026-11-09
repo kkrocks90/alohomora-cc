@@ -21,6 +21,8 @@ import {
 } from "./flat-discount.js";
 import { handleAdminDeliverySettings } from "./delivery-charges.js";
 import { handleAdminCategory } from "./admin-categories.js";
+import { trackOrder } from "./tracking.js";
+import { handleAdminReviews, listReviews } from "./reviews.js";
 import { handleAdminFlavour } from "./admin-flavours.js";
 import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
 import {
@@ -819,6 +821,17 @@ export default {
         return errorResponse("The extra order fields are temporarily unavailable.", 503, configuredOrigin);
       }
     }
+    if (request.method === "GET" && path === "/reviews") {
+      if (!env.ORDERS_DB) return jsonResponse({ reviews: [] }, 200, configuredOrigin);
+      try {
+        const response = jsonResponse({ reviews: await listReviews(env.ORDERS_DB) }, 200, configuredOrigin);
+        response.headers.set("Cache-Control", "public, max-age=120, s-maxage=120");
+        return response;
+      } catch (error) {
+        console.error("Could not load reviews.", error);
+        return jsonResponse({ reviews: [] }, 200, configuredOrigin);
+      }
+    }
     const pincodeMatch = path.match(/^\/pincode\/(\d{6})$/);
     if (request.method === "GET" && pincodeMatch) {
       try {
@@ -833,6 +846,14 @@ export default {
     }
     if (request.method !== "POST") return errorResponse("Method not allowed.", 405, configuredOrigin);
 
+    if (path === "/orders/track") {
+      const result = await trackOrder(request, env);
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (/^\/admin\/reviews\/(list|create|update|delete)$/.test(path)) {
+      const result = await handleAdminReviews(request, env, path.split("/").pop());
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
     if (path === "/orders") return handleCreateOrder(request, env, configuredOrigin);
     if (path === "/verify") return handleVerifyPayment(request, env, configuredOrigin);
     if (path === "/promos/quote") return handlePromoQuote(request, env, configuredOrigin);

@@ -1,0 +1,65 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
+const base = import.meta.env.BASE_URL;
+---
+
+<SiteLayout
+  title="Track your order — Chocolate Circle"
+  description="Check the progress of your Chocolate Circle order with your order number and phone number or email."
+  noIndex
+>
+  <main class="account-page track-page" id="track-page" data-checkout-api={checkoutApiUrl}>
+    <section class="account-panel" aria-labelledby="track-title">
+      <p class="eyebrow">Where is my chocolate?</p>
+      <h1 id="track-title">Track your order</h1>
+      <p class="account-intro">
+        Enter your order number and the phone number or email you used when ordering. No sign-in needed.
+      </p>
+      <form class="account-form" id="track-form">
+        <label for="track-order">Order number</label>
+        <input id="track-order" name="orderId" placeholder="CC-240101-AB12C" maxlength="20" autocomplete="off" autocapitalize="characters" required />
+        <label for="track-contact">Phone number or email</label>
+        <input id="track-contact" name="contact" maxlength="120" autocomplete="off" required />
+        <button class="button button-primary" type="submit">Track order <span aria-hidden="true">↗︎</span></button>
+      </form>
+      <p class="account-status" id="track-status" role="status" aria-live="polite"></p>
+      <div class="track-result" id="track-result" hidden></div>
+      <p class="account-intro">
+        Have an account? <a href={`${base}account/`}>View all your orders</a>. Need help? <a href={`${base}contact/`}>Contact us</a>.
+      </p>
+    </section>
+  </main>
+  <script>
+    import "../scripts/track";
+  </script>
+</SiteLayout>
+
+<style>
+  .track-result {
+    display: grid;
+    gap: 14px;
+    margin: 18px 0;
+    padding: 18px;
+    border: 1px solid var(--line, #e3d6c8);
+    border-radius: 16px;
+    background: #fffaf4;
+  }
+
+  .track-result h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .track-result ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .track-meta {
+    margin: 0;
+    color: #6f5a4a;
+    font-size: 14px;
+  }
+</style>

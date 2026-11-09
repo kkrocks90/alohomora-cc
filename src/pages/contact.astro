@@ -4,6 +4,8 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 const base = import.meta.env.BASE_URL;
 const whatsappUrl =
   "https://wa.me/919500868468?text=Hi%20Chocolate%20Circle%2C%20I%27d%20like%20to%20ask%20about%20your%20chocolates.";
+const googleMapsUrl = import.meta.env.PUBLIC_GOOGLE_MAPS_URL?.trim() ?? "";
+const googleReviewUrl = import.meta.env.PUBLIC_GOOGLE_REVIEW_URL?.trim() ?? "";
 const contactLd = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
@@ -16,7 +18,8 @@ const contactLd = {
     email: "customer.support@chocolatecircle.in",
     telephone: "+919500868468",
     address: { "@type": "PostalAddress", addressLocality: "Chennai", addressRegion: "Tamil Nadu", postalCode: "600073", addressCountry: "IN" },
-    sameAs: ["https://www.instagram.com/achocolatecircle/"],
+    sameAs: ["https://www.instagram.com/achocolatecircle/", googleMapsUrl].filter(Boolean),
+    ...(googleMapsUrl ? { hasMap: googleMapsUrl } : {}),
   },
 };
 ---
@@ -83,6 +86,9 @@ const contactLd = {
         <a href={`${base}privacy-policy/`}>Privacy Policy</a> ·
         <a href={`${base}about/`}>About us</a>
       </p>
+      {googleReviewUrl && (
+        <p>Happy with your order? <a href={googleReviewUrl} target="_blank" rel="noopener noreferrer">Leave us a Google review</a>. It helps a small shop a lot.</p>
+      )}
       <p>
         <a class="button button-primary" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
           Chat on WhatsApp <span aria-hidden="true">↗</span>

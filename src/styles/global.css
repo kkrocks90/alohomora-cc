@@ -8500,3 +8500,79 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     min-height: 48px;
   }
 }
+/* Customer reviews */
+.reviews-section {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 20px 24px;
+  text-align: center;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+  text-align: left;
+}
+
+.review-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--line, #e3d6c8);
+  border-radius: 16px;
+  background: #fffaf4;
+}
+
+.review-stars {
+  color: #c98a1b;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.review-card blockquote {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.review-card figcaption {
+  color: #6f5a4a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reviews-cta {
+  margin-top: 20px;
+}
+
+.admin-review-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.admin-review-form .admin-review-wide,
+.admin-review-form button {
+  grid-column: 1 / -1;
+}
+
+.admin-review-form textarea,
+.admin-review-form select {
+  width: 100%;
+  font: inherit;
+}
+
+@media (max-width: 620px) {
+  .admin-review-form {
+    grid-template-columns: 1fr;
+  }
+
+  .reviews-section {
+    padding: 40px 14px 16px;
+  }
+}

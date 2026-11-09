@@ -152,6 +152,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="delivery"
         >Delivery charges</button>
+        <button
+          class="admin-tab"
+          id="admin-reviews-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-reviews-panel"
+          tabindex="-1"
+          data-admin-tab="reviews"
+        >Reviews</button>
       </div>
 
       <section
@@ -470,6 +480,45 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <button class="button button-primary" type="submit">Calculate charge</button>
           </form>
           <p class="admin-flat-summary" id="admin-delivery-result" role="status" aria-live="polite"></p>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-reviews-panel"
+        role="tabpanel"
+        aria-labelledby="admin-reviews-tab"
+        data-admin-panel="reviews"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel" aria-labelledby="admin-reviews-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Social proof</p>
+              <h2 id="admin-reviews-title">Customer reviews</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Add kind words from customers (WhatsApp, Instagram or Google). Published reviews show on the home page, newest first. Only add reviews customers have given you.</p>
+          <form class="admin-category-form admin-review-form" id="admin-review-form">
+            <label>Customer name<input name="name" maxlength="60" required placeholder="Asha" /></label>
+            <label>Location (optional)<input name="location" maxlength="60" placeholder="Chennai" /></label>
+            <label>Rating
+              <select name="rating">
+                <option value="5">5 stars</option>
+                <option value="4">4 stars</option>
+                <option value="3">3 stars</option>
+                <option value="2">2 stars</option>
+                <option value="1">1 star</option>
+              </select>
+            </label>
+            <label>Product (optional)<input name="productName" maxlength="80" placeholder="Choco squares" /></label>
+            <label class="admin-review-wide">Review<textarea name="reviewText" rows="3" maxlength="600" required></textarea></label>
+            <label class="remember-me-option"><input name="published" type="checkbox" checked /> <span>Show on home page</span></label>
+            <button class="button button-primary" id="admin-review-submit" type="submit">Add review</button>
+            <button class="button button-secondary" id="admin-review-cancel" type="button" hidden>Cancel edit</button>
+          </form>
+          <div class="admin-category-list" id="admin-review-list"></div>
         </section>
       </section>
 
