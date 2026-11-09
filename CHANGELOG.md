@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.60.4 - 2026-11-09
+
+### Changed
+
+- Admin desktop layout is much wider on large screens.
+
 ## v1.60.3 - 2026-11-09
 
 ### Changed
