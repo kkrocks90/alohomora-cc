@@ -386,13 +386,11 @@ if (root) {
     for (const panel of adminTabPanels) {
       panel.hidden = panel.dataset.adminPanel !== selectedTab;
     }
-    if (menuLabel) menuLabel.textContent = tab.textContent?.trim() ?? "";
     setMenuOpen(false);
     if (moveFocus) tab.focus();
   }
 
-  const menuToggle = root.querySelector<HTMLButtonElement>("#admin-menu-toggle");
-  const menuLabel = root.querySelector<HTMLElement>("#admin-menu-label");
+  const menuToggle = document.querySelector<HTMLButtonElement>("#admin-menu-toggle");
   const menuBackdrop = root.querySelector<HTMLElement>("#admin-menu-backdrop");
   const tabList = root.querySelector<HTMLElement>(".admin-tabs");
   function setMenuOpen(open: boolean) {
@@ -491,6 +489,7 @@ if (root) {
   function showSignedOut(message = "") {
     adminData = null;
     dashboard.hidden = true;
+    document.querySelector<HTMLElement>("#admin-menu-toggle")?.setAttribute("hidden", "");
     loginPanel.hidden = false;
     codeForm.hidden = true;
     emailForm.hidden = false;
@@ -1264,6 +1263,7 @@ if (root) {
     adminData = normalizeAdminData(result);
     loginPanel.hidden = true;
     dashboard.hidden = false;
+    document.querySelector<HTMLElement>("#admin-menu-toggle")?.removeAttribute("hidden");
     signedIn.textContent = `Signed in as ${adminData.email}`;
     renderCustomers();
     renderPromos();

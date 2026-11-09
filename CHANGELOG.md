@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.60.1 - 2026-11-09
+
+### Fixed
+
+- Admin mobile menu: the burger button now sits in the header like the storefront, and the drawer is no longer hidden behind the header.
+
 ## v1.60.0 - 2026-11-09
 
 ### Changed

@@ -65,11 +65,6 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
       <p class="admin-status" id="admin-status" role="status" aria-live="polite"></p>
       <div class="admin-stats" id="admin-stats" aria-label="Order summary"></div>
 
-      <button class="admin-menu-toggle" id="admin-menu-toggle" type="button" aria-expanded="false" aria-controls="admin-tabs">
-        <span class="admin-menu-icon" aria-hidden="true"></span>
-        <span id="admin-menu-label">Order book</span>
-        <span class="admin-menu-hint">Menu</span>
-      </button>
       <div class="admin-menu-backdrop" id="admin-menu-backdrop" hidden></div>
       <div class="admin-tabs" id="admin-tabs" role="tablist" aria-label="Order management sections">
         <div class="admin-menu-heading">

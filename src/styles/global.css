@@ -8863,3 +8863,12 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     min-height: 48px;
   }
 }
+/* Admin header burger; main fade animation must not trap the fixed drawer */
+.admin-page { animation: none; }
+
+@media (max-width: 620px) {
+  .admin-header-label { display: none; }
+  .admin-header-menu:not([hidden]) { display: flex; }
+}
+.admin-header.admin-header .admin-header-menu { display: none; margin-right: 0; }
+@media (max-width: 620px) { .admin-header.admin-header .admin-header-menu:not([hidden]) { display: flex; } }
