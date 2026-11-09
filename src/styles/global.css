@@ -8964,3 +8964,124 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
   .admin-dashboard { width: 100%; max-width: 1760px; grid-template-columns: 240px minmax(0, 1fr); }
   .admin-header { padding-left: clamp(24px, 3vw, 56px); padding-right: clamp(24px, 3vw, 56px); }
 }
+/* Reviews admin */
+.rv-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin: 16px 0 24px;
+  padding: 18px;
+  border: 1px dashed #dcc9b6;
+  border-radius: 16px;
+  background: #fffaf3;
+}
+
+.rv-wide {
+  grid-column: 1 / -1;
+}
+
+.rv-text {
+  min-height: 110px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.rv-form select.cat-input {
+  appearance: auto;
+}
+
+.rv-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #4b3026;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rv-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rv-switch-track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: #d9cdc1;
+  transition: background 0.18s;
+}
+
+.rv-switch-track::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+  content: "";
+  transition: transform 0.18s;
+}
+
+.rv-switch input:checked + .rv-switch-track {
+  background: #5f4033;
+}
+
+.rv-switch input:checked + .rv-switch-track::after {
+  transform: translateX(18px);
+}
+
+.rv-switch input:focus-visible + .rv-switch-track {
+  outline: 2px solid #a25f4c;
+  outline-offset: 2px;
+}
+
+.rv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rv-actions .button {
+  min-width: 160px;
+}
+
+.rv-actions .button[hidden] {
+  display: none;
+}
+
+.rv-stars {
+  color: #d29a3a;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.rv-quote {
+  margin: 0;
+  color: #5a463a;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.rv-card .cat-info strong {
+  font-size: 18px;
+}
+
+@media (max-width: 620px) {
+  .rv-form {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+  }
+
+  .rv-actions .button {
+    flex: 1 1 100%;
+    min-height: 48px;
+  }
+}

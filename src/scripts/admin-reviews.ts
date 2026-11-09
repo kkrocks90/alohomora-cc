@@ -58,28 +58,48 @@ export function initReviewsAdmin({ root, post, setStatus }: Deps) {
     list!.replaceChildren();
     if (reviews.length === 0) {
       const empty = document.createElement("p");
-      empty.className = "admin-form-hint";
+      empty.className = "cat-empty";
       empty.textContent = "No reviews yet. Add one above and it appears on the home page.";
       list!.append(empty);
       return;
     }
     for (const review of reviews) {
       const row = document.createElement("article");
-      row.className = "admin-category-row";
+      row.className = "cat-card rv-card";
       if (!review.published) row.classList.add("is-hidden");
       const info = document.createElement("div");
-      info.className = "admin-category-info";
+      info.className = "cat-info";
+      const stars = document.createElement("span");
+      stars.className = "rv-stars";
+      stars.textContent = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+      stars.setAttribute("aria-label", `${review.rating} out of 5 stars`);
       const title = document.createElement("strong");
-      title.textContent = `${"★".repeat(review.rating)} ${review.name}${review.location ? `, ${review.location}` : ""}`;
-      const text = document.createElement("span");
-      text.textContent = `${review.text}${review.published ? "" : " · Hidden"}`;
-      info.append(title, text);
+      title.textContent = review.name;
+      const text = document.createElement("p");
+      text.className = "rv-quote";
+      text.textContent = review.text;
+      const badges = document.createElement("div");
+      badges.className = "cat-badges";
+      for (const label of [review.location, review.productName]) {
+        if (!label) continue;
+        const badge = document.createElement("span");
+        badge.className = "cat-badge";
+        badge.textContent = label;
+        badges.append(badge);
+      }
+      if (!review.published) {
+        const hidden = document.createElement("span");
+        hidden.className = "cat-badge cat-badge-muted";
+        hidden.textContent = "Hidden";
+        badges.append(hidden);
+      }
+      info.append(stars, title, text, badges);
       const actions = document.createElement("div");
-      actions.className = "admin-category-actions";
-      const make = (label: string, onClick: () => void) => {
+      actions.className = "cat-actions";
+      const make = (label: string, onClick: () => void, extra = "") => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "button button-secondary admin-category-action";
+        button.className = `cat-btn ${extra}`.trim();
         button.textContent = label;
         button.addEventListener("click", onClick);
         return button;
@@ -100,7 +120,7 @@ export function initReviewsAdmin({ root, post, setStatus }: Deps) {
         make(review.published ? "Hide" : "Show", () => void run("update", { ...review, reviewText: review.text, published: !review.published })),
         make("Delete", () => {
           if (window.confirm(`Delete the review from ${review.name}?`)) void run("delete", { id: review.id });
-        }),
+        }, "cat-btn-danger"),
       );
       row.append(info, actions);
       list!.append(row);

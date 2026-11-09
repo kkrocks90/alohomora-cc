@@ -509,25 +509,27 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             </div>
           </div>
           <p class="admin-form-hint">Add kind words from customers (WhatsApp, Instagram or Google). Published reviews show on the home page, newest first. Only add reviews customers have given you.</p>
-          <form class="admin-category-form admin-review-form" id="admin-review-form">
-            <label>Customer name<input name="name" maxlength="60" required placeholder="Asha" /></label>
-            <label>Location (optional)<input name="location" maxlength="60" placeholder="Chennai" /></label>
-            <label>Rating
-              <select name="rating">
-                <option value="5">5 stars</option>
-                <option value="4">4 stars</option>
-                <option value="3">3 stars</option>
-                <option value="2">2 stars</option>
-                <option value="1">1 star</option>
+          <form class="rv-form" id="admin-review-form">
+            <label class="cat-add-field">Customer name<input class="cat-input" name="name" maxlength="60" required placeholder="Asha" /></label>
+            <label class="cat-add-field">Location (optional)<input class="cat-input" name="location" maxlength="60" placeholder="Chennai" /></label>
+            <label class="cat-add-field">Rating
+              <select class="cat-input" name="rating">
+                <option value="5">★★★★★  5 stars</option>
+                <option value="4">★★★★☆  4 stars</option>
+                <option value="3">★★★☆☆  3 stars</option>
+                <option value="2">★★☆☆☆  2 stars</option>
+                <option value="1">★☆☆☆☆  1 star</option>
               </select>
             </label>
-            <label>Product (optional)<input name="productName" maxlength="80" placeholder="Choco squares" /></label>
-            <label class="admin-review-wide">Review<textarea name="reviewText" rows="3" maxlength="600" required></textarea></label>
-            <label class="remember-me-option"><input name="published" type="checkbox" checked /> <span>Show on home page</span></label>
-            <button class="button button-primary" id="admin-review-submit" type="submit">Add review</button>
-            <button class="button button-secondary" id="admin-review-cancel" type="button" hidden>Cancel edit</button>
+            <label class="cat-add-field">Product (optional)<input class="cat-input" name="productName" maxlength="80" placeholder="Choco squares" /></label>
+            <label class="cat-add-field rv-wide">Review<textarea class="cat-input rv-text" name="reviewText" rows="4" maxlength="600" required placeholder="What did the customer say?"></textarea></label>
+            <label class="rv-switch rv-wide"><input name="published" type="checkbox" checked /><span class="rv-switch-track" aria-hidden="true"></span><span>Show on home page</span></label>
+            <div class="rv-actions rv-wide">
+              <button class="button button-primary" id="admin-review-submit" type="submit">Add review</button>
+              <button class="button button-secondary" id="admin-review-cancel" type="button" hidden>Cancel edit</button>
+            </div>
           </form>
-          <div class="admin-category-list" id="admin-review-list"></div>
+          <div class="cat-list" id="admin-review-list"></div>
         </section>
       </section>
 
