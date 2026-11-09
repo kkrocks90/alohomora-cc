@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.60.3 - 2026-11-09
+
+### Changed
+
+- Storefront and admin mobile side menus: smaller, more compact items.
+- Removed Featured and Good to know from the storefront side menu.
+
 ## v1.60.2 - 2026-11-09
 
 ### Fixed

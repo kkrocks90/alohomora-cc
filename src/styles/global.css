@@ -8933,3 +8933,28 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     box-shadow: 0 4px 12px rgb(60 30 20 / 22%);
   }
 }
+/* Compact side menus (storefront and admin) */
+.mobile-menu .mobile-menu-links a,
+.mobile-menu-links a {
+  padding: 12px 10px;
+  font-size: 17px;
+}
+
+.mobile-menu-links a span:last-child {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+}
+
+@media (max-width: 620px) {
+  .admin-tabs .admin-tab {
+    padding: 12px 10px;
+    font-size: 17px;
+  }
+
+  .admin-tabs .admin-tab::after {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
