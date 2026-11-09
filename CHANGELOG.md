@@ -5,6 +5,13 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.60.0 - 2026-11-09
+
+### Changed
+
+- Admin: Product categories and Flavours are now separate menu items.
+- Redesigned both pages as mobile-friendly cards with count badges, full-width inputs, equal-width action buttons and a sticky Save bar for flavours.
+
 ## v1.59.1 - 2026-11-09
 
 ### Changed

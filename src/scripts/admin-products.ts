@@ -98,7 +98,7 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
     if (options.length === 0) {
       const empty = document.createElement("p");
       empty.className = "admin-form-hint";
-      empty.textContent = "No flavours yet. Add them in the Flavours section below.";
+      empty.textContent = "No flavours yet. Add them in the Flavours menu.";
       flavourList.append(empty);
       return;
     }

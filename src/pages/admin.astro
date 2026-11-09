@@ -138,14 +138,24 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         >Products</button>
         <button
           class="admin-tab"
-          id="admin-catalogue-tab"
+          id="admin-categories-tab"
           type="button"
           role="tab"
           aria-selected="false"
-          aria-controls="admin-catalogue-panel"
+          aria-controls="admin-categories-panel"
           tabindex="-1"
-          data-admin-tab="catalogue"
-        >Categories &amp; flavours</button>
+          data-admin-tab="categories"
+        >Product categories</button>
+        <button
+          class="admin-tab"
+          id="admin-flavours-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-flavours-panel"
+          tabindex="-1"
+          data-admin-tab="flavours"
+        >Flavours</button>
         <button
           class="admin-tab"
           id="admin-delivery-tab"
@@ -528,14 +538,58 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 
       <section
         class="admin-tab-panel"
-        id="admin-catalogue-panel"
+        id="admin-categories-panel"
         role="tabpanel"
-        aria-labelledby="admin-catalogue-tab"
-        data-admin-panel="catalogue"
+        aria-labelledby="admin-categories-tab"
+        data-admin-panel="categories"
         tabindex="0"
         hidden
       >
-        <section class="admin-panel" aria-labelledby="admin-category-title">
+        <section class="admin-panel cat-panel" aria-labelledby="admin-category-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Catalogue</p>
+              <h2 id="admin-category-title">Product categories</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Hidden categories disappear from the shop filters and home page, but their products stay in the shop. A category can only be deleted when no product uses it.</p>
+          <form class="cat-add" id="admin-category-form">
+            <label class="cat-add-field">New category<input class="cat-input" name="name" maxlength="60" required placeholder="Festive specials" /></label>
+            <button class="button button-primary" type="submit">Add category</button>
+          </form>
+          <div class="cat-list" id="admin-category-list"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-flavours-panel"
+        role="tabpanel"
+        aria-labelledby="admin-flavours-tab"
+        data-admin-panel="flavours"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel cat-panel" aria-labelledby="admin-flavour-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Catalogue</p>
+              <h2 id="admin-flavour-title">Flavours</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">One list for every product. The extra percentage (can be 0) is added to the price of any product ordered in that flavour. A flavour can only be deleted when no product uses it.</p>
+          <form class="cat-add flv-add" id="admin-flavour-form">
+            <label class="cat-add-field">New flavour<input class="cat-input" name="name" maxlength="60" required placeholder="Hazelnut" /></label>
+            <label class="cat-add-field flv-add-extra">Extra price %<input class="cat-input" name="extraPercent" type="number" inputmode="numeric" min="0" max="500" step="1" value="0" required /></label>
+            <button class="button button-primary" type="submit">Add flavour</button>
+          </form>
+          <div class="cat-list" id="admin-flavour-list"></div>
+          <div class="flv-savebar">
+            <button class="button button-primary" type="button" id="admin-flavour-save-all">Save all changes</button>
+          </div>
+        </section>
+      </section>
+      <section class="admin-panel" aria-labelledby="admin-category-title">
           <div class="admin-panel-heading">
             <div>
               <p class="eyebrow">Catalogue</p>

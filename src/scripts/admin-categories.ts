@@ -41,10 +41,10 @@ export function initCategoriesAdmin({ root, post, setStatus, reload }: Deps) {
     }
   }
 
-  function button(label: string, onClick: () => void, className = "button button-secondary") {
+  function button(label: string, onClick: () => void, className = "") {
     const element = document.createElement("button");
     element.type = "button";
-    element.className = `${className} admin-category-action`;
+    element.className = `cat-btn ${className}`;
     element.textContent = label;
     element.addEventListener("click", onClick);
     return element;
@@ -52,13 +52,14 @@ export function initCategoriesAdmin({ root, post, setStatus, reload }: Deps) {
 
   function renderRow(category: CatalogueCategory) {
     const row = document.createElement("article");
-    row.className = "admin-category-row";
+    row.className = "cat-card";
     if (category.hidden) row.classList.add("is-hidden");
     const actions = document.createElement("div");
-    actions.className = "admin-category-actions";
+    actions.className = "cat-actions";
 
     if (renaming === category.name) {
       const input = document.createElement("input");
+      input.className = "cat-input";
       input.value = category.name;
       input.maxLength = 60;
       input.setAttribute("aria-label", `New name for ${category.name}`);
@@ -73,7 +74,7 @@ export function initCategoriesAdmin({ root, post, setStatus, reload }: Deps) {
         }
       });
       actions.append(
-        button("Save", commit, "button button-primary"),
+        button("Save", commit, "cat-btn-primary"),
         button("Cancel", () => {
           renaming = null;
           render(categories);
@@ -85,25 +86,39 @@ export function initCategoriesAdmin({ root, post, setStatus, reload }: Deps) {
     }
 
     const info = document.createElement("div");
-    info.className = "admin-category-info";
+    info.className = "cat-info";
     const title = document.createElement("strong");
     title.textContent = category.name;
-    const meta = document.createElement("span");
-    meta.textContent = `${category.productCount} product${category.productCount === 1 ? "" : "s"}${category.hidden ? " · Hidden from shop" : ""}`;
-    info.append(title, meta);
+    const badges = document.createElement("div");
+    badges.className = "cat-badges";
+    const count = document.createElement("span");
+    count.className = "cat-badge";
+    count.textContent = `${category.productCount} product${category.productCount === 1 ? "" : "s"}`;
+    badges.append(count);
+    if (category.hidden) {
+      const hidden = document.createElement("span");
+      hidden.className = "cat-badge cat-badge-muted";
+      hidden.textContent = "Hidden";
+      badges.append(hidden);
+    }
+    info.append(title, badges);
     actions.append(
       button("Rename", () => {
         renaming = category.name;
         render(categories);
       }),
-      button(category.hidden ? "Show" : "Hide", () =>
+      button(category.hidden ? "Show in shop" : "Hide from shop", () =>
         void save("/admin/categories/update", { name: category.name, hidden: !category.hidden }, category.hidden ? "Category shown." : "Category hidden."),
       ),
-      button("Delete", () => {
-        if (window.confirm(`Delete the category "${category.name}"?`)) {
-          void save("/admin/categories/delete", { name: category.name }, "Category deleted.");
-        }
-      }),
+      button(
+        "Delete",
+        () => {
+          if (window.confirm(`Delete the category "${category.name}"?`)) {
+            void save("/admin/categories/delete", { name: category.name }, "Category deleted.");
+          }
+        },
+        "cat-btn-danger",
+      ),
     );
     row.append(info, actions);
     return row;
@@ -114,7 +129,7 @@ export function initCategoriesAdmin({ root, post, setStatus, reload }: Deps) {
     list.replaceChildren(...next.map(renderRow));
     if (next.length === 0) {
       const empty = document.createElement("p");
-      empty.className = "admin-form-hint";
+      empty.className = "cat-empty";
       empty.textContent = "No categories yet.";
       list.append(empty);
     }

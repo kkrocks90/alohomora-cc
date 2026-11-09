@@ -42,36 +42,38 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
 
   function renderRow(flavour: CatalogueFlavour) {
     const row = document.createElement("article");
-    row.className = "admin-category-row admin-flavour-row";
+    row.className = "cat-card flv-card";
 
     const nameField = document.createElement("input");
+    nameField.className = "cat-input";
     nameField.value = flavour.name;
     nameField.maxLength = 60;
     nameField.setAttribute("aria-label", `Name of ${flavour.name}`);
 
     const extraWrap = document.createElement("label");
-    extraWrap.className = "admin-flavour-extra";
+    extraWrap.className = "flv-extra";
     const extraText = document.createElement("span");
-    extraText.textContent = "Extra %";
+    extraText.textContent = "Extra price %";
     const extraField = document.createElement("input");
     extraField.type = "number";
     extraField.min = "0";
     extraField.max = "500";
     extraField.step = "1";
     extraField.inputMode = "numeric";
+    extraField.className = "cat-input";
     extraField.value = String(flavour.extraPercent);
     extraField.setAttribute("aria-label", `Extra percentage for ${flavour.name}`);
     extraWrap.append(extraText, extraField);
 
     const meta = document.createElement("span");
-    meta.className = "admin-flavour-meta";
+    meta.className = "cat-badge";
     meta.textContent = `${flavour.productCount} product${flavour.productCount === 1 ? "" : "s"}`;
 
     const actions = document.createElement("div");
-    actions.className = "admin-category-actions";
+    actions.className = "cat-actions";
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
-    deleteButton.className = "button button-secondary admin-category-action";
+    deleteButton.className = "cat-btn cat-btn-danger";
     deleteButton.textContent = "Delete";
     deleteButton.addEventListener("click", () => {
       if (window.confirm(`Delete the flavour "${flavour.name}"?`)) {
@@ -82,7 +84,10 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
     row.dataset.original = flavour.name;
     row.dataset.savedName = flavour.name;
     row.dataset.savedExtra = String(flavour.extraPercent);
-    row.append(nameField, extraWrap, meta, actions);
+    const bottom = document.createElement("div");
+    bottom.className = "flv-bottom";
+    bottom.append(extraWrap, meta);
+    row.append(nameField, bottom, actions);
     return row;
   }
 
@@ -123,7 +128,7 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
     list.replaceChildren(...flavours.map(renderRow));
     if (flavours.length === 0) {
       const empty = document.createElement("p");
-      empty.className = "admin-form-hint";
+      empty.className = "cat-empty";
       empty.textContent = "No flavours yet.";
       list.append(empty);
     }
