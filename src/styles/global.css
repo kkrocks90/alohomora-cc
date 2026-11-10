@@ -9130,3 +9130,9 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
   }
   .admin-menu-foot button { color: #9a3b2e; }
 }
+/* Lock page scroll while the mobile admin menu is open */
+@media (max-width: 620px) {
+  html.admin-menu-open, html.admin-menu-open body { overflow: hidden; overscroll-behavior: none; }
+  .admin-menu-backdrop { touch-action: none; }
+  .admin-tabs.is-open { overscroll-behavior: contain; overflow-y: auto; }
+}

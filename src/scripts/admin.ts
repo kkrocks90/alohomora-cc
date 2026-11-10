@@ -397,6 +397,7 @@ if (root) {
   function setMenuOpen(open: boolean) {
     tabList?.classList.toggle("is-open", open);
     if (menuBackdrop) menuBackdrop.hidden = !open;
+    document.documentElement.classList.toggle("admin-menu-open", open);
     menuToggle?.setAttribute("aria-expanded", String(open));
   }
   menuToggle?.addEventListener("click", () => setMenuOpen(!tabList?.classList.contains("is-open")));
