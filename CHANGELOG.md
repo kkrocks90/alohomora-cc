@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.63.2 - 2026-11-10
+
+- Order board shows Confirmed, Preparing, Ready and Out for delivery only (New orders are handled in the Orders tab). Removed the move-forward buttons; cards are moved by dragging.
+
 ## v1.63.1 - 2026-11-10
 
 - Order board now ends at Out for delivery. Delivered and cancelled orders are hidden from it (change those from the Orders tab). Removed the Unpaid filter and Show cancelled toggle; payment status still shows on each card.

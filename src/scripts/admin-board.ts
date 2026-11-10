@@ -29,7 +29,6 @@ interface BoardOptions {
 }
 
 const COLUMNS: { status: string; label: string; hint: string }[] = [
-  { status: "received", label: "New", hint: "Awaiting confirmation" },
   { status: "confirmed", label: "Confirmed", hint: "Accepted" },
   { status: "preparing", label: "Preparing", hint: "Being made" },
   { status: "ready", label: "Ready", hint: "Packed" },
@@ -141,12 +140,6 @@ export function initBoard(options: BoardOptions) {
     render();
   }
 
-  function nextStatus(status: string) {
-    const index = COLUMNS.findIndex((column) => column.status === status);
-    const next = COLUMNS[index + 1];
-    return index >= 0 && next && next.status !== "cancelled" ? next : null;
-  }
-
   function renderCard(order: BoardOrder) {
     const card = el("article", "kb-card");
     card.draggable = true;
@@ -169,17 +162,6 @@ export function initBoard(options: BoardOptions) {
 
     const foot = el("div", "kb-card-foot");
     foot.append(el("b", "", options.money(order.amountPaise / 100)));
-    const next = nextStatus(order.orderStatus);
-    if (next) {
-      const advance = el("button", "kb-advance", `→ ${next.label}`);
-      advance.type = "button";
-      advance.setAttribute("aria-label", `Move ${order.orderId} to ${next.label}`);
-      advance.addEventListener("click", (event) => {
-        event.stopPropagation();
-        void move(order.orderId, next.status);
-      });
-      foot.append(advance);
-    }
     card.append(top, name, items, chips, foot);
 
     card.addEventListener("click", () => openDrawer(order.orderId));
@@ -354,13 +336,6 @@ export function initBoard(options: BoardOptions) {
     invoice.type = "button";
     invoice.addEventListener("click", () => options.invoice(order));
     actions.append(share, invoice);
-    const next = nextStatus(order.orderStatus);
-    if (next) {
-      const advance = el("button", "button button-primary", `Move to ${next.label}`);
-      advance.type = "button";
-      advance.addEventListener("click", () => void move(order.orderId, next.status));
-      actions.append(advance);
-    }
     drawer!.append(head, stages, body, actions);
   }
 
