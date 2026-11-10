@@ -258,28 +258,12 @@ export function initBoard(options: BoardOptions) {
 
     const head = el("header", "kb-drawer-head");
     const heading = el("div");
-    heading.append(el("p", "eyebrow", order.orderId), el("h3", "", order.customerName));
+    heading.append(el("p", "eyebrow", `${order.orderId} · ${COLUMNS.find((column) => column.status === order.orderStatus)?.label ?? order.orderStatus}`), el("h3", "", order.customerName));
     const close = el("button", "icon-button", "Ã—");
     close.type = "button";
     close.setAttribute("aria-label", "Close order details");
     close.addEventListener("click", closeDrawer);
     head.append(heading, close);
-
-    const stages = el("div", "kb-stages");
-    stages.setAttribute("role", "group");
-    stages.setAttribute("aria-label", "Order stage");
-    for (const column of COLUMNS) {
-      const button = el("button", "kb-stage", column.label);
-      button.type = "button";
-      if (column.status === order.orderStatus) button.classList.add("is-current");
-      if (column.status === "cancelled") button.classList.add("is-cancel");
-      button.setAttribute("aria-pressed", String(column.status === order.orderStatus));
-      button.addEventListener("click", () => {
-        if (column.status === "cancelled" && !window.confirm(`Cancel order ${order.orderId}?`)) return;
-        void move(order.orderId, column.status);
-      });
-      stages.append(button);
-    }
 
     const body = el("div", "kb-drawer-body");
     const phone = order.customerPhone.replace(/\D/g, "");
@@ -337,7 +321,7 @@ export function initBoard(options: BoardOptions) {
     invoice.type = "button";
     invoice.addEventListener("click", () => options.invoice(order));
     actions.append(share, invoice);
-    drawer!.append(head, stages, body, actions);
+    drawer!.append(head, body, actions);
   }
 
   function openDrawer(orderId: string) {

@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.64.4 - 2026-11-10
+
+- Order panel on the board no longer has stage buttons; the stage is shown as text and orders can only be moved by drag and drop.
+
 ## v1.64.3 - 2026-11-10
 
 - Order board auto-scrolls sideways while dragging a card near the left or right edge, so cards can be dropped into columns that are off-screen.
