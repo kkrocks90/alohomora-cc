@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.64.1 - 2026-11-10
+
+- Order board: on mobile the order details now slide in from the right like the admin menu (instead of a bottom sheet), with a slide animation on desktop too.
+
 ## v1.64.0 - 2026-11-10
 
 - WhatsApp order alerts through Wassi: the customer and the owner get a message when an order is placed. Needs the `WASSI_API_KEY` Worker secret and `WASSI_ADMIN_PHONE` var; does nothing until set.
