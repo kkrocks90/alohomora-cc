@@ -14,7 +14,7 @@ ADMIN_EMAIL = "customer.support@chocolatecircle.in"
 ADMIN_EMAILS = "alohomora.chocolatecircle@gmail.com,admin.chocolatecircle@gmail.com"
 SUPPORT_EMAIL = "customer.support@chocolatecircle.in"
 # Optional comma-separated operations staff: they can sign in at /admin/ but only see the order board.
-OPERATIONS_EMAILS = ""
+OPERATIONS_EMAILS = "vinisha.kiranraj@gmail.com"
 
 [[d1_databases]]
 binding = "ORDERS_DB"
