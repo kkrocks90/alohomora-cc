@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.64.3 - 2026-11-10
+
+- Order board auto-scrolls sideways while dragging a card near the left or right edge, so cards can be dropped into columns that are off-screen.
+- Hid the board's scroll bar on mobile.
+
 ## v1.64.2 - 2026-11-10
 
 - Order board details panel now slides back out to the right when closed.

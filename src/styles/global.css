@@ -9231,3 +9231,8 @@ html.kb-open, html.kb-open body { overflow: hidden; }
   .admin-tabs .admin-tab::after { width: 20px; height: 20px; font-size: 10px; }
   .admin-menu-foot a, .admin-menu-foot button { padding: 7px 8px; font-size: 13px; }
 }
+.kb-board.is-dragging-card { scroll-snap-type: none; }
+@media (max-width: 620px) {
+  .kb-board { scrollbar-width: none; -ms-overflow-style: none; }
+  .kb-board::-webkit-scrollbar { display: none; }
+}

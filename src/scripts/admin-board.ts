@@ -372,6 +372,32 @@ export function initBoard(options: BoardOptions) {
     }
   }
 
+  let pointerX = 0;
+  let scrollFrame = 0;
+  function autoScroll() {
+    scrollFrame = 0;
+    if (!dragId) {
+      board!.classList.remove("is-dragging-card");
+      return;
+    }
+    const rect = board!.getBoundingClientRect();
+    const zone = Math.min(90, rect.width * 0.2);
+    let speed = 0;
+    if (pointerX < rect.left + zone) speed = -Math.ceil(((rect.left + zone - pointerX) / zone) * 18);
+    else if (pointerX > rect.right - zone) speed = Math.ceil(((pointerX - (rect.right - zone)) / zone) * 18);
+    if (speed) board!.scrollLeft += speed;
+    scrollFrame = requestAnimationFrame(autoScroll);
+  }
+  document.addEventListener("dragover", (event) => {
+    if (!dragId) return;
+    pointerX = event.clientX;
+    board!.classList.add("is-dragging-card");
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(autoScroll);
+  });
+  const endDrag = () => { dragId = null; };
+  document.addEventListener("drop", endDrag);
+  document.addEventListener("dragend", endDrag);
+
   backdrop.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && openOrderId) closeDrawer();
