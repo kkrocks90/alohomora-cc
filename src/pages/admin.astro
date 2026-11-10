@@ -240,9 +240,7 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
               <button type="button" data-kb-filter="overdue" aria-pressed="false">Overdue</button>
               <button type="button" data-kb-filter="today" aria-pressed="false">Due today</button>
               <button type="button" data-kb-filter="week" aria-pressed="false">Next 7 days</button>
-              <button type="button" data-kb-filter="unpaid" aria-pressed="false">Unpaid</button>
             </div>
-            <button type="button" class="kb-cancelled-toggle" id="kb-cancelled-toggle" aria-pressed="false">Show cancelled</button>
           </div>
           <p class="kb-tip">Drag a card to another column, or tap a card for details and the → button to move it forward.</p>
           <div class="kb-board" id="kb-board"></div>

@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.63.1 - 2026-11-10
+
+- Order board now ends at Out for delivery. Delivered and cancelled orders are hidden from it (change those from the Orders tab). Removed the Unpaid filter and Show cancelled toggle; payment status still shows on each card.
+
 ## v1.63.0 - 2026-11-10
 
 - Added an Operations role (set `OPERATIONS_EMAILS` in the Worker vars). Operations staff sign in at /admin/ and see only the Order board.

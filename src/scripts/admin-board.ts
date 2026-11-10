@@ -34,8 +34,6 @@ const COLUMNS: { status: string; label: string; hint: string }[] = [
   { status: "preparing", label: "Preparing", hint: "Being made" },
   { status: "ready", label: "Ready", hint: "Packed" },
   { status: "out_for_delivery", label: "Out for delivery", hint: "On the way" },
-  { status: "delivered", label: "Delivered", hint: "Completed" },
-  { status: "cancelled", label: "Cancelled", hint: "Not proceeding" },
 ];
 const CLOSED = new Set(["delivered", "cancelled"]);
 const DELIVERED_LIMIT = 12;
@@ -96,7 +94,6 @@ export function initBoard(options: BoardOptions) {
   if (!board || !search || !filters || !drawer || !backdrop) throw new Error("The order board markup is missing.");
 
   let filter = "all";
-  let showCancelled = false;
   let showAllDelivered = false;
   let openOrderId: string | null = null;
   let dragId: string | null = null;
@@ -109,7 +106,6 @@ export function initBoard(options: BoardOptions) {
     }
     if (filter === "all") return true;
     const open = !CLOSED.has(order.orderStatus);
-    if (filter === "unpaid") return open && order.paymentStatus === "unpaid" && order.paymentMethod !== "promo";
     const due = dueInfo(order);
     if (!open || !due) return false;
     if (filter === "overdue") return due.days < 0;
@@ -210,11 +206,9 @@ export function initBoard(options: BoardOptions) {
   function render() {
     const all = options.getOrders();
     const visible = all.filter(matches);
-    const cancelledCount = visible.filter((order) => order.orderStatus === "cancelled").length;
-    const columns = COLUMNS.filter((column) => column.status !== "cancelled" || showCancelled);
     board!.replaceChildren();
 
-    for (const column of columns) {
+    for (const column of COLUMNS) {
       let list = sorted(visible.filter((order) => order.orderStatus === column.status), column.status);
       const total = list.length;
       const sum = list.reduce((acc, order) => acc + order.amountPaise, 0);
@@ -257,11 +251,6 @@ export function initBoard(options: BoardOptions) {
       board!.append(section);
     }
 
-    const toggle = panel.querySelector<HTMLButtonElement>("#kb-cancelled-toggle");
-    if (toggle) {
-      toggle.textContent = showCancelled ? "Hide cancelled" : `Show cancelled${cancelledCount ? ` (${cancelledCount})` : ""}`;
-      toggle.setAttribute("aria-pressed", String(showCancelled));
-    }
     const summary = panel.querySelector<HTMLElement>("#kb-summary");
     if (summary) {
       const open = all.filter((order) => !CLOSED.has(order.orderStatus));
@@ -403,10 +392,5 @@ export function initBoard(options: BoardOptions) {
     filters.querySelectorAll<HTMLButtonElement>("[data-kb-filter]").forEach((chip) => chip.setAttribute("aria-pressed", String(chip === button)));
     render();
   });
-  panel.querySelector("#kb-cancelled-toggle")?.addEventListener("click", () => {
-    showCancelled = !showCancelled;
-    render();
-  });
-
   return { render, close: closeDrawer };
 }
