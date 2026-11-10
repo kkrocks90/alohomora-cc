@@ -82,6 +82,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         >Dashboard</button>
         <button
           class="admin-tab"
+          id="admin-board-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-board-panel"
+          tabindex="-1"
+          data-admin-tab="board"
+        >Order board</button>
+        <button
+          class="admin-tab"
           id="admin-orders-tab"
           type="button"
           role="tab"
@@ -203,6 +213,41 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           </div>
           <div class="admin-stats" id="admin-stats" aria-label="Order summary"></div>
           <div class="dash-grid" id="admin-insights"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
+        id="admin-board-panel"
+        role="tabpanel"
+        aria-labelledby="admin-board-tab"
+        data-admin-panel="board"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel kb-panel" aria-labelledby="admin-board-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Order lifecycle</p>
+              <h2 id="admin-board-title">Order board</h2>
+            </div>
+            <p class="kb-summary" id="kb-summary" aria-live="polite"></p>
+          </div>
+          <div class="kb-toolbar">
+            <input id="kb-search" type="search" placeholder="Search orders, customers, items" autocomplete="off" aria-label="Search the board" />
+            <div class="kb-filters" id="kb-filters" role="group" aria-label="Filter orders">
+              <button type="button" data-kb-filter="all" aria-pressed="true">All</button>
+              <button type="button" data-kb-filter="overdue" aria-pressed="false">Overdue</button>
+              <button type="button" data-kb-filter="today" aria-pressed="false">Due today</button>
+              <button type="button" data-kb-filter="week" aria-pressed="false">Next 7 days</button>
+              <button type="button" data-kb-filter="unpaid" aria-pressed="false">Unpaid</button>
+            </div>
+            <button type="button" class="kb-cancelled-toggle" id="kb-cancelled-toggle" aria-pressed="false">Show cancelled</button>
+          </div>
+          <p class="kb-tip">Drag a card to another column, or tap a card for details and the → button to move it forward.</p>
+          <div class="kb-board" id="kb-board"></div>
+          <div class="kb-backdrop" id="kb-backdrop" hidden></div>
+          <aside class="kb-drawer" id="kb-drawer" aria-label="Order details" hidden></aside>
         </section>
       </section>
 

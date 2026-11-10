@@ -28,6 +28,17 @@ export function isAdminEmail(env, email) {
   return allowed.includes(candidate);
 }
 
+// OPERATIONS_EMAILS is an optional comma-separated list of staff who run the order board but cannot manage the shop.
+export function isOperationsEmail(env, email) {
+  const candidate = normalizeCustomerEmail(email);
+  if (!candidate) return false;
+  return String(env?.OPERATIONS_EMAILS ?? "").split(",").map((value) => normalizeCustomerEmail(value)).includes(candidate);
+}
+
+export function isStaffEmail(env, email) {
+  return isAdminEmail(env, email) || isOperationsEmail(env, email);
+}
+
 export function normalizeCustomerEmail(email) {
   if (
     typeof email !== "string" ||
@@ -211,7 +222,7 @@ export async function verifyLoginCode(request, env) {
       return result(401, { error: "That sign-in code is invalid or expired. Request a new code and try again." });
     }
 
-    if (!isAdminEmail(env, email)) {
+    if (!isStaffEmail(env, email)) {
       const nowText = new Date(now).toISOString();
       await env.ORDERS_DB
         .prepare(
@@ -239,7 +250,7 @@ export async function verifyLoginCode(request, env) {
 }
 
 async function startSession(env, email, now) {
-  if (!isAdminEmail(env, email)) {
+  if (!isStaffEmail(env, email)) {
     const nowText = new Date(now).toISOString();
     await env.ORDERS_DB
       .prepare(
@@ -326,7 +337,7 @@ export async function updateCustomerProfile(request, env) {
   try {
     const email = await authenticatedEmail(request, env);
     if (!email) return result(401, { error: "Please sign in to update your profile." });
-    if (isAdminEmail(env, email)) {
+    if (isStaffEmail(env, email)) {
       return result(403, { error: "Admin accounts do not have customer profiles." });
     }
     const name = typeof body?.name === "string" ? body.name.trim() : "";
@@ -413,7 +424,7 @@ export async function getCustomerOrders(request, env) {
     ]);
     return result(200, {
       email,
-      isAdmin: isAdminEmail(env, email),
+      isAdmin: isStaffEmail(env, email),
       profile: {
         name: customer?.customer_name ?? "",
         phone: customer?.customer_phone ?? "",

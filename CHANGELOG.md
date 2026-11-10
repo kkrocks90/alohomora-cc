@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.63.0 - 2026-11-10
+
+- Added an Operations role (set `OPERATIONS_EMAILS` in the Worker vars). Operations staff sign in at /admin/ and see only the Order board.
+- Added a kanban Order board with drag and drop between stages, due-date chips, search and filters, and an order detail drawer.
+
 ## v1.62.3 - 2026-11-10
 
 ### Fixed

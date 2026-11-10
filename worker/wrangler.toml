@@ -13,6 +13,8 @@ GOOGLE_CLIENT_ID = "257349998723-vsp3avjcvpjqk7hu9uog8ufptvs9kcqc.apps.googleuse
 ADMIN_EMAIL = "customer.support@chocolatecircle.in"
 ADMIN_EMAILS = "alohomora.chocolatecircle@gmail.com,admin.chocolatecircle@gmail.com"
 SUPPORT_EMAIL = "customer.support@chocolatecircle.in"
+# Optional comma-separated operations staff: they can sign in at /admin/ but only see the order board.
+OPERATIONS_EMAILS = ""
 
 [[d1_databases]]
 binding = "ORDERS_DB"

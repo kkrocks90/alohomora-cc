@@ -4,7 +4,7 @@ import { getFlatDiscount } from "./flat-discount.js";
 import { getDeliverySettings } from "./delivery-charges.js";
 import { listAdminCategories } from "./admin-categories.js";
 import { listAdminFlavours } from "./admin-flavours.js";
-import { authenticatedEmail, isAdminEmail, normalizeCustomerEmail } from "./customer-auth.js";
+import { authenticatedEmail, isAdminEmail, isOperationsEmail, normalizeCustomerEmail } from "./customer-auth.js";
 import { sendOrderEmails } from "./notify.js";
 import { generateOrderId } from "./order-id.js";
 import { assertFieldCapacity, listCustomFields, validateFieldDefinition } from "./custom-fields.js";
@@ -55,10 +55,78 @@ export async function requireAdmin(request, env) {
   return { email };
 }
 
+// Admins and operations staff may work the order board; only admins manage everything else.
+export async function requireStaff(request, env) {
+  const adminEmail = normalizeCustomerEmail(env.ADMIN_EMAIL);
+  if (!env.ORDERS_DB || !adminEmail || typeof env.AUTH_TOKEN_SECRET !== "string") {
+    return { error: result(503, { error: "Admin access is not configured." }) };
+  }
+  const email = await authenticatedEmail(request, env);
+  if (!email) return { error: result(401, { error: "Please sign in to continue." }) };
+  if (isAdminEmail(env, email)) return { email, role: "admin" };
+  if (isOperationsEmail(env, email)) return { email, role: "operations" };
+  return { error: result(403, { error: "This account does not have admin access." }) };
+}
+
+const ORDER_COLUMNS = `order_id, razorpay_order_id, payment_id, payment_status, payment_method, order_status,
+                  customer_id, customer_name, customer_phone, customer_email,
+                  delivery_address, city, state, pincode, items_json, custom_json, amount_paise, product_subtotal_paise,
+                  discount_paise, promo_code, currency, delivery_method, event_date, created_at, payment_link_url,
+                  amount_received_paise, delivery_paise`;
+
+function mapAdminOrder(order) {
+  return {
+    orderId: order.order_id,
+    razorpayOrderId: order.razorpay_order_id ?? null,
+    paymentId: order.payment_id,
+    paymentStatus: order.payment_status,
+    paymentMethod: order.payment_method,
+    amountReceivedPaise: order.amount_received_paise ?? 0,
+    orderStatus: order.order_status,
+    customerId: order.customer_id,
+    customerName: order.customer_name,
+    customerPhone: order.customer_phone,
+    customerEmail: order.customer_email,
+    deliveryAddress: order.delivery_address,
+    city: order.city ?? "",
+    state: order.state ?? "",
+    pincode: order.pincode ?? "",
+    items: JSON.parse(order.items_json),
+    customFields: parseSnapshot(order.custom_json),
+    amountPaise: order.amount_paise,
+    productSubtotalPaise: order.product_subtotal_paise ?? order.amount_paise,
+    discountPaise: order.discount_paise ?? 0,
+    deliveryPaise: order.delivery_paise ?? 0,
+    promoCode: order.promo_code ?? "",
+    currency: order.currency,
+    deliveryMethod: order.delivery_method,
+    eventDate: order.event_date ?? "",
+    createdAt: order.created_at,
+    paymentLinkUrl: "",
+  };
+}
+
+async function getOperationsData(env, email) {
+  const orders = await env.ORDERS_DB.prepare(`SELECT ${ORDER_COLUMNS} FROM orders ORDER BY created_at DESC`).all();
+  return result(200, {
+    email,
+    role: "operations",
+    orders: orders.results.map(mapAdminOrder),
+    customers: [],
+    orderStatuses: ORDER_STATUSES,
+    products: [],
+    categories: [],
+    promos: [],
+    customFields: [],
+    customProducts: [],
+  });
+}
+
 export async function getAdminData(request, env) {
   try {
-    const access = await requireAdmin(request, env);
+    const access = await requireStaff(request, env);
     if (access.error) return access.error;
+    if (access.role === "operations") return await getOperationsData(env, access.email);
     await ensureCatalogue(env, { force: true });
     const [ordersResult, customersResult, promosResult, customFields, customProducts, catalogueProducts, catalogueCategories, flatDiscount, catalogueFlavours, deliverySettings] = await Promise.all([
       env.ORDERS_DB
@@ -102,6 +170,7 @@ export async function getAdminData(request, env) {
     ]);
     return result(200, {
       email: access.email,
+      role: "admin",
       orders: ordersResult.results.map((order) => ({
         orderId: order.order_id,
         razorpayOrderId: order.razorpay_order_id ?? null,
@@ -810,7 +879,7 @@ export async function updateAdminOrderStatus(request, env) {
     return result(400, { error: error.message });
   }
   try {
-    const access = await requireAdmin(request, env);
+    const access = await requireStaff(request, env);
     if (access.error) return access.error;
     const orderId = requiredText(body?.orderId, 100, "order number");
     if (!ORDER_STATUSES.includes(body?.orderStatus)) {

@@ -2,6 +2,7 @@ import { clearAdminSessionToken, getAdminSessionToken, saveAdminSessionToken } f
 import { initializePincodeLookup } from "./pincode-lookup";
 import { normalizeState } from "../data/indian-states";
 import { printInvoice } from "./order-view";
+import { initBoard } from "./admin-board";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
 import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
@@ -410,15 +411,16 @@ if (root) {
   for (const tab of adminTabs) {
     tab.addEventListener("click", () => activateAdminTab(tab));
     tab.addEventListener("keydown", (event: KeyboardEvent) => {
-      const currentIndex = adminTabs.indexOf(tab);
+      const visibleTabs = adminTabs.filter((candidate) => !candidate.hidden);
+      const currentIndex = visibleTabs.indexOf(tab);
       let nextIndex: number;
-      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % adminTabs.length;
-      else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + adminTabs.length) % adminTabs.length;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % visibleTabs.length;
+      else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + visibleTabs.length) % visibleTabs.length;
       else if (event.key === "Home") nextIndex = 0;
-      else if (event.key === "End") nextIndex = adminTabs.length - 1;
+      else if (event.key === "End") nextIndex = visibleTabs.length - 1;
       else return;
       event.preventDefault();
-      const nextTab = adminTabs[nextIndex];
+      const nextTab = visibleTabs[nextIndex];
       if (nextTab) activateAdminTab(nextTab, true);
     });
   }
@@ -490,6 +492,7 @@ if (root) {
 
   function showSignedOut(message = "") {
     adminData = null;
+    board.close();
     dashboard.hidden = true;
     document.querySelector<HTMLElement>("#admin-menu-toggle")?.setAttribute("hidden", "");
     loginPanel.hidden = false;
@@ -852,6 +855,33 @@ if (root) {
 
   function renderInvoice(order: AdminOrder) {
     printInvoice(invoice, order);
+  }
+
+  let adminRole: "admin" | "operations" = "admin";
+  const boardPanel = requireElement<HTMLElement>(root, "#admin-board-panel");
+  const board = initBoard({
+    panel: boardPanel,
+    getOrders: () => adminData?.orders ?? [],
+    moveOrder: async (orderId, orderStatus) => {
+      await post("/admin/orders/update-status", { orderId, orderStatus });
+      renderOrders();
+      renderStats();
+    },
+    money: (rupees) => currency.format(rupees),
+    invoice: (order) => renderInvoice(order as AdminOrder),
+    shareText: (order) => orderShareText(order as AdminOrder),
+    notify: (message, error = false) => setStatus(message, error),
+  });
+
+  function applyRole(role: "admin" | "operations") {
+    adminRole = role;
+    for (const tab of adminTabs) tab.hidden = role === "operations" && tab.dataset.adminTab !== "board";
+    root!.classList.toggle("is-operations", role === "operations");
+    const current = adminTabs.find((tab) => tab.getAttribute("aria-selected") === "true");
+    if (role === "operations" && current?.dataset.adminTab !== "board") {
+      const boardTab = adminTabs.find((tab) => tab.dataset.adminTab === "board");
+      if (boardTab) activateAdminTab(boardTab);
+    }
   }
 
   function renderStats() {
@@ -1452,7 +1482,9 @@ if (root) {
     loginPanel.hidden = true;
     dashboard.hidden = false;
     document.querySelector<HTMLElement>("#admin-menu-toggle")?.removeAttribute("hidden");
-    signedIn.textContent = `Signed in as ${adminData.email}`;
+    const role = (result as { role?: unknown }).role === "operations" ? "operations" : "admin";
+    applyRole(role);
+    signedIn.textContent = `Signed in as ${adminData.email}${role === "operations" ? " · Operations" : ""}`;
     renderCustomers();
     renderPromos();
     customFieldsAdmin.render(adminData.customFields);
@@ -1465,7 +1497,7 @@ if (root) {
     categoriesAdmin.render(adminData.catalogueCategories);
     flatDiscountAdmin.render(adminData.flatDiscount);
     deliveryAdmin.render(adminData.deliverySettings);
-    void reviewsAdmin.load();
+    if (role === "admin") void reviewsAdmin.load();
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     if (!editingOrderId) {
@@ -1473,6 +1505,8 @@ if (root) {
       renderOrderLine();
     }
     renderOrders();
+    renderStats();
+    board.render();
     updateOrderTotal();
   }
 
