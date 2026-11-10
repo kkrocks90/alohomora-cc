@@ -76,6 +76,58 @@ export async function sendOrderEmails(env, order) {
       html: `<p>Hi ${escapeHtml(order.customerName)},</p><p>Thank you for your order with Chocolate Circle! Your order number is <b>${escapeHtml(order.orderId)}</b>.</p>${listHtml}<p><b>Total ${escapeHtml(total)}</b> - ${escapeHtml(payment)}</p><p>We will be in touch on WhatsApp or phone if we need anything. Reply to this email or message us on WhatsApp at +91 95008 68468 for any questions.</p>`,
     });
   }
+
+  await sendOrderWhatsApp(env, order);
+}
+
+function whatsappNumber(raw) {
+  const digits = String(raw ?? "").replace(/\D/g, "");
+  if (digits.length === 10) return `+91${digits}`;
+  if (digits.length === 11 && digits.startsWith("0")) return `+91${digits.slice(1)}`;
+  return digits.length >= 11 && digits.length <= 15 ? `+${digits}` : "";
+}
+
+async function sendWhatsApp(env, phone, message) {
+  const to = whatsappNumber(phone);
+  if (!to || typeof env.WASSI_API_KEY !== "string" || !env.WASSI_API_KEY) return;
+  const base = (typeof env.WASSI_API_URL === "string" && env.WASSI_API_URL) || "https://api.wassi.chat";
+  try {
+    const response = await fetch(`${base.replace(/\/+$/, "")}/v1/messages`, {
+      method: "POST",
+      headers: { Token: env.WASSI_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: to, message }),
+    });
+    if (!response.ok) console.error("The WhatsApp provider returned status", response.status);
+  } catch (error) {
+    console.error("Could not send a WhatsApp message.", error);
+  }
+}
+
+// Never throws: a failed WhatsApp message must not fail the order.
+export async function sendOrderWhatsApp(env, order) {
+  const { items, payment, address } = summarise(order);
+  const lines = items.map(itemLine);
+  if (Number(order.discountPaise) > 0) lines.push(`Discount: -${rupees(order.discountPaise)}`);
+  if (Number(order.deliveryPaise) > 0) lines.push(`Delivery charge: +${rupees(order.deliveryPaise)}`);
+  const total = rupees(order.amountPaise);
+
+  await sendWhatsApp(env, order.customerPhone, [
+    `Hi ${order.customerName}, thank you for your order with Chocolate Circle! 🍫`,
+    `Order number: *${order.orderId}*`,
+    ...lines,
+    `Total: *${total}* - ${payment}`,
+    order.eventDate ? `Needed by: ${order.eventDate}` : "",
+    "We will message you here if we need anything.",
+  ].filter(Boolean).join("\n"));
+
+  await sendWhatsApp(env, env.WASSI_ADMIN_PHONE, [
+    `🛒 New order *${order.orderId}*`,
+    `${order.customerName} | ${order.customerPhone}`,
+    ...lines,
+    `Total: *${total}* - ${payment}`,
+    order.eventDate ? `Needed by: ${order.eventDate}` : "",
+    `Delivery: ${order.deliveryMethod || "-"} to ${address || "-"}`,
+  ].filter(Boolean).join("\n"));
 }
 
 const OCCASIONS = ["Corporate gifting", "Festive hampers", "Event or launch", "Wedding or celebration", "Something else"];

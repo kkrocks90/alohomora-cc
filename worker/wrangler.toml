@@ -15,6 +15,9 @@ ADMIN_EMAILS = "alohomora.chocolatecircle@gmail.com,admin.chocolatecircle@gmail.
 SUPPORT_EMAIL = "customer.support@chocolatecircle.in"
 # Optional comma-separated operations staff: they can sign in at /admin/ but only see the order board.
 OPERATIONS_EMAILS = "vinisha.kiranraj@gmail.com"
+# WhatsApp order alerts via Wassi. Set the secret with: npx wrangler secret put WASSI_API_KEY
+# WASSI_ADMIN_PHONE is the owner's WhatsApp number that receives new-order alerts (e.g. 9876543210).
+WASSI_ADMIN_PHONE = ""
 
 [[d1_databases]]
 binding = "ORDERS_DB"

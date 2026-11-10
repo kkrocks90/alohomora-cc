@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.64.0 - 2026-11-10
+
+- WhatsApp order alerts through Wassi: the customer and the owner get a message when an order is placed. Needs the `WASSI_API_KEY` Worker secret and `WASSI_ADMIN_PHONE` var; does nothing until set.
+
 ## v1.63.2 - 2026-11-10
 
 - Order board shows Confirmed, Preparing, Ready and Out for delivery only (New orders are handled in the Orders tab). Removed the move-forward buttons; cards are moved by dragging.
