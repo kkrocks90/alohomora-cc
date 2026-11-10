@@ -9115,3 +9115,18 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
   .dash-bar em { font-size: 9px; }
   .admin-stat { padding: 12px 14px; }
 }
+/* Admin mobile: View store / Sign out live in the side menu; smaller menu */
+.admin-menu-foot { display: none; }
+@media (max-width: 620px) {
+  .admin-desktop-only { display: none !important; }
+  .admin-heading-actions { grid-template-columns: 1fr; }
+  .admin-tabs .admin-tab { padding: 8px 10px; font-size: 15px; min-height: 0; }
+  .admin-tabs .admin-tab::after { width: 22px; height: 22px; font-size: 11px; }
+  .admin-menu-heading { padding-bottom: 6px; }
+  .admin-menu-foot { display: grid; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eadfd3; }
+  .admin-menu-foot a, .admin-menu-foot button {
+    display: block; width: 100%; padding: 8px 10px; border: 0; background: none;
+    color: #6b5448; font: inherit; font-size: 14px; font-weight: 600; text-align: left; text-decoration: none; cursor: pointer;
+  }
+  .admin-menu-foot button { color: #9a3b2e; }
+}

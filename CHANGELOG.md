@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.62.2 - 2026-11-10
+
+### Changed
+
+- Mobile admin: View store and Sign out moved into the side menu; menu items made smaller.
+
 ## v1.62.1 - 2026-11-10
 
 ### Fixed

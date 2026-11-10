@@ -1786,6 +1786,11 @@ if (root) {
     }
   });
 
+  root.querySelector("#admin-menu-signout")?.addEventListener("click", () => {
+    setMenuOpen(false);
+    root.querySelector<HTMLButtonElement>("#admin-sign-out")?.click();
+  });
+
   requireElement<HTMLButtonElement>(root, "#admin-sign-out").addEventListener("click", async () => {
     const token = getAdminSessionToken();
     let signOutMessage = "You’re signed out.";
