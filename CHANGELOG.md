@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.62.0 - 2026-11-10
+
+### Added
+
+- Admin: new Dashboard tab (opens first) with summary tiles moved out of the page header, plus 14-day revenue chart, orders by status, top products, popular flavours, needs-attention and recent orders. Responsive on desktop and mobile.
+
 ## v1.61.0 - 2026-11-09
 
 ### Added

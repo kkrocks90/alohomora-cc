@@ -63,7 +63,6 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         </div>
       </div>
       <p class="admin-status" id="admin-status" role="status" aria-live="polite"></p>
-      <div class="admin-stats" id="admin-stats" aria-label="Order summary"></div>
 
       <div class="admin-menu-backdrop" id="admin-menu-backdrop" hidden></div>
       <div class="admin-tabs" id="admin-tabs" role="tablist" aria-label="Order management sections">
@@ -73,12 +72,22 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
         </div>
         <button
           class="admin-tab"
-          id="admin-orders-tab"
+          id="admin-dashboard-tab"
           type="button"
           role="tab"
           aria-selected="true"
-          aria-controls="admin-orders-panel"
+          aria-controls="admin-dashboard-panel"
           tabindex="0"
+          data-admin-tab="dashboard"
+        >Dashboard</button>
+        <button
+          class="admin-tab"
+          id="admin-orders-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-orders-panel"
+          tabindex="-1"
           data-admin-tab="orders"
         >Order book</button>
         <button
@@ -175,11 +184,32 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
 
       <section
         class="admin-tab-panel"
+        id="admin-dashboard-panel"
+        role="tabpanel"
+        aria-labelledby="admin-dashboard-tab"
+        data-admin-panel="dashboard"
+        tabindex="0"
+      >
+        <section class="admin-panel" aria-labelledby="admin-dashboard-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">At a glance</p>
+              <h2 id="admin-dashboard-title">Dashboard</h2>
+            </div>
+          </div>
+          <div class="admin-stats" id="admin-stats" aria-label="Order summary"></div>
+          <div class="dash-grid" id="admin-insights"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel"
         id="admin-orders-panel"
         role="tabpanel"
         aria-labelledby="admin-orders-tab"
         data-admin-panel="orders"
         tabindex="0"
+        hidden
       >
         <section class="admin-panel" aria-labelledby="admin-orders-title">
           <div class="admin-panel-heading">

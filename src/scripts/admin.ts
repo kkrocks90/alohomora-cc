@@ -329,6 +329,7 @@ if (root) {
   const orderSubmit = requireElement<HTMLButtonElement>(root, "#admin-order-submit");
   const orderFormTitle = requireElement<HTMLElement>(root, "#admin-create-order-title");
   const adminStats = requireElement<HTMLElement>(root, "#admin-stats");
+  const adminInsights = requireElement<HTMLElement>(root, "#admin-insights");
   const customProductList = requireElement<HTMLDataListElement>(root, "#admin-custom-products");
   const orderTotal = requireElement<HTMLElement>(root, "#admin-order-total");
   const paymentSelect = requireElement<HTMLSelectElement>(root, "#admin-order-payment-status");
@@ -868,6 +869,22 @@ if (root) {
       ["Unpaid", String(unpaid.length), currency.format(unpaid.reduce((sum, order) => sum + amountDue(order), 0) / 100)],
       ["Paid revenue", currency.format(paidTotal / 100), "Excludes cancelled"],
     ];
+    const live = orders.filter((order) => order.orderStatus !== "cancelled");
+    const receivedOf = (order: AdminOrder) => (order.paymentStatus === "paid" ? order.amountPaise : order.amountReceivedPaise ?? 0);
+    const now = new Date();
+    const monthOrders = live.filter((order) => {
+      const d = new Date(order.createdAt);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    });
+    const monthRevenue = monthOrders.reduce((sum, order) => sum + receivedOf(order), 0);
+    const avg = live.length ? live.reduce((sum, order) => sum + order.amountPaise, 0) / live.length : 0;
+    const customerCount = new Set(live.map((order) => order.customerPhone.replace(/\D/g, "").slice(-10) || order.customerEmail)).size;
+    tiles.push(
+      ["This month", currency.format(monthRevenue / 100), `${monthOrders.length} order${monthOrders.length === 1 ? "" : "s"}`],
+      ["Avg order value", currency.format(avg / 100), "Excludes cancelled"],
+      ["Delivered", String(orders.filter((order) => order.orderStatus === "delivered").length), "Completed orders"],
+      ["Customers", String(customerCount), "Unique buyers"],
+    );
     adminStats.replaceChildren(...tiles.map(([label, value, note]) => {
       const tile = document.createElement("div");
       tile.className = "admin-stat";
@@ -876,6 +893,151 @@ if (root) {
       appendText(tile, "small", note);
       return tile;
     }));
+    renderInsights(live, receivedOf);
+  }
+
+  function insightCard(title: string, sub: string) {
+    const card = document.createElement("section");
+    card.className = "dash-card";
+    const head = document.createElement("div");
+    head.className = "dash-card-head";
+    appendText(head, "h3", title);
+    appendText(head, "small", sub);
+    card.append(head);
+    return card;
+  }
+
+  function renderInsights(live: AdminOrder[], receivedOf: (order: AdminOrder) => number) {
+    const empty = (card: HTMLElement, text: string) => appendText(card, "p", text, "dash-empty");
+    const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+    const days: { label: string; paise: number; key: string }[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push({ label: d.toLocaleDateString("en-IN", { day: "numeric", month: "short" }), paise: 0, key: dayKey(d) });
+    }
+    for (const order of live) {
+      const slot = days.find((day) => day.key === dayKey(new Date(order.createdAt)));
+      if (slot) slot.paise += receivedOf(order);
+    }
+    const trend = insightCard("Revenue, last 14 days", currency.format(days.reduce((s, d) => s + d.paise, 0) / 100));
+    const max = Math.max(...days.map((day) => day.paise), 1);
+    const bars = document.createElement("div");
+    bars.className = "dash-bars";
+    for (const day of days) {
+      const col = document.createElement("div");
+      col.className = "dash-bar";
+      col.title = `${day.label}: ${currency.format(day.paise / 100)}`;
+      const fill = document.createElement("span");
+      fill.style.height = `${Math.max((day.paise / max) * 100, day.paise ? 4 : 0)}%`;
+      col.append(fill);
+      appendText(col, "em", day.label.split(" ")[0] ?? "");
+      bars.append(col);
+    }
+    trend.append(bars);
+
+    const statusCard = insightCard("Orders by status", `${live.length} active`);
+    const counts = new Map<string, number>();
+    for (const order of live) counts.set(order.orderStatus, (counts.get(order.orderStatus) ?? 0) + 1);
+    if (!counts.size) empty(statusCard, "No orders yet.");
+    for (const [status, count] of [...counts].sort((a, b) => b[1] - a[1])) {
+      const row = document.createElement("div");
+      row.className = "dash-row";
+      appendText(row, "span", statusLabels[status] ?? status);
+      const track = document.createElement("div");
+      track.className = "dash-track";
+      const fill = document.createElement("i");
+      fill.style.width = `${(count / live.length) * 100}%`;
+      track.append(fill);
+      row.append(track);
+      appendText(row, "b", String(count));
+      statusCard.append(row);
+    }
+
+    const productTotals = new Map<string, { qty: number; paise: number }>();
+    for (const order of live) {
+      for (const item of order.items) {
+        const entry = productTotals.get(item.name) ?? { qty: 0, paise: 0 };
+        entry.qty += item.quantity;
+        entry.paise += item.quantity * item.unitPriceRupees * 100;
+        productTotals.set(item.name, entry);
+      }
+    }
+    const topCard = insightCard("Top products", "By quantity sold");
+    const top = [...productTotals].sort((a, b) => b[1].qty - a[1].qty).slice(0, 5);
+    if (!top.length) empty(topCard, "No sales yet.");
+    const topMax = Math.max(...top.map(([, v]) => v.qty), 1);
+    top.forEach(([name, v], index) => {
+      const row = document.createElement("div");
+      row.className = "dash-row";
+      appendText(row, "span", `${index + 1}. ${name}`);
+      const track = document.createElement("div");
+      track.className = "dash-track";
+      const fill = document.createElement("i");
+      fill.style.width = `${(v.qty / topMax) * 100}%`;
+      track.append(fill);
+      row.append(track);
+      appendText(row, "b", `${v.qty}`);
+      topCard.append(row);
+    });
+
+    const flavourTotals = new Map<string, number>();
+    for (const order of live) {
+      for (const item of order.items) {
+        if (item.flavour) flavourTotals.set(item.flavour, (flavourTotals.get(item.flavour) ?? 0) + item.quantity);
+      }
+    }
+    const flavourCard = insightCard("Popular flavours", "By quantity sold");
+    const flavours = [...flavourTotals].sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (!flavours.length) empty(flavourCard, "No flavour data yet.");
+    const flavourMax = Math.max(...flavours.map(([, qty]) => qty), 1);
+    for (const [name, qty] of flavours) {
+      const row = document.createElement("div");
+      row.className = "dash-row";
+      appendText(row, "span", name);
+      const track = document.createElement("div");
+      track.className = "dash-track";
+      const fill = document.createElement("i");
+      fill.style.width = `${(qty / flavourMax) * 100}%`;
+      track.append(fill);
+      row.append(track);
+      appendText(row, "b", String(qty));
+      flavourCard.append(row);
+    }
+
+    const attention = insightCard("Needs attention", "New or unpaid orders");
+    const urgent = live
+      .filter((order) => order.orderStatus === "received" || (order.paymentStatus === "unpaid" && order.paymentMethod !== "promo" && order.orderStatus !== "delivered"))
+      .slice(0, 6);
+    if (!urgent.length) empty(attention, "All caught up.");
+    for (const order of urgent) {
+      const row = document.createElement("div");
+      row.className = "dash-list-row";
+      const who = document.createElement("div");
+      appendText(who, "strong", order.customerName);
+      appendText(who, "small", `${order.orderId} · ${order.orderStatus === "received" ? "New" : "Unpaid"}`);
+      row.append(who);
+      appendText(row, "b", currency.format((order.paymentStatus === "paid" ? order.amountPaise : amountDue(order)) / 100));
+      attention.append(row);
+    }
+
+    const recent = insightCard("Recent orders", "Latest 6");
+    const latest = [...live].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 6);
+    if (!latest.length) empty(recent, "No orders yet.");
+    for (const order of latest) {
+      const row = document.createElement("div");
+      row.className = "dash-list-row";
+      const who = document.createElement("div");
+      appendText(who, "strong", order.customerName);
+      appendText(who, "small", `${new Date(order.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })} · ${statusLabels[order.orderStatus] ?? order.orderStatus}`);
+      row.append(who);
+      appendText(row, "b", currency.format(order.amountPaise / 100));
+      recent.append(row);
+    }
+
+    trend.classList.add("dash-wide");
+    adminInsights.replaceChildren(trend, statusCard, attention, topCard, flavourCard, recent);
   }
 
   function resetOrderForm() {

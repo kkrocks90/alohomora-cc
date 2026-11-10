@@ -9085,3 +9085,33 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     min-height: 48px;
   }
 }
+/* Admin dashboard */
+#admin-dashboard-panel .admin-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 18px; }
+.dash-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.dash-card { display: grid; align-content: start; gap: 10px; padding: 16px 18px; border: 1px solid #e8ded3; border-radius: 16px; background: #fffdf9; }
+.dash-wide { grid-column: 1 / -1; }
+.dash-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.dash-card-head h3 { margin: 0; color: #40271f; font-family: var(--serif); font-size: 19px; font-weight: 500; }
+.dash-card-head small { color: #9a8a7f; font-size: 12px; font-weight: 600; }
+.dash-empty { margin: 0; color: #9a8a7f; font-size: 13px; }
+.dash-bars { display: flex; align-items: flex-end; gap: 6px; height: 150px; padding-top: 6px; }
+.dash-bar { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; height: 100%; min-width: 0; }
+.dash-bar span { display: block; width: 100%; min-height: 0; border-radius: 6px 6px 2px 2px; background: linear-gradient(180deg, #8a5a44, #5b3a2c); }
+.dash-bar em { color: #9a8a7f; font-size: 10px; font-style: normal; }
+.dash-row { display: grid; grid-template-columns: minmax(80px, 1.1fr) minmax(0, 1.4fr) auto; align-items: center; gap: 10px; font-size: 13px; color: #5a463c; }
+.dash-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-row b { min-width: 22px; color: #40271f; text-align: right; }
+.dash-track { height: 8px; overflow: hidden; border-radius: 99px; background: #f1e8dd; }
+.dash-track i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #b58a63, #6b3f2e); }
+.dash-list-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid #f0e6db; }
+.dash-list-row:first-of-type { border-top: 0; }
+.dash-list-row strong { display: block; color: #40271f; font-size: 14px; }
+.dash-list-row small { color: #9a8a7f; font-size: 12px; }
+.dash-list-row b { color: #40271f; font-size: 14px; white-space: nowrap; }
+@media (max-width: 900px) { #admin-dashboard-panel .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .dash-grid { grid-template-columns: minmax(0, 1fr); }
+  .dash-bars { gap: 3px; }
+  .dash-bar em { font-size: 9px; }
+  .admin-stat { padding: 12px 14px; }
+}
