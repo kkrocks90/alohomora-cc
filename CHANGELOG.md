@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.64.2 - 2026-11-10
+
+- Order board details panel now slides back out to the right when closed.
+- Mobile admin side menu is narrower with smaller text.
+
 ## v1.64.1 - 2026-11-10
 
 - Order board: on mobile the order details now slide in from the right like the admin menu (instead of a bottom sheet), with a slide animation on desktop too.

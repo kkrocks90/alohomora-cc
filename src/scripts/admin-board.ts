@@ -95,6 +95,7 @@ export function initBoard(options: BoardOptions) {
   let filter = "all";
   let showAllDelivered = false;
   let openOrderId: string | null = null;
+  let closeTimer = 0;
   let dragId: string | null = null;
 
   function matches(order: BoardOrder) {
@@ -342,6 +343,9 @@ export function initBoard(options: BoardOptions) {
   function openDrawer(orderId: string) {
     openOrderId = orderId;
     renderDrawer();
+    window.clearTimeout(closeTimer);
+    drawer!.classList.remove("is-closing");
+    backdrop!.classList.remove("is-closing");
     drawer!.hidden = false;
     backdrop!.hidden = false;
     document.documentElement.classList.add("kb-open");
@@ -350,9 +354,22 @@ export function initBoard(options: BoardOptions) {
 
   function closeDrawer() {
     openOrderId = null;
-    drawer!.hidden = true;
-    backdrop!.hidden = true;
     document.documentElement.classList.remove("kb-open");
+    if (drawer!.hidden) return;
+    drawer!.classList.add("is-closing");
+    backdrop!.classList.add("is-closing");
+    window.clearTimeout(closeTimer);
+    closeTimer = window.setTimeout(finishClose, 260);
+  }
+
+  function finishClose() {
+    window.clearTimeout(closeTimer);
+    drawer!.classList.remove("is-closing");
+    backdrop!.classList.remove("is-closing");
+    if (openOrderId === null) {
+      drawer!.hidden = true;
+      backdrop!.hidden = true;
+    }
   }
 
   backdrop.addEventListener("click", closeDrawer);

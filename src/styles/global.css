@@ -9221,3 +9221,13 @@ html.kb-open, html.kb-open body { overflow: hidden; }
 .kb-drawer:not([hidden]) { animation: kb-slide-in 0.28s cubic-bezier(0.22, 0.8, 0.3, 1); }
 .kb-backdrop:not([hidden]) { animation: kb-fade-in 0.2s ease; }
 @media (prefers-reduced-motion: reduce) { .kb-drawer:not([hidden]), .kb-backdrop:not([hidden]) { animation: none; } }
+@keyframes kb-slide-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes kb-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.kb-drawer.is-closing { animation: kb-slide-out 0.26s cubic-bezier(0.4, 0, 0.8, 0.4) forwards; }
+.kb-backdrop.is-closing { animation: kb-fade-out 0.2s ease forwards; pointer-events: none; }
+@media (max-width: 620px) {
+  .admin-tabs { width: min(72vw, 280px); padding: 20px 16px; }
+  .admin-tabs .admin-tab { padding: 6px 8px; font-size: 14px; }
+  .admin-tabs .admin-tab::after { width: 20px; height: 20px; font-size: 10px; }
+  .admin-menu-foot a, .admin-menu-foot button { padding: 7px 8px; font-size: 13px; }
+}
