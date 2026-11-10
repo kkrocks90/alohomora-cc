@@ -5,6 +5,12 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.62.1 - 2026-11-10
+
+### Fixed
+
+- Admin desktop: sidebar menu no longer drops below the Dashboard content.
+
 ## v1.62.0 - 2026-11-10
 
 ### Added

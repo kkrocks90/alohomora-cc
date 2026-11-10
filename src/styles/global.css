@@ -8898,7 +8898,7 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
     z-index: 5;
     top: 90px;
     grid-column: 1;
-    grid-row: 4 / span 40;
+    grid-row: 3 / span 40;
     flex-direction: column;
     gap: 2px;
     margin: 0;
