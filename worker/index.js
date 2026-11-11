@@ -24,6 +24,7 @@ import { handleAdminCategory } from "./admin-categories.js";
 import { trackOrder } from "./tracking.js";
 import { handleAdminReviews, listReviews } from "./reviews.js";
 import { handleAdminFlavour } from "./admin-flavours.js";
+import { handleAdminFaqs, listFaqs } from "./faqs.js";
 import { createAdminProduct, rebuildSite, updateAdminProduct, uploadProductImage } from "./admin-products.js";
 import {
   getDistanceKm,
@@ -765,6 +766,11 @@ export default {
       response.headers.set("Cache-Control", "public, max-age=30, s-maxage=30");
       return response;
     }
+    if (request.method === "GET" && path === "/faqs") {
+      const response = jsonResponse({ faqs: await listFaqs(env) }, 200, configuredOrigin);
+      response.headers.set("Cache-Control", "public, max-age=30, s-maxage=30");
+      return response;
+    }
     if (request.method === "POST" && path === "/corporate/enquiry") {
       let body;
       try {
@@ -908,6 +914,10 @@ export default {
     }
     if (path === "/admin/flavours/create" || path === "/admin/flavours/update" || path === "/admin/flavours/delete" || path === "/admin/flavours/save-all") {
       const result = await handleAdminFlavour(request, env, path.split("/").pop());
+      return jsonResponse(result.body, result.status, configuredOrigin);
+    }
+    if (path === "/admin/faqs/list" || path === "/admin/faqs/save") {
+      const result = await handleAdminFaqs(request, env, path.split("/").pop());
       return jsonResponse(result.body, result.status, configuredOrigin);
     }
     if (path === "/admin/delivery-settings/save" || path === "/admin/delivery-settings/preview") {

@@ -2940,3 +2940,12 @@ html.kb-open, html.kb-open body { overflow: hidden
 .kb-board::-webkit-scrollbar { display: none
   }
 }
+
+#admin-faq-list { grid-template-columns: minmax(0, 1fr) }
+.faq-card { display: grid; gap: 10px }
+.faq-answer { min-height: 76px; resize: vertical; font: inherit }
+.faq-card .cat-actions { display: flex; justify-content: flex-end; gap: 8px }
+.faq-savebar { gap: 10px }
+@media (max-width: 900px) {
+.admin-tab-desktop, .admin-tabs .admin-tab.admin-tab-desktop { display: none !important }
+}

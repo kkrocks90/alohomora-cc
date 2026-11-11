@@ -36,3 +36,19 @@ try {
 } catch (error) {
   console.warn(`[catalogue] could not load products (${error.message}); using bundled products.json`);
 }
+
+try {
+  const response = await fetch(`${apiUrl}/faqs`, {
+    headers: { Origin: "https://chocolatecircle.in" },
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const { faqs } = await response.json();
+  if (!Array.isArray(faqs) || !faqs.every((item) => typeof item?.question === "string" && typeof item?.answer === "string")) {
+    throw new Error("invalid FAQ data");
+  }
+  await writeFile(new URL("../src/data/faqs.json", import.meta.url), `${JSON.stringify(faqs, null, 4)}\n`);
+  console.log(`[catalogue] loaded ${faqs.length} FAQs`);
+} catch (error) {
+  console.warn(`[catalogue] could not load FAQs (${error.message}); using bundled faqs.json`);
+}

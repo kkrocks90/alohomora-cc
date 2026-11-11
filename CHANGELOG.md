@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.66.0 - 2026-11-11
+
+- Admin FAQs tab (desktop only): add, edit, reorder and remove the About-page FAQ. Saved FAQs feed the About page and its FAQPage markup at the next publish. Needs migration 0024 and a Worker deploy.
+
 ## v1.65.0 - 2026-11-11
 
 - AI and search visibility: added /llms.txt (shop summary, categories and product list), explicit robots.txt rules for AI crawlers (private pages excluded), and an About-page FAQ with FAQPage structured data.

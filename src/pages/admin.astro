@@ -190,6 +190,16 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
           tabindex="-1"
           data-admin-tab="reviews"
         >Reviews</button>
+        <button
+          class="admin-tab admin-tab-desktop"
+          id="admin-faqs-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="admin-faqs-panel"
+          tabindex="-1"
+          data-admin-tab="faqs"
+        >FAQs</button>
         <div class="admin-menu-foot">
           <a href={import.meta.env.BASE_URL}>View store ↗</a>
           <button type="button" id="admin-menu-signout">Sign out</button>
@@ -632,6 +642,31 @@ const checkoutApiUrl = import.meta.env.PUBLIC_CHECKOUT_API_URL?.trim() ?? "";
             <button class="button button-primary" type="submit">Add category</button>
           </form>
           <div class="cat-list" id="admin-category-list"></div>
+        </section>
+      </section>
+
+      <section
+        class="admin-tab-panel admin-tab-desktop"
+        id="admin-faqs-panel"
+        role="tabpanel"
+        aria-labelledby="admin-faqs-tab"
+        data-admin-panel="faqs"
+        tabindex="0"
+        hidden
+      >
+        <section class="admin-panel cat-panel" aria-labelledby="admin-faq-title">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Website</p>
+              <h2 id="admin-faq-title">FAQs</h2>
+            </div>
+          </div>
+          <p class="admin-form-hint">Shown on the About page and shared with search engines and AI assistants. Add, edit or remove questions, then save. The website updates after the next publish.</p>
+          <div class="cat-list" id="admin-faq-list"></div>
+          <div class="flv-savebar faq-savebar">
+            <button class="button" type="button" id="admin-faq-add">Add question</button>
+            <button class="button button-primary" type="button" id="admin-faq-save">Save all changes</button>
+          </div>
         </section>
       </section>
 

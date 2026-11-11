@@ -8,6 +8,7 @@ import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
 import { mountGoogleSignIn } from "./google-signin";
 import { initFlavoursAdmin, isCatalogueFlavour } from "./admin-flavours";
+import { initFaqsAdmin } from "./admin-faqs";
 import { initFlatDiscountAdmin, isFlatDiscount, type FlatDiscount } from "./admin-flat-discount";
 import { initReviewsAdmin } from "./admin-reviews";
 import { initDeliveryAdmin, isDeliverySettings, type DeliverySettings } from "./admin-delivery";
@@ -1497,7 +1498,10 @@ if (root) {
     categoriesAdmin.render(adminData.catalogueCategories);
     flatDiscountAdmin.render(adminData.flatDiscount);
     deliveryAdmin.render(adminData.deliverySettings);
-    if (role === "admin") void reviewsAdmin.load();
+    if (role === "admin") {
+      void reviewsAdmin.load();
+      void faqsAdmin.load();
+    }
     syncPromoFormFields();
     customProductList.replaceChildren(...adminData.customProducts.map((product) => new Option(product.name)));
     if (!editingOrderId) {
@@ -1552,6 +1556,12 @@ if (root) {
   });
 
   const reviewsAdmin = initReviewsAdmin({
+    root,
+    post: (path, body) => post(path, body),
+    setStatus,
+  });
+
+  const faqsAdmin = initFaqsAdmin({
     root,
     post: (path, body) => post(path, body),
     setStatus,
