@@ -1,13 +1,13 @@
 ---
-import "../styles/global.css";
-import "../styles/themes/diwali.css";
-import "../styles/themes/monsoon.css";
-import "../styles/themes/christmas.css";
-import "../styles/themes/republic-day.css";
-import "../styles/themes/pongal.css";
-import "../styles/themes/birthday.css";
-import "../styles/themes/independence-day.css";
-import "../styles/themes/valentines-day.css";
+import globalCss from "../styles/global.css?url";
+import diwaliCss from "../styles/themes/diwali.css?url";
+import monsoonCss from "../styles/themes/monsoon.css?url";
+import christmasCss from "../styles/themes/christmas.css?url";
+import republicDayCss from "../styles/themes/republic-day.css?url";
+import pongalCss from "../styles/themes/pongal.css?url";
+import birthdayCss from "../styles/themes/birthday.css?url";
+import independenceDayCss from "../styles/themes/independence-day.css?url";
+import valentinesDayCss from "../styles/themes/valentines-day.css?url";
 import { theme } from "../config/theme";
 
 interface Props {
@@ -30,6 +30,8 @@ const {
   jsonLd = [],
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const themeStyles: Record<string, string> = { diwali: diwaliCss, monsoon: monsoonCss, christmas: christmasCss, "republic-day": republicDayCss, pongal: pongalCss, birthday: birthdayCss, "independence-day": independenceDayCss, "valentines-day": valentinesDayCss };
+const themeStyle = themeStyles[theme.id];
 const gaId = import.meta.env.PUBLIC_GA_ID?.trim() ?? "";
 const cfAnalyticsToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN?.trim() ?? "";
 const searchConsoleToken = import.meta.env.PUBLIC_SEARCH_CONSOLE_VERIFICATION?.trim() ?? "";
@@ -47,6 +49,8 @@ const socialImageUrl = new URL(socialImage, Astro.site);
     <link rel="canonical" href={canonicalUrl} />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content={theme.themeColor} />
+    <link rel="stylesheet" href={globalCss} />
+    {themeStyle && <link rel="stylesheet" href={themeStyle} />}
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Chocolate Circle" />
     <meta property="og:locale" content="en_IN" />
