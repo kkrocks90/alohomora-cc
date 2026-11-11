@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.65.0 - 2026-11-11
+
+- AI and search visibility: added /llms.txt (shop summary, categories and product list), explicit robots.txt rules for AI crawlers (private pages excluded), and an About-page FAQ with FAQPage structured data.
+
 ## v1.64.5 - 2026-11-10
 
 - Faster storefront: admin-only CSS moved out of the shared stylesheet and only the active theme's CSS is loaded, cutting render-blocking CSS from about 226 KB to about 109 KB.

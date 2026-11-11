@@ -2,11 +2,43 @@
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const base = import.meta.env.BASE_URL;
+const faqs = [
+  {
+    q: "Where is Chocolate Circle based and do you deliver across India?",
+    a: "We are a small-batch handmade chocolate shop based in Chennai, Tamil Nadu. We can arrange delivery across India wherever a courier can serve your address.",
+  },
+  {
+    q: "How much notice do you need for an order?",
+    a: "Please allow at least 3 to 4 days for preparation. For an event, we plan delivery for two days before the event or on the event date, depending on your location.",
+  },
+  {
+    q: "Can I personalise the wrapper on my chocolates?",
+    a: "Yes. Many products offer a personalised wrapper; choose the option on the product page.",
+  },
+  {
+    q: "Do you take bulk or corporate gifting orders?",
+    a: "Yes. We make hampers and bulk orders for festivals, weddings, birthdays and corporate gifting. See our Corporate page or message us on WhatsApp.",
+  },
+  {
+    q: "How can I contact Chocolate Circle?",
+    a: "Email customer.support@chocolatecircle.in or WhatsApp +91 95008 68468.",
+  },
+];
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a },
+  })),
+};
 ---
 
 <SiteLayout
   title="About us — Chocolate Circle"
   description="Meet Chocolate Circle, a small-batch handmade chocolate shop based in Chennai."
+  jsonLd={[faqLd]}
 >
   <main class="policy-page about-page">
     <header class="policy-heading">
@@ -48,6 +80,13 @@ d’d love to help with an order or a question. Reach us at
         <a href="mailto:customer.support@chocolatecircle.in">customer.support@chocolatecircle.in</a>
         or on <a href="https://wa.me/919500868468">WhatsApp at +91 95008 68468</a>.
       </p>
+      <h2>Frequently asked questions</h2>
+      {faqs.map((item) => (
+        <>
+          <h3>{item.q}</h3>
+          <p>{item.a}</p>
+        </>
+      ))}
       <p>
         <a class="button button-primary" href={`${base}store/`}>
           Find your chocolate <span aria-hidden="true">↗</span>
