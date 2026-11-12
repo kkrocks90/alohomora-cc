@@ -6128,6 +6128,27 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
   .reviews-section {
     padding: 40px 14px 16px;
   }
+
+  .reviews-grid {
+    display: flex;
+    gap: 12px;
+    margin-inline: -14px;
+    padding: 4px 14px 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 14px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .reviews-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .review-card {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+  }
 }
 
 /* Categories and flavours: card layout */

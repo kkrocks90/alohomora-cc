@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.2 - 2026-11-12
+
+- Mobile: customer reviews now sit in a horizontal row you swipe through, with snap-to-card scrolling.
+
 ## v1.68.1 - 2026-11-12
 
 - Publish from the admin now rebuilds with the theme of the last successful deploy, so a manually chosen theme sticks. The deploy run name records the theme.
