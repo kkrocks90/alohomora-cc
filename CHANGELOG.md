@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.7 - 2026-11-12
+
+- Themes: the shop heading band, product tags, mobile tab bar, borders, text and shadows that were hard-coded warm browns now follow the active theme's colours.
+
 ## v1.68.6 - 2026-11-12
 
 - Admin: removed the Refresh button.
