@@ -1,6 +1,5 @@
 import { requireAdmin } from "./admin.js";
 import { ensureCatalogue, loadAllProductRows } from "./catalogue.js";
-import { triggerSiteRebuild } from "./admin-products.js";
 
 const INPUT_ERROR = /^(Enter|That|Move|Request|A promo|A custom)/;
 
@@ -202,8 +201,7 @@ export async function handleAdminCategory(request, env, action) {
     await applyAction(env.ORDERS_DB, action, body);
     await ensureCatalogue(env, { force: true });
     const categories = await listAdminCategories(env);
-    const rebuildTriggered = await triggerSiteRebuild(env);
-    return result(200, { categories, rebuildTriggered });
+    return result(200, { categories });
   } catch (error) {
     if (error instanceof Error && INPUT_ERROR.test(error.message)) return result(400, { error: error.message });
     console.error("Could not save the category.", error);

@@ -61,10 +61,10 @@ d’d love to help with an order or a question. Reach us at
       </p>
       {faqs.length > 0 && <h2>Frequently asked questions</h2>}
       {faqs.map((item) => (
-        <>
-          <h3>{item.question}</h3>
+        <details class="faq-item">
+          <summary>{item.question}</summary>
           <p>{item.answer}</p>
-        </>
+        </details>
       ))}
       <p>
         <a class="button button-primary" href={`${base}store/`}>

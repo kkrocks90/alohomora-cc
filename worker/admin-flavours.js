@@ -1,6 +1,5 @@
 import { requireAdmin } from "./admin.js";
 import { ensureCatalogue, loadAllProductRows } from "./catalogue.js";
-import { triggerSiteRebuild } from "./admin-products.js";
 
 const INPUT_ERROR = /^(Enter|That|Remove|Request|Extra)/;
 const MAX_EXTRA_PERCENT = 500;
@@ -146,8 +145,7 @@ export async function handleAdminFlavour(request, env, action) {
     await applyAction(env.ORDERS_DB, action, body);
     await ensureCatalogue(env, { force: true });
     const flavours = await listAdminFlavours(env);
-    const rebuildTriggered = await triggerSiteRebuild(env);
-    return result(200, { flavours, rebuildTriggered });
+    return result(200, { flavours });
   } catch (error) {
     if (error instanceof Error && INPUT_ERROR.test(error.message)) return result(400, { error: error.message });
     console.error("Could not save the flavour.", error);

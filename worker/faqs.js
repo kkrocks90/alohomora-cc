@@ -1,5 +1,4 @@
 import { requireAdmin } from "./admin.js";
-import { triggerSiteRebuild } from "./admin-products.js";
 import bundledFaqs from "../src/data/faqs.json" with { type: "json" };
 
 const INPUT_ERROR = /^(Enter|Add|Request)/;
@@ -73,8 +72,7 @@ export async function handleAdminFaqs(request, env, action) {
       )
       .bind(JSON.stringify(faqs), new Date().toISOString())
       .run();
-    const rebuildTriggered = await triggerSiteRebuild(env);
-    return result(200, { faqs, rebuildTriggered });
+    return result(200, { faqs });
   } catch (error) {
     if (error instanceof Error && INPUT_ERROR.test(error.message)) return result(400, { error: error.message });
     console.error("Could not save the FAQs.", error);

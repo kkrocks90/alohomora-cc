@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.67.0 - 2026-11-12
+
+- Manual publishing: saving products, categories, flavours or FAQs no longer starts a site rebuild. Press Publish to storefront (now also on the Categories, Flavours and FAQs tabs) when you are done editing. Needs a Worker deploy.
+- About page FAQs are now collapsible questions.
+
 ## v1.66.0 - 2026-11-11
 
 - Admin FAQs tab (desktop only): add, edit, reorder and remove the About-page FAQ. Saved FAQs feed the About page and its FAQPage markup at the next publish. Needs migration 0024 and a Worker deploy.

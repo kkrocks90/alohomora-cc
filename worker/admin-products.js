@@ -75,7 +75,7 @@ async function readJson(request) {
   }
 }
 
-// Saving a product asks GitHub to rebuild the static storefront (needs a token secret on the Worker).
+// Asks GitHub to rebuild the static storefront (needs a token secret on the Worker). Only run from the manual Publish button.
 export async function triggerSiteRebuild(env) {
   if (!env.GITHUB_DISPATCH_TOKEN) return false;
   const repo = env.GITHUB_REPO || "kkrocks90/alohomora-cc";
@@ -153,8 +153,7 @@ export async function createAdminProduct(request, env) {
     await registerCategories(env.ORDERS_DB, [product.tag, ...product.extraTags]);
     await registerFlavours(env.ORDERS_DB, product.flavours).catch(() => {});
     const products = await listAdminProducts(env);
-    const rebuildTriggered = await triggerSiteRebuild(env);
-    return result(201, { productId, products, rebuildTriggered });
+    return result(201, { productId, products });
   } catch (error) {
     if (error instanceof Error && INPUT_ERROR.test(error.message)) return result(400, { error: error.message });
     console.error("Could not create a product.", error);
@@ -186,8 +185,7 @@ export async function updateAdminProduct(request, env) {
     await registerCategories(env.ORDERS_DB, [product.tag, ...product.extraTags]);
     await registerFlavours(env.ORDERS_DB, product.flavours).catch(() => {});
     const products = await listAdminProducts(env);
-    const rebuildTriggered = await triggerSiteRebuild(env);
-    return result(200, { productId, products, rebuildTriggered });
+    return result(200, { productId, products });
   } catch (error) {
     if (error instanceof Error && INPUT_ERROR.test(error.message)) return result(400, { error: error.message });
     console.error("Could not update a product.", error);

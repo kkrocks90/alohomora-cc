@@ -95,7 +95,7 @@ export function initFaqsAdmin({ root, post, setStatus }: Deps) {
     try {
       const result = await post("/admin/faqs/save", { items: collect() });
       render(Array.isArray(result.faqs) ? result.faqs.filter(isFaq) : []);
-      setStatus("FAQs saved. The About page updates after the next publish.");
+      setStatus("FAQs saved. Press Publish to storefront to show it on the website.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The FAQs could not be saved.", true);
     } finally {

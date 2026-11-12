@@ -33,7 +33,7 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
   async function save(path: string, body: unknown, success: string) {
     try {
       await post(path, body);
-      setStatus(`${success} The storefront updates after the next publish.`);
+      setStatus(`${success} Press Publish to storefront to show it on the website.`);
       await reload();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The flavour could not be saved.", true);
@@ -115,7 +115,7 @@ export function initFlavoursAdmin({ root, post, setStatus, reload }: Deps) {
     saveAll.disabled = true;
     try {
       await post("/admin/flavours/save-all", { items });
-      setStatus(`Saved ${items.length} flavour${items.length === 1 ? "" : "s"}. The storefront updates after the next publish.`);
+      setStatus(`Saved ${items.length} flavour${items.length === 1 ? "" : "s"}. Press Publish to storefront to show it on the website.`);
       await reload();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The flavours could not be saved.", true);

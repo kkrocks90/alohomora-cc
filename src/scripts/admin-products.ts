@@ -296,13 +296,8 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
     };
     submit.disabled = true;
     try {
-      const result = await post(editingId ? "/admin/products/update" : "/admin/products/create", payload);
-      const rebuilt = result.rebuildTriggered === true;
-      setStatus(
-        rebuilt
-          ? "Product saved. The storefront is updating and will show it in about a minute."
-          : "Product saved. Use “Publish to storefront” to show it to customers.",
-      );
+      await post(editingId ? "/admin/products/update" : "/admin/products/create", payload);
+      setStatus("Product saved. Use “Publish to storefront” to show it to customers.");
       resetForm();
       await reload();
     } catch (error) {
@@ -335,8 +330,8 @@ export function initProductsAdmin({ root, post, uploadImage, setStatus, reload, 
       renderFlavours(checkedFlavours());
       categoryList.replaceChildren(...getCategories().map((category) => new Option(category)));
       publishHint.textContent = rebuildConfigured
-        ? "Saving a product updates the storefront automatically (about a minute)."
-        : "Automatic storefront updates are not set up yet, so changes appear on the site after the next manual publish. Orders always use the latest prices.";
+        ? "Changes are saved straight away but only appear on the website after you press Publish to storefront. Orders always use the latest prices."
+        : "Automatic publishing is not set up yet. Orders always use the latest prices.";
       renderList();
     },
   };

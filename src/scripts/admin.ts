@@ -1561,6 +1561,20 @@ if (root) {
     setStatus,
   });
 
+  root.querySelectorAll<HTMLButtonElement>("[data-publish-site]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      try {
+        await post("/admin/products/publish");
+        setStatus("Storefront update started. It will be live in about a minute.");
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "The storefront update could not be started.", true);
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+
   const faqsAdmin = initFaqsAdmin({
     root,
     post: (path, body) => post(path, body),

@@ -33,7 +33,7 @@ export function initCategoriesAdmin({ root, post, setStatus, reload }: Deps) {
   async function save(path: string, body: unknown, success: string) {
     try {
       await post(path, body);
-      setStatus(`${success} The storefront updates after the next publish.`);
+      setStatus(`${success} Press Publish to storefront to show it on the website.`);
       renaming = null;
       await reload();
     } catch (error) {
