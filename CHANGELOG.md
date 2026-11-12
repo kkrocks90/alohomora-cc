@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.69.1 - 2026-11-12
+
+- Fixed the alignment and styling of the flat discount Applies to dropdown.
+
 ## v1.69.0 - 2026-11-12
 
 - The flat discount can now apply to all products or just one category (new Applies to choice in admin). Prices, banner, checkout and the order total all follow the chosen category. Needs the 0025 migration.

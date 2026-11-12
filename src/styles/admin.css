@@ -1663,7 +1663,8 @@
   font-size: 13px;
   font-weight: 700
 }
-.admin-flat-form input:not([type="checkbox"]) {
+.admin-flat-form input:not([type="checkbox"]),
+.admin-flat-form select {
   min-height: 46px;
   width: 100%;
   padding: 10px 14px;
@@ -1674,7 +1675,8 @@
   font: inherit;
   font-weight: 500
 }
-.admin-flat-form input:focus {
+.admin-flat-form input:focus,
+.admin-flat-form select:focus {
   border-color: var(--accent, #7a3e1d);
   outline: 0;
   box-shadow: 0 0 0 3px rgba(122, 62, 29, 0.15)
