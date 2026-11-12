@@ -380,6 +380,14 @@ if (root) {
   let editingCustomerId: string | null = null;
   let editingOrderId: string | null = null;
 
+  let tabSwitchTimer = 0;
+  const tabSpinner = document.createElement("div");
+  tabSpinner.className = "admin-tab-spinner";
+  tabSpinner.setAttribute("role", "status");
+  tabSpinner.innerHTML = '<span class="admin-spinner" aria-hidden="true"></span><span class="sr-only">Loading</span>';
+  tabSpinner.hidden = true;
+  adminTabPanels[0]?.parentElement?.insertBefore(tabSpinner, adminTabPanels[0]);
+
   function activateAdminTab(tab: HTMLButtonElement, moveFocus = false) {
     const selectedTab = tab.dataset.adminTab;
     if (!selectedTab) return;
@@ -388,9 +396,13 @@ if (root) {
       candidate.setAttribute("aria-selected", String(selected));
       candidate.tabIndex = selected ? 0 : -1;
     }
-    for (const panel of adminTabPanels) {
-      panel.hidden = panel.dataset.adminPanel !== selectedTab;
-    }
+    window.clearTimeout(tabSwitchTimer);
+    for (const panel of adminTabPanels) panel.hidden = true;
+    tabSpinner.hidden = false;
+    tabSwitchTimer = window.setTimeout(() => {
+      tabSpinner.hidden = true;
+      for (const panel of adminTabPanels) panel.hidden = panel.dataset.adminPanel !== selectedTab;
+    }, 700);
     setMenuOpen(false);
     if (moveFocus) tab.focus();
   }

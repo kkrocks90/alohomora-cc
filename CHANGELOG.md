@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.4 - 2026-11-12
+
+- Admin: switching menu sections now shows a short spinner (about 0.7s) before the section appears.
+
 ## v1.68.3 - 2026-11-12
 
 - Admin: Order board moved out of the side menu into a link on the Order book page (operations staff still land on it directly). Refresh is now a small icon-only button.
