@@ -1,4 +1,5 @@
 import { requireAdmin } from "./admin.js";
+import { getCategories } from "./catalogue.js";
 
 export const FLAT_DISCOUNT_BLOCKS_COUPONS_MESSAGE =
   "Promo codes can't be used while the flat discount is running.";
@@ -10,6 +11,7 @@ function toDiscount(row) {
     percentage: Number(row.percentage),
     active: row.active === 1,
     endDate: row.end_date ?? "",
+    category: row.category ?? "",
   };
 }
 
@@ -18,7 +20,7 @@ export async function getFlatDiscount(database) {
   if (!database) return null;
   try {
     const row = await database
-      .prepare("SELECT name, percentage, active, end_date FROM flat_discount WHERE id = 1")
+      .prepare("SELECT name, percentage, active, end_date, category FROM flat_discount WHERE id = 1")
       .first();
     return toDiscount(row);
   } catch (error) {
@@ -35,8 +37,15 @@ export async function getActiveFlatDiscount(database, now = new Date()) {
   return discount;
 }
 
-export function calculateFlatDiscountPaise(subtotalPaise, discount) {
-  return Math.floor((subtotalPaise * discount.percentage) / 100);
+// With a category set, only the lines in that category are discounted. items are the validated order items.
+export function calculateFlatDiscountPaise(subtotalPaise, discount, items) {
+  let eligiblePaise = subtotalPaise;
+  if (discount.category && items) {
+    eligiblePaise = items
+      .filter((item) => [item.product.tag, ...(item.product.extraTags ?? [])].includes(discount.category))
+      .reduce((sum, item) => sum + (item.unitPrice ?? item.product.price) * item.quantity * 100, 0);
+  }
+  return Math.floor((eligiblePaise * discount.percentage) / 100);
 }
 
 export function validateFlatDiscount(body) {
@@ -53,18 +62,20 @@ export function validateFlatDiscount(body) {
     }
     endDate = body.endDate;
   }
-  return { name, percentage, active: body?.active === true, endDate };
+  const category = typeof body?.category === "string" ? body.category.trim() : "";
+  if (category && !getCategories().includes(category)) throw new Error("Choose a valid category, or all products.");
+  return { name, percentage, active: body?.active === true, endDate, category };
 }
 
 export async function saveFlatDiscount(database, body) {
   const discount = validateFlatDiscount(body);
   await database
     .prepare(
-      `INSERT INTO flat_discount (id, name, percentage, active, end_date) VALUES (1, ?, ?, ?, ?)
+      `INSERT INTO flat_discount (id, name, percentage, active, end_date, category) VALUES (1, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET name = excluded.name, percentage = excluded.percentage,
-         active = excluded.active, end_date = excluded.end_date`,
+         active = excluded.active, end_date = excluded.end_date, category = excluded.category`,
     )
-    .bind(discount.name, discount.percentage, discount.active ? 1 : 0, discount.endDate || null)
+    .bind(discount.name, discount.percentage, discount.active ? 1 : 0, discount.endDate || null, discount.category || null)
     .run();
   return discount;
 }

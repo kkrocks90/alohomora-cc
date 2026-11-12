@@ -109,7 +109,7 @@ const customizable = product.customizable !== false;
           </dl>
         )}
         <div class="product-detail-price">
-          <strong data-price-now={product.price}>₹{product.price}</strong>
+          <strong data-price-now={product.price} data-product-tags={JSON.stringify([product.tag, ...(product.extraTags ?? [])])}>₹{product.price}</strong>
           <span>{product.packSize}</span>
         </div>
         <div class="product-actions">

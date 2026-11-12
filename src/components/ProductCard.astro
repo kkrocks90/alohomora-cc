@@ -63,7 +63,7 @@ const productUrl = `${import.meta.env.BASE_URL}product/${product.id}/`;
     <p>{product.description}</p>
     <div class="product-buy-row">
       <div class="product-card-price">
-        <strong data-price-now={product.price}>₹{product.price}</strong>
+        <strong data-price-now={product.price} data-product-tags={JSON.stringify([product.tag, ...(product.extraTags ?? [])])}>₹{product.price}</strong>
         {product.flavours.length > 0 && <span>{product.flavours.length} flavours</span>}
       </div>
       <a class="add-button" href={productUrl}>Choose options <span aria-hidden="true">→</span></a>

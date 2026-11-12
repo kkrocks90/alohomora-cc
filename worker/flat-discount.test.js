@@ -21,8 +21,8 @@ function makeDatabase(row = null) {
           return state.row;
         },
         async run() {
-          const [name, percentage, active, endDate] = this.values;
-          state.row = { name, percentage, active, end_date: endDate };
+          const [name, percentage, active, endDate, category] = this.values;
+          state.row = { name, percentage, active, end_date: endDate, category };
         },
       };
     },
@@ -35,6 +35,7 @@ test("flat discount validation accepts whole percentages only", () => {
     percentage: 10,
     active: true,
     endDate: "2026-11-30",
+    category: "",
   });
   assert.throws(() => validateFlatDiscount({ name: "x", percentage: 0 }), /1 to 90/);
   assert.throws(() => validateFlatDiscount({ name: "x", percentage: 12.5 }), /1 to 90/);
@@ -46,6 +47,16 @@ test("flat discount validation accepts whole percentages only", () => {
 test("flat discount is rounded down in paise", () => {
   assert.equal(calculateFlatDiscountPaise(99900, { percentage: 10 }), 9990);
   assert.equal(calculateFlatDiscountPaise(333, { percentage: 10 }), 33);
+});
+
+test("a category flat discount only counts that category's lines", () => {
+  const items = [
+    { product: { tag: "Hampers", price: 1000 }, quantity: 1 },
+    { product: { tag: "Bulk", extraTags: ["Hampers"], price: 500 }, quantity: 2, unitPrice: 600 },
+    { product: { tag: "Candy", price: 200 }, quantity: 3 },
+  ];
+  assert.equal(calculateFlatDiscountPaise(280000, { percentage: 10, category: "Hampers" }, items), 22000);
+  assert.equal(calculateFlatDiscountPaise(280000, { percentage: 10, category: "" }, items), 28000);
 });
 
 test("only an active, unexpired flat discount is offered", async () => {

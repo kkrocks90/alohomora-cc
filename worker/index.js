@@ -322,7 +322,7 @@ async function handleCreateOrder(request, env, origin) {
     flatDiscount = await getActiveFlatDiscount(env.ORDERS_DB);
     if (flatDiscount) {
       if (promoQuote) throw new Error(FLAT_DISCOUNT_BLOCKS_COUPONS_MESSAGE);
-      flatDiscountPaise = calculateFlatDiscountPaise(order.subtotalPaise, flatDiscount);
+      flatDiscountPaise = calculateFlatDiscountPaise(order.subtotalPaise, flatDiscount, order.items);
       order.amount = order.subtotalPaise - flatDiscountPaise;
     }
   } catch (error) {
@@ -442,6 +442,7 @@ async function handleCreateOrder(request, env, origin) {
   if (flatDiscount && flatDiscountPaise > 0) {
     notes.flat = JSON.stringify({
       pct: flatDiscount.percentage,
+      category: flatDiscount.category || undefined,
       subtotal_paise: order.subtotalPaise,
       discount_paise: flatDiscountPaise,
     });
@@ -796,7 +797,7 @@ export default {
       if (!env.ORDERS_DB) return errorResponse("The discount service is not configured.", 503, configuredOrigin);
       const discount = await getActiveFlatDiscount(env.ORDERS_DB);
       const response = jsonResponse(
-        { discount: discount ? { name: discount.name, percentage: discount.percentage, endDate: discount.endDate } : null },
+        { discount: discount ? { name: discount.name, percentage: discount.percentage, endDate: discount.endDate, category: discount.category } : null },
         200,
         configuredOrigin,
       );

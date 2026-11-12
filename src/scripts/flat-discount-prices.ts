@@ -7,11 +7,21 @@ function formatRupees(paise: number) {
 }
 
 let activePercentage = 0;
+let activeCategory = "";
+
+function eligible(target: HTMLElement) {
+  if (!activeCategory) return true;
+  try {
+    return (JSON.parse(target.dataset.productTags ?? "[]") as string[]).includes(activeCategory);
+  } catch {
+    return false;
+  }
+}
 
 // The product page changes dataset.priceNow when a flavour is picked, then announces it with "cc:price".
 document.addEventListener("cc:price", (event) => {
   const target = event.target as HTMLElement | null;
-  if (!activePercentage || !target?.classList.contains("price-now")) return;
+  if (!activePercentage || !target?.classList.contains("price-now") || !eligible(target)) return;
   const originalPaise = Math.round(Number(target.dataset.priceNow) * 100);
   if (!Number.isFinite(originalPaise) || originalPaise <= 0) return;
   target.textContent = formatRupees(originalPaise - Math.floor((originalPaise * activePercentage) / 100));
@@ -29,12 +39,15 @@ async function showDiscountedPrices() {
       credentials: "omit",
     });
     if (!response.ok) return;
-    const payload = (await response.json()) as { discount?: { percentage?: unknown } | null };
+    const payload = (await response.json()) as { discount?: { percentage?: unknown; category?: unknown } | null };
     const percentage = payload?.discount?.percentage;
     if (typeof percentage !== "number" || !Number.isInteger(percentage) || percentage < 1 || percentage > 90) return;
 
     activePercentage = percentage;
+    const category = payload?.discount?.category;
+    activeCategory = typeof category === "string" ? category : "";
     targets.forEach((target) => {
+      if (!eligible(target)) return;
       const price = Number(target.dataset.priceNow);
       if (!Number.isFinite(price) || price <= 0) return;
       const originalPaise = Math.round(price * 100);

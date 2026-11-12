@@ -120,7 +120,7 @@ let customerEmail = "";
 let sessionToken = "";
 let profileComplete = false;
 let appliedPromo: AppliedPromo | null = null;
-let flatDiscount: { name: string; percentage: number } | null = null;
+let flatDiscount: { name: string; percentage: number; category: string } | null = null;
 
 function initializeFormPincodeLookup(form: HTMLFormElement) {
   const city = form.elements.namedItem("city");
@@ -160,11 +160,19 @@ function getCartSignature() {
 
 function renderPromoSummary(subtotalPaise: number) {
   if (flatDiscount) {
-    const discountPaise = Math.floor((subtotalPaise * flatDiscount.percentage) / 100);
+    const eligiblePaise = flatDiscount.category
+      ? cart.reduce((sum, item) => {
+          const product = productById.get(item.id)!;
+          return [product.tag, ...(product.extraTags ?? [])].includes(flatDiscount!.category)
+            ? sum + unitPrice(product, item.flavour) * item.quantity * 100
+            : sum;
+        }, 0)
+      : subtotalPaise;
+    const discountPaise = Math.floor((eligiblePaise * flatDiscount.percentage) / 100);
     appliedPromo = null;
     promoForm.hidden = true;
     promoRemoveButton.hidden = true;
-    discountLabel.textContent = `${flatDiscount.name} (${flatDiscount.percentage}% off)`;
+    discountLabel.textContent = `${flatDiscount.name} (${flatDiscount.percentage}% off${flatDiscount.category ? ` on ${flatDiscount.category}` : ""})`;
     discountRow.hidden = discountPaise === 0;
     discountTotal.textContent = `\u2212${currency.format(discountPaise / 100)}`;
     payableTotal.textContent = currency.format((subtotalPaise - discountPaise) / 100);
@@ -276,7 +284,8 @@ async function loadFlatDiscount() {
     const payload: unknown = await response.json();
     const discount = (payload as { discount?: { name?: unknown; percentage?: unknown } | null })?.discount;
     if (discount && typeof discount.name === "string" && Number.isInteger(discount.percentage)) {
-      flatDiscount = { name: discount.name, percentage: discount.percentage as number };
+      const category = (discount as { category?: unknown }).category;
+      flatDiscount = { name: discount.name, percentage: discount.percentage as number, category: typeof category === "string" ? category : "" };
       renderOrder();
     }
   } catch (error) {

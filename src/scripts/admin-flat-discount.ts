@@ -3,6 +3,7 @@ export interface FlatDiscount {
   percentage: number;
   active: boolean;
   endDate: string;
+  category?: string;
 }
 
 interface Deps {
@@ -35,9 +36,13 @@ export function initFlatDiscountAdmin({ root, post, setStatus, reload }: Deps) {
   const percentage = required<HTMLInputElement>(form, "input[name='percentage']");
   const endDate = required<HTMLInputElement>(form, "input[name='endDate']");
   const active = required<HTMLInputElement>(form, "input[name='active']");
+  const category = required<HTMLSelectElement>(form, "select[name='category']");
   const summary = required<HTMLElement>(root, "#admin-flat-summary");
 
-  function render(discount: FlatDiscount | null) {
+  function render(discount: FlatDiscount | null, categories: string[] = []) {
+    const chosen = discount?.category ?? category.value;
+    category.replaceChildren(new Option("All products", ""), ...categories.map((item) => new Option(item, item)));
+    category.value = categories.includes(chosen) ? chosen : "";
     if (discount) {
       name.value = discount.name;
       percentage.value = String(discount.percentage);
@@ -46,7 +51,7 @@ export function initFlatDiscountAdmin({ root, post, setStatus, reload }: Deps) {
     }
     summary.dataset.state = discount?.active ? "on" : "off";
     summary.textContent = discount?.active
-      ? `Live now: ${discount.percentage}% off every order${discount.endDate ? ` until ${discount.endDate}` : ""}. Promo codes are paused.`
+      ? `Live now: ${discount.percentage}% off ${discount.category ? `${discount.category} products` : "every order"}${discount.endDate ? ` until ${discount.endDate}` : ""}. Promo codes are paused.`
       : "No flat discount is live. Promo codes work as usual.";
   }
 
@@ -59,6 +64,7 @@ export function initFlatDiscountAdmin({ root, post, setStatus, reload }: Deps) {
         name: name.value,
         percentage: Number(percentage.value),
         endDate: endDate.value,
+        category: category.value,
         active: active.checked,
       });
       setStatus(active.checked ? "Flat discount saved and live." : "Flat discount saved (turned off).");

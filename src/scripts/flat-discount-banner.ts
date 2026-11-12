@@ -18,7 +18,7 @@ async function showFlatDiscount() {
     });
     if (!response.ok) throw new Error(`The discount service returned status ${response.status}.`);
     const payload = (await response.json()) as {
-      discount?: { name?: unknown; percentage?: unknown; endDate?: unknown } | null;
+      discount?: { name?: unknown; percentage?: unknown; endDate?: unknown; category?: unknown } | null;
     };
     const discount = payload?.discount;
     if (!discount) return;
@@ -29,9 +29,10 @@ async function showFlatDiscount() {
     const offer = banner.querySelector<HTMLElement>("[data-promo-offer]");
     if (!name || !offer) throw new Error("The discount banner is missing its display fields.");
     const until = typeof discount.endDate === "string" && discount.endDate ? formatEndDate(discount.endDate) : "";
+    const scope = typeof discount.category === "string" && discount.category ? ` on ${discount.category}` : "";
     const percent = banner.querySelector<HTMLElement>("[data-promo-percent]");
     if (percent) percent.textContent = `${discount.percentage}%`;
-    name.textContent = `${discount.name}: flat ${discount.percentage}% off`;
+    name.textContent = `${discount.name}: flat ${discount.percentage}    % off${scope}`;
     offer.textContent = `Applied automatically at checkout${until ? `, until ${until}` : ""}.`;
     banner.hidden = false;
   } catch (error) {

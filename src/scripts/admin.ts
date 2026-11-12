@@ -1531,7 +1531,7 @@ if (root) {
     );
     flavoursAdmin.render(adminData.catalogueFlavours);
     categoriesAdmin.render(adminData.catalogueCategories);
-    flatDiscountAdmin.render(adminData.flatDiscount);
+    flatDiscountAdmin.render(adminData.flatDiscount, adminData.categories);
     deliveryAdmin.render(adminData.deliverySettings);
     if (role === "admin") {
       void reviewsAdmin.load();
