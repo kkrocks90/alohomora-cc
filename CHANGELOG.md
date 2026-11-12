@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.3 - 2026-11-12
+
+- Admin: Order board moved out of the side menu into a link on the Order book page (operations staff still land on it directly). Refresh is now a small icon-only button.
+
 ## v1.68.2 - 2026-11-12
 
 - Mobile: customer reviews now sit in a horizontal row you swipe through, with snap-to-card scrolling.

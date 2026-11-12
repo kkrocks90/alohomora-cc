@@ -890,14 +890,23 @@ if (root) {
 
   function applyRole(role: "admin" | "operations") {
     adminRole = role;
-    for (const tab of adminTabs) tab.hidden = role === "operations" && tab.dataset.adminTab !== "board";
+    for (const tab of adminTabs) {
+      tab.hidden = role === "operations" ? tab.dataset.adminTab !== "board" : tab.dataset.adminTab === "board";
+    }
     root!.classList.toggle("is-operations", role === "operations");
+    const openBoard = root!.querySelector<HTMLElement>("#admin-open-board");
+    if (openBoard) openBoard.hidden = role === "operations";
     const current = adminTabs.find((tab) => tab.getAttribute("aria-selected") === "true");
     if (role === "operations" && current?.dataset.adminTab !== "board") {
       const boardTab = adminTabs.find((tab) => tab.dataset.adminTab === "board");
       if (boardTab) activateAdminTab(boardTab);
     }
   }
+
+  root.querySelector("#admin-open-board")?.addEventListener("click", () => {
+    const boardTab = adminTabs.find((tab) => tab.dataset.adminTab === "board");
+    if (boardTab) activateAdminTab(boardTab);
+  });
 
   function renderStats() {
     if (!adminData) return;
