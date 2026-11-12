@@ -1,5 +1,8 @@
 name: Deploy website to GitHub Pages
 
+# The theme is in the run name so the admin Publish button can reuse the last deployed theme.
+run-name: "Deploy website [theme=${{ (inputs.theme != 'repo-setting' && inputs.theme) || vars.SITE_THEME || 'default' }}]"
+
 on:
   workflow_dispatch:
     inputs:

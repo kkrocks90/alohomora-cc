@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.1 - 2026-11-12
+
+- Publish from the admin now rebuilds with the theme of the last successful deploy, so a manually chosen theme sticks. The deploy run name records the theme.
+
 ## v1.68.0 - 2026-11-12
 
 - Kanban order panel: tapping a product opens a closable popup with its photo(s), description, price, pack size, size/weight and what was ordered (works for operations staff too).

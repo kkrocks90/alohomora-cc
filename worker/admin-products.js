@@ -75,11 +75,34 @@ async function readJson(request) {
   }
 }
 
+// Reads the theme from the latest successful deploy's run name so Publish keeps the theme chosen at the last manual deploy.
+async function lastDeployedTheme(repo, env) {
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${repo}/actions/workflows/deploy.yml/runs?status=success&per_page=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+          Accept: "application/vnd.github+json",
+          "User-Agent": "chocolate-circle-worker",
+        },
+      },
+    );
+    if (!response.ok) return "";
+    const data = await response.json();
+    const match = /\[theme=([a-z-]+)\]/.exec(data.workflow_runs?.[0]?.name ?? "");
+    return match ? match[1] : "";
+  } catch {
+    return "";
+  }
+}
+
 // Asks GitHub to rebuild the static storefront (needs a token secret on the Worker). Only run from the manual Publish button.
 export async function triggerSiteRebuild(env) {
   if (!env.GITHUB_DISPATCH_TOKEN) return false;
   const repo = env.GITHUB_REPO || "kkrocks90/alohomora-cc";
   try {
+    const theme = await lastDeployedTheme(repo, env);
     const response = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/deploy.yml/dispatches`, {
       method: "POST",
       headers: {
@@ -88,7 +111,7 @@ export async function triggerSiteRebuild(env) {
         "User-Agent": "chocolate-circle-worker",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ref: "main" }),
+      body: JSON.stringify({ ref: "main", ...(theme ? { inputs: { theme } } : {}) }),
     });
     if (!response.ok) console.error("Site rebuild request failed.", response.status);
     return response.ok;
