@@ -510,6 +510,7 @@ if (root) {
     board.close();
     dashboard.hidden = true;
     document.querySelector<HTMLElement>("#admin-menu-toggle")?.setAttribute("hidden", "");
+    document.querySelector<HTMLElement>("#admin-header-refresh")?.setAttribute("hidden", "");
     loginPanel.hidden = false;
     codeForm.hidden = true;
     emailForm.hidden = false;
@@ -1518,6 +1519,7 @@ if (root) {
     loginPanel.hidden = true;
     dashboard.hidden = false;
     document.querySelector<HTMLElement>("#admin-menu-toggle")?.removeAttribute("hidden");
+    document.querySelector<HTMLElement>("#admin-header-refresh")?.removeAttribute("hidden");
     const role = (result as { role?: unknown }).role === "operations" ? "operations" : "admin";
     applyRole(role);
     signedIn.textContent = `Signed in as ${adminData.email}${role === "operations" ? " · Operations" : ""}`;
@@ -1871,14 +1873,16 @@ if (root) {
     }
   });
 
-  requireElement<HTMLButtonElement>(root, "#admin-refresh").addEventListener("click", async () => {
+  const refreshDashboard = async () => {
     try {
       await loadDashboard();
       setStatus("Dashboard refreshed.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not refresh the dashboard.", true);
     }
-  });
+  };
+  root.querySelector("#admin-refresh")?.addEventListener("click", refreshDashboard);
+  document.querySelector("#admin-header-refresh")?.addEventListener("click", refreshDashboard);
 
   root.querySelector("#admin-menu-signout")?.addEventListener("click", () => {
     setMenuOpen(false);

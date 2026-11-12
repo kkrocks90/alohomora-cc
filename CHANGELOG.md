@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.5 - 2026-11-12
+
+- Admin mobile: the refresh icon now sits in the top bar next to the menu button, so it is always reachable.
+
 ## v1.68.4 - 2026-11-12
 
 - Admin: switching menu sections now shows a short spinner (about 0.7s) before the section appears.
