@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.68.0 - 2026-11-12
+
+- Kanban order panel: tapping a product opens a closable popup with its photo(s), description, price, pack size, size/weight and what was ordered (works for operations staff too).
+
 ## v1.67.0 - 2026-11-12
 
 - Manual publishing: saving products, categories, flavours or FAQs no longer starts a site rebuild. Press Publish to storefront (now also on the Categories, Flavours and FAQs tabs) when you are done editing. Needs a Worker deploy.

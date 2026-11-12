@@ -1,3 +1,15 @@
+export interface ProductDetail {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  packSize: string;
+  tag: string;
+  dimensions: string;
+  weight: string;
+  images: string[];
+}
+
 export interface BoardOrder {
   orderId: string;
   customerName: string;
@@ -6,7 +18,7 @@ export interface BoardOrder {
   city: string;
   state: string;
   pincode: string;
-  items: { name: string; quantity: number; flavour: string; wrapper: string; custom: { label: string; value: string }[] }[];
+  items: { id?: string; name: string; quantity: number; flavour: string; wrapper: string; custom: { label: string; value: string }[] }[];
   customFields: { label: string; value: string }[];
   amountPaise: number;
   amountReceivedPaise?: number;
@@ -21,6 +33,8 @@ export interface BoardOrder {
 interface BoardOptions {
   panel: HTMLElement;
   getOrders: () => BoardOrder[];
+  getProduct: (id: string | undefined, name: string) => ProductDetail | undefined;
+  imageUrl: (name: string) => Promise<string | undefined>;
   moveOrder: (orderId: string, status: string) => Promise<void>;
   money: (paise: number) => string;
   invoice: (order: BoardOrder) => void;
@@ -258,7 +272,7 @@ export function initBoard(options: BoardOptions) {
 
     const head = el("header", "kb-drawer-head");
     const heading = el("div");
-    heading.append(el("p", "eyebrow", `${order.orderId} � ${COLUMNS.find((column) => column.status === order.orderStatus)?.label ?? order.orderStatus}`), el("h3", "", order.customerName));
+    heading.append(el("p", "eyebrow", `${order.orderId} � ${COLUMNS.find((column) => column.status === order.orderStatus)?.label ?? order.orderStatus}`), el("h3", "", order.customerName));
     const close = el("button", "icon-button", "×");
     close.type = "button";
     close.setAttribute("aria-label", "Close order details");
@@ -292,7 +306,13 @@ export function initBoard(options: BoardOptions) {
     const items = el("div", "kb-items");
     for (const item of order.items) {
       const line = el("div", "kb-item");
-      line.append(el("strong", "", `${item.name} × ${item.quantity}`));
+      const nameButton = el("button", "kb-item-link", `${item.name} × ${item.quantity}`) as HTMLButtonElement;
+      nameButton.type = "button";
+      nameButton.setAttribute("aria-label", `View details of ${item.name}`);
+      nameButton.addEventListener("click", () => void openProduct(item));
+      const strong = el("strong");
+      strong.append(nameButton);
+      line.append(strong);
       const details = [item.flavour && `Flavour: ${item.flavour}`, item.wrapper && `Wrapper: ${item.wrapper}`, ...(item.custom ?? []).map((answer) => `${answer.label}: ${answer.value}`)].filter(Boolean);
       for (const detail of details) line.append(el("small", "", String(detail)));
       items.append(line);
@@ -322,6 +342,86 @@ export function initBoard(options: BoardOptions) {
     invoice.addEventListener("click", () => options.invoice(order));
     actions.append(share, invoice);
     drawer!.append(head, body, actions);
+  }
+
+  let productModal: HTMLElement | null = null;
+
+  function closeProduct() {
+    productModal?.remove();
+    productModal = null;
+    document.removeEventListener("keydown", onProductKey, true);
+  }
+
+  function onProductKey(event: KeyboardEvent) {
+    if (event.key !== "Escape") return;
+    event.stopPropagation();
+    closeProduct();
+  }
+
+  async function openProduct(item: BoardOrder["items"][number]) {
+    closeProduct();
+    const product = options.getProduct(item.id, item.name);
+    const modal = el("div", "kb-product-modal");
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", `${item.name} details`);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeProduct();
+    });
+    const card = el("div", "kb-product-card");
+    const close = el("button", "icon-button kb-product-close", "×") as HTMLButtonElement;
+    close.type = "button";
+    close.setAttribute("aria-label", "Close product details");
+    close.addEventListener("click", closeProduct);
+
+    const gallery = el("div", "kb-product-gallery");
+    const main = el("img", "kb-product-photo") as HTMLImageElement;
+    main.alt = item.name;
+    const thumbs = el("div", "kb-product-thumbs");
+    gallery.append(main, thumbs);
+
+    const info = el("div", "kb-product-info");
+    info.append(el("h3", "", product?.name ?? item.name));
+    const facts = [
+      product && `₹${product.price}`,
+      product?.packSize,
+      product?.tag,
+      product?.dimensions && `Size: ${product.dimensions}`,
+      product?.weight && `Weight: ${product.weight}`,
+    ].filter(Boolean);
+    if (facts.length) info.append(el("p", "kb-product-facts", facts.join(" · ")));
+    info.append(el("p", "kb-product-desc", product?.description || (product ? "" : "Product details are not available for this item.")));
+    const ordered = [`Quantity: ${item.quantity}`, item.flavour && `Flavour: ${item.flavour}`, item.wrapper && `Wrapper: ${item.wrapper}`].filter(Boolean);
+    info.append(el("p", "kb-product-ordered", `Ordered · ${ordered.join(" · ")}`));
+
+    card.append(close, gallery, info);
+    modal.append(card);
+    document.body.append(modal);
+    productModal = modal;
+    document.addEventListener("keydown", onProductKey, true);
+    close.focus();
+
+    const urls = (await Promise.all((product?.images ?? []).map((name) => options.imageUrl(name)))).filter((url): url is string => Boolean(url));
+    if (productModal !== modal) return;
+    if (urls.length === 0) {
+      gallery.hidden = true;
+      return;
+    }
+    main.src = urls[0]!;
+    if (urls.length > 1) {
+      for (const url of urls) {
+        const thumb = el("button", "kb-product-thumb") as HTMLButtonElement;
+        thumb.type = "button";
+        const image = el("img") as HTMLImageElement;
+        image.src = url;
+        image.alt = "";
+        thumb.append(image);
+        thumb.addEventListener("click", () => {
+          main.src = url;
+        });
+        thumbs.append(thumb);
+      }
+    }
   }
 
   function openDrawer(orderId: string) {

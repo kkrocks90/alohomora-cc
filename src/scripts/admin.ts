@@ -2,7 +2,7 @@ import { clearAdminSessionToken, getAdminSessionToken, saveAdminSessionToken } f
 import { initializePincodeLookup } from "./pincode-lookup";
 import { normalizeState } from "../data/indian-states";
 import { printInvoice } from "./order-view";
-import { initBoard } from "./admin-board";
+import { initBoard, type ProductDetail } from "./admin-board";
 import { initCustomFieldsAdmin, isCustomField } from "./admin-custom-fields";
 import { initProductsAdmin, isCatalogueProduct } from "./admin-products";
 import { initCategoriesAdmin, isCatalogueCategory } from "./admin-categories";
@@ -103,6 +103,7 @@ interface AdminData {
   catalogueCategories: Parameters<ReturnType<typeof initCategoriesAdmin>["render"]>[0];
   catalogueFlavours: Parameters<ReturnType<typeof initFlavoursAdmin>["render"]>[0];
   flavourExtras: Record<string, number>;
+  productDetails?: ProductDetail[];
   flatDiscount: FlatDiscount | null;
   deliverySettings: DeliverySettings | null;
   rebuildConfigured: boolean;
@@ -263,6 +264,7 @@ function normalizeAdminData(data: AdminData): AdminData {
       ? (data as { deliverySettings: DeliverySettings }).deliverySettings
       : null,
     rebuildConfigured: data.rebuildConfigured === true,
+    productDetails: Array.isArray(data.productDetails) ? data.productDetails : [],
     orders: data.orders.map((order) => ({
       ...order,
       customFields: Array.isArray(order.customFields) ? order.customFields : [],
@@ -859,10 +861,22 @@ if (root) {
   }
 
   let adminRole: "admin" | "operations" = "admin";
+  let bundledImages: Promise<Record<string, string>> | null = null;
+  async function resolveProductImage(name: string) {
+    if (/^https?:\/\//.test(name)) return name;
+    bundledImages ??= fetch(`${import.meta.env.BASE_URL}product-images.json`)
+      .then((response) => (response.ok ? (response.json() as Promise<Record<string, string>>) : {}))
+      .catch(() => ({}));
+    return (await bundledImages)[name];
+  }
   const boardPanel = requireElement<HTMLElement>(root, "#admin-board-panel");
   const board = initBoard({
     panel: boardPanel,
     getOrders: () => adminData?.orders ?? [],
+    getProduct: (id, name) =>
+      adminData?.productDetails?.find((product) => product.id === id) ??
+      adminData?.productDetails?.find((product) => product.name === name),
+    imageUrl: resolveProductImage,
     moveOrder: async (orderId, orderStatus) => {
       await post("/admin/orders/update-status", { orderId, orderStatus });
       renderOrders();

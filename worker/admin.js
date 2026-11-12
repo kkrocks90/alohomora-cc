@@ -106,6 +106,12 @@ function mapAdminOrder(order) {
   };
 }
 
+function productDetails(products) {
+  return products.map(({ id, name, description, price, packSize, tag, dimensions, weight, images }) => ({
+    id, name, description, price, packSize, tag, dimensions: dimensions ?? "", weight: weight ?? "", images: images ?? [],
+  }));
+}
+
 async function getOperationsData(env, email) {
   const orders = await env.ORDERS_DB.prepare(`SELECT ${ORDER_COLUMNS} FROM orders ORDER BY created_at DESC`).all();
   return result(200, {
@@ -119,6 +125,7 @@ async function getOperationsData(env, email) {
     promos: [],
     customFields: [],
     customProducts: [],
+    productDetails: productDetails(await listAdminProducts(env).catch(() => [])),
   });
 }
 
@@ -218,6 +225,7 @@ export async function getAdminData(request, env) {
       catalogueProducts,
       catalogueCategories,
       catalogueFlavours,
+      productDetails: productDetails(catalogueProducts),
       flavourExtras: Object.fromEntries(getFlavours().map(({ name, extra }) => [name, extra])),
       flatDiscount,
       deliverySettings,
