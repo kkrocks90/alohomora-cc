@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.70.4 - 2026-11-14
+
+- Fix: on desktop the themed corner art sits at the top of the main banner (all themes).
+- Removed the centre emoji (umbrella, gift, etc.) from themed hero banners.
+
 ## v1.70.3 - 2026-11-14
 
 - Fix: on mobile the themed corner art now sits at the top of the main banner, directly below the offer band.

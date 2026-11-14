@@ -6201,7 +6201,7 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
 /* Illustrated corner art */
 .theme-hero-art { line-height: 0; }
 .theme-hero-art svg { display: block; width: 72px; height: auto; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 25%)); animation: cc-float 5s ease-in-out infinite; }
-html .theme-hero-art.theme-hero-lantern { align-self: center !important; margin-top: 0 !important; animation: none !important; }
+html .theme-hero-art.theme-hero-lantern { align-self: start !important; margin-top: .4rem !important; animation: none !important; }
 .theme-hero-art-flip svg { transform: scaleX(-1); animation-name: cc-float-flip; }
 @keyframes cc-float-flip { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-5px); } }
 .art-rain path { animation: cc-rain 1.2s linear infinite; }
@@ -6217,7 +6217,7 @@ html .theme-hero-art.theme-hero-lantern { align-self: center !important; margin-
   .theme-hero-art svg { width: 40px; }
   .theme-hero-offer { padding: 26px 56px 12px; }
   .theme-hero-banner { position: relative; }
-  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern { display: block; position: static; grid-column: 1; grid-row: 2; margin: 14px 0 0; width: 38px; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern { display: block; position: static; grid-column: 1; grid-row: 2; margin: 0 !important; padding-top: 14px; width: 38px; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern svg { width: 38px; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-copy { grid-row: 3; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-left { justify-self: start; }

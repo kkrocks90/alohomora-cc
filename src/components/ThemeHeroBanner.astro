@@ -33,7 +33,6 @@ const art = THEME_ART[theme.id];
         <p>{banner.text}</p>
         <a class="theme-hero-cta" href={`${base}${banner.href}`}>{banner.cta}</a>
       </div>
-      {banner.decor && <span class="theme-hero-diya theme-hero-emoji" aria-hidden="true">{banner.decor.center}</span>}
       {!banner.decor && <svg class="theme-hero-diya" viewBox="0 0 120 90" aria-hidden="true">
         <path d="M60 4c9 12 10 22 0 30-10-8-9-18 0-30z" fill="#ffd166" />
         <path d="M60 14c4 6 4 11 0 15-4-4-4-9 0-15z" fill="#e8742a" />
