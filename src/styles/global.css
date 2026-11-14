@@ -6219,7 +6219,7 @@ html .theme-hero-art.theme-hero-lantern { align-self: start !important; margin-t
   .theme-hero-banner { position: relative; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern { display: block; position: static; grid-column: 1; grid-row: 2; margin: 0 !important; padding-top: 14px; width: 38px; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern svg { width: 38px; }
-  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-copy { grid-row: 3; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-copy { grid-row: 2; padding-top: 0.6rem; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-left { justify-self: start; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-right { justify-self: end; }
 }
