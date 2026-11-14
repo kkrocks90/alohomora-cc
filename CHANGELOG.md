@@ -5,6 +5,11 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.70.0 - 2026-11-14
+
+- The home page now shows one themed banner. A live flat discount appears as a theme-coloured band at the top of it instead of a separate banner, and the Shop button is the only call to action.
+- Redrew the corner art for every themed banner (rain clouds, Christmas trees, medals, wheat, balloons, kites, hearts) as light animated illustrations that respect reduced motion.
+
 ## v1.69.1 - 2026-11-12
 
 - Fixed the alignment and styling of the flat discount Applies to dropdown.

@@ -6184,3 +6184,39 @@ svg.theme-hero-diya path:nth-child(2) { animation-delay: -.6s; }
 .faq-item summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; font-weight: 400; line-height: 1 }
 .faq-item[open] summary::after { content: "\2212" }
 .faq-item p { margin: 0; padding: 0 16px 16px }
+
+/* Themed hero: the offer is a band at the top of the banner */
+.theme-hero-offer {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;
+  margin: -1.5rem -2rem 0; padding: 12px 20px;
+  background: var(--hero-accent, #f3dc9a); color: var(--hero-ink, #2a1a0a);
+  font-size: 15px; font-weight: 600; text-align: left;
+}
+.theme-hero-offer[hidden] { display: none; }
+.theme-hero-offer-pct { padding: 6px 14px; border-radius: 999px; background: var(--hero-ink, #2a1a0a); color: var(--hero-accent, #fff); font-family: var(--serif); font-size: 16px; font-weight: 700; white-space: nowrap; }
+.theme-hero-offer-copy { display: grid; }
+.theme-hero-offer-copy small { font-size: 12.5px; font-weight: 500; opacity: .8; }
+
+/* Illustrated corner art */
+.theme-hero-art { line-height: 0; }
+.theme-hero-art svg { display: block; width: 72px; height: auto; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 25%)); animation: cc-float 5s ease-in-out infinite; }
+html .theme-hero-art.theme-hero-lantern { align-self: center !important; margin-top: 0 !important; animation: none !important; }
+.theme-hero-art-flip svg { transform: scaleX(-1); animation-name: cc-float-flip; }
+@keyframes cc-float-flip { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-5px); } }
+.art-rain path { animation: cc-rain 1.2s linear infinite; }
+@keyframes cc-rain { 0% { opacity: 0; transform: translateY(-4px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(8px); } }
+.art-twinkle { animation: cc-twinkle 2.4s ease-in-out infinite; }
+@keyframes cc-twinkle { 50% { opacity: .35; } }
+.art-sway { transform-box: fill-box; transform-origin: 50% 100%; animation: cc-art-sway 4s ease-in-out infinite; }
+@keyframes cc-art-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+.art-beat { transform-box: fill-box; transform-origin: 50% 50%; animation: cc-beat 1.6s ease-in-out infinite; }
+@keyframes cc-beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 30% { transform: scale(1); } }
+@media (max-width: 620px) {
+  .theme-hero-offer { margin: -1.5rem -1.25rem 0; flex-direction: column; text-align: center; gap: 8px; }
+  .theme-hero-art svg { width: 40px; }
+  .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-hero-art svg, .art-rain path, .art-twinkle, .art-sway, .art-beat { animation: none !important; }
+}

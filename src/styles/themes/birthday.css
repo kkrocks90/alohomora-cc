@@ -214,7 +214,7 @@ html[data-theme="birthday"] .theme-hero-banner {
 html[data-theme="birthday"] .theme-hero-lantern { width: 44px; height: auto; align-self: start; margin-top: -1.5rem; animation: birthday-sway 4s ease-in-out infinite; transform-origin: top center; }
 html[data-theme="birthday"] .theme-hero-lantern-right { grid-column: 4; animation-delay: -2s; }
 html[data-theme="birthday"] .theme-hero-diya { grid-column: 3; width: 88px; filter: drop-shadow(0 0 14px rgba(255, 233, 154, 0.7)); }
-html[data-theme="birthday"] .theme-hero-copy { grid-column: 2; grid-row: 1; }
+html[data-theme="birthday"] .theme-hero-copy { grid-column: 2; }
 html[data-theme="birthday"] .theme-hero-kicker { margin: 0; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.75rem; color: #ffe99a; }
 html[data-theme="birthday"] .theme-hero-copy h2 { margin: 0.2rem 0 0.4rem; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: #ffe99a; }
 html[data-theme="birthday"] .theme-hero-copy p:not(.theme-hero-kicker) { margin: 0 auto 1rem; max-width: 46ch; }
@@ -260,3 +260,5 @@ html[data-theme="birthday"] .site-header::after {
 @media (max-width: 620px) {
   html[data-theme="birthday"] .site-header::after { background-size: 22px 14px, 100% 1px; }
 }
+
+html[data-theme="birthday"] .theme-hero-banner { --hero-accent: #ffe99a; --hero-ink: #8a1f63; }

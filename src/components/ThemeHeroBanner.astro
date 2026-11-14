@@ -1,14 +1,24 @@
 ---
 import { theme } from "../config/theme";
+import { THEME_ART } from "../config/theme-art";
 
 const banner = theme.heroBanner;
 const base = import.meta.env.BASE_URL;
+const art = THEME_ART[theme.id];
 ---
 
 {
   banner && (
     <section class={`theme-hero-banner theme-hero-banner-${theme.id}`} aria-label={banner.title}>
-      {banner.decor && <span class="theme-hero-lantern theme-hero-lantern-left theme-hero-emoji" aria-hidden="true">{banner.decor.left}</span>}
+      <div class="theme-hero-offer" data-promo-banner hidden>
+        <span class="theme-hero-offer-pct"><strong data-promo-percent></strong> OFF</span>
+        <span class="theme-hero-offer-copy">
+          <strong data-promo-name></strong>
+          <small data-promo-offer></small>
+        </span>
+      </div>
+      {banner.decor && art && <span class="theme-hero-lantern theme-hero-lantern-left theme-hero-art" aria-hidden="true" set:html={art.replaceAll("ID", "L")} />}
+      {banner.decor && !art && <span class="theme-hero-lantern theme-hero-lantern-left theme-hero-emoji" aria-hidden="true">{banner.decor.left}</span>}
       {!banner.decor && <svg class="theme-hero-lantern theme-hero-lantern-left" viewBox="0 0 60 150" aria-hidden="true">
         <line x1="30" y1="0" x2="30" y2="40" stroke="#d9a441" stroke-width="2" />
         <rect x="14" y="40" width="32" height="8" rx="3" fill="#d9a441" />
@@ -31,7 +41,8 @@ const base = import.meta.env.BASE_URL;
         <ellipse cx="60" cy="44" rx="52" ry="8" fill="#8a3a14" />
         <path d="M30 66q30 14 60 0" stroke="#f6d27a" stroke-width="2" fill="none" />
       </svg>}
-      {banner.decor && <span class="theme-hero-lantern theme-hero-lantern-right theme-hero-emoji" aria-hidden="true">{banner.decor.right}</span>}
+      {banner.decor && art && <span class="theme-hero-lantern theme-hero-lantern-right theme-hero-art theme-hero-art-flip" aria-hidden="true" set:html={art.replaceAll("ID", "R")} />}
+      {banner.decor && !art && <span class="theme-hero-lantern theme-hero-lantern-right theme-hero-emoji" aria-hidden="true">{banner.decor.right}</span>}
       {!banner.decor && <svg class="theme-hero-lantern theme-hero-lantern-right" viewBox="0 0 60 150" aria-hidden="true">
         <line x1="30" y1="0" x2="30" y2="40" stroke="#d9a441" stroke-width="2" />
         <rect x="14" y="40" width="32" height="8" rx="3" fill="#d9a441" />
