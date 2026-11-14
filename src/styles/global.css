@@ -6217,10 +6217,11 @@ html .theme-hero-art.theme-hero-lantern { align-self: center !important; margin-
   .theme-hero-art svg { width: 40px; }
   .theme-hero-offer { padding: 26px 56px 12px; }
   .theme-hero-banner { position: relative; }
-  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern { display: block; position: absolute; top: 28px; bottom: auto; margin: 0; width: 38px; z-index: 2; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern { display: block; position: static; grid-column: 1; grid-row: 2; margin: 14px 0 0; width: 38px; }
   html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern svg { width: 38px; }
-  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-left { left: 10px; }
-  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-right { right: 10px; left: auto; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-copy { grid-row: 3; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-left { justify-self: start; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-right { justify-self: end; }
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-hero-art svg, .art-rain path, .art-twinkle, .art-sway, .art-beat { animation: none !important; }
