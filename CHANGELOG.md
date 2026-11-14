@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.70.1 - 2026-11-14
+
+- Fix: themed corner art (e.g. rain clouds) is now visible on mobile while an offer is live.
+
 ## v1.70.0 - 2026-11-14
 
 - The home page now shows one themed banner. A live flat discount appears as a theme-coloured band at the top of it instead of a separate banner, and the Shop button is the only call to action.

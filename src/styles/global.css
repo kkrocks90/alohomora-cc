@@ -6215,7 +6215,12 @@ html .theme-hero-art.theme-hero-lantern { align-self: center !important; margin-
 @media (max-width: 620px) {
   .theme-hero-offer { margin: -1.5rem -1.25rem 0; flex-direction: column; text-align: center; gap: 8px; }
   .theme-hero-art svg { width: 40px; }
-  .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern { display: none; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) { padding-bottom: 4rem; }
+  .theme-hero-banner { position: relative; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern { display: block; position: absolute; top: auto; bottom: 10px; margin: 0; width: 46px; z-index: 0; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-art.theme-hero-lantern svg { width: 46px; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-left { left: 10px; }
+  html .theme-hero-banner:has(.theme-hero-offer:not([hidden])) .theme-hero-lantern-right { right: 10px; left: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-hero-art svg, .art-rain path, .art-twinkle, .art-sway, .art-beat { animation: none !important; }
