@@ -5,6 +5,10 @@ All notable changes to Chocolate Circle are recorded here. The project follows
 
 For every release: add an entry below, bump `version` in `package.json`, commit, and tag `vX.Y.Z`.
 
+## v1.70.2 - 2026-11-14
+
+- Fix: on mobile, themed corner art sits at the top corners of the offer band and the offer text no longer collides with the theme garland.
+
 ## v1.70.1 - 2026-11-14
 
 - Fix: themed corner art (e.g. rain clouds) is now visible on mobile while an offer is live.
